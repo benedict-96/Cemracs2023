@@ -1,0 +1,85 @@
+\documentclass{article}
+
+\usepackage{sectsty}
+\sectionfont{\bfseries\Large\raggedright}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+
+\usepackage{hyperref}
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{cemracs23.bib}
+
+\usepackage{comment}
+%\begin{comment}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={160mm,247mm},
+ left=20mm,
+ top=20mm,
+ }
+%\end{comment}
+
+\begin{document}
+{%\centering
+\section*{CEMRACS 2023 project proposal: Structure-Preserving Numerical Integration of Dynamical Systems using Transformer Neural Networks}
+}
+
+
+\section{Context}
+
+Two of the many trends in neural network research of the past few years have been (i) the ``learning'' of dynamical systems, especially with recurrent neural networks such as LSTMs \cite{wang2017new, gonzalez2018non, xue2020lstm}, and (ii) the introduction of transformer neural networks for natural language processing (NLP) tasks \cite{vaswani2017attention}. Both of these trends have created enormous amounts of traction, particularly the second one: transformer networks now dominate the field of NLP. 
+
+The reasons for this are essentially two-fold: one is the simplicity and interpretability of the transformer architecture and the other one is its parallelizability for computation on GPUs. While vanilla recurrent neural networks also lend themselves to almost straightforward interpretation, LSTMs (their more succesful version) do not, as the network architecture involves many complex components.
+In addition, all recursive neural networks are sequential by design, which makes optimization on a GPU impractical.    
+
+Some efforts have already been made to include elements of the transformer architecture into neural networks that are designed to learn dynamical systems \cite{shalova2020tensorized, geneva2022transformers}, but although showing some success, these approches only utilize part of the transformer network. This negligence means that the success that transformers have experienced in NLP has not been extended to dynamical systems. 
+
+\section{Description and objectives}
+
+The original transformer paper \cite{vaswani2017attention} proposed a relatively simple neural network architecture that is easy to train (allows for straightforward parallelization) and shows remarkable success when applied to NLP tasks. 
+
+Even though the transformer contains many components (for example vanilla feedforward neural networks), the two core components are a ``positional encoding'' and a ``attention mechanism''; both of these appear several times in the architecture.
+The positional encoding is a mapping that takes a set of vectors $\xi_1, \ldots, \xi_T$ (i.e. time-series data; in the original paper $\xi_i$ represents the $i$-th word in a sentence of length $T$) and produces a new set of vectors $\tilde{\xi}_1, \ldots, \tilde{\xi}_T$ that ``are aware'' of their position in the sentence/time series.
+For the original transformer paper this was done in the following way: 
+\begin{equation}
+    \xi_i^j \mapsto \tilde{\xi}_i^j := \xi_i^j + \begin{cases} \sin(i\cdot10^{-4j/e}) & \text{ if $j$ is even} \\ \cos(i\cdot10^{-4(j-1)/e}) & \text{ if $j$ is odd}, \end{cases}
+    \label{eq:embedding}
+\end{equation}
+
+where $e$ is the length of the vector $\xi_i$, i.e. the dimension of the ``embedding space''. 
+In mathematical terms this positional encoding adds an element of the torus $\mathbb{T}^{\lfloor{}e/2\rfloor}$ to the input ($\lfloor\cdot\rfloor$ is the floor or ``rounding down'' operation). Even more concretely, the embedding corresponds to the solution of a system of $\lfloor{}e/2\rfloor$ independent harmonic oscillators with frequencies $10^{-2j/e}$ (for $j\in\{1,\ldots,\lfloor{}e/2\rfloor\}$); $i\in\{1,\ldots,T\}$ in the above equation is the time step. The vastly different frequencies of the harmonic oscillators (very high for low $j$ and very low for high $j$) are meant to capture different features of the data. 
+
+
+The other core component is an ``attention mechanism'' whose inputs are sets of ``queries'' $Q$, ``keys'' $K$ and ``values'' $V$ (in the original paper each row of these matrices represents a word in a sentence) and performs a reweighting of $\hat{V}:= VW^V$ based on $\hat{Q}:=QW^Q$ and $\hat{K}:=KW^K$:
+\begin{equation}
+    \mathrm{Attention}(\hat{Q},\hat{K},\hat{V}) = \mathrm{softmax}\left(\frac{\hat{Q}\hat{K}^T}{e}\right)\hat{V}.
+    \label{eq:attention}
+\end{equation}
+This realizes a position-dependent reweighting of the each row in $\hat{V}$ (each row of $V$ or $\hat{V}$ represents a word, previously called $\xi_i$); the matrices $W^Q$, $W^K$ and $W^V$ are ``projection matrices'' that are learned during training. For NLP tasks this reweighting step is crucial as it assigns higher value to words that contain meaning and lesser value to words such as arcticles (``a'', ``the'') that do not. 
+
+The objective of this project is the adaptation of the transformer architecture, especially the two crucial components (the positional encoding and the attention mechanism) to dynamical systems. A point of interest will be investigating the role that the positional encoding plays for such systems; in the case of the original transformer this adds a simple dynamical system to the input - this may be superfluous if the input is already a dynamical system. 
+
+An effort should also be made towards making the network architecture ``structure-preserving'' (i.e. such that the resulting integration scheme is symplectic). A possible way to do this is to design the new networks in a similar way to SympNets \cite{jin2020sympnets}, i.e. updating the $q$ and $p$ components of a canonical Hamiltonian system separately.  
+
+\section{Proposed methodology}
+The project can roughly be divided into four steps.
+
+In the initial stage of the project some familiarity with the transformer architecture should be gained; this may involve implementing the original transformer \cite{vaswani2017attention}. 
+
+The next stage will involve adjusting the attention mechanism (equation \eqref{eq:attention}) to dynamical systems: this will perhaps require changing the activation function from a softmax to something different. 
+
+A third step will be investigating different choices of input embeddings to the original one (equation \eqref{eq:embedding}). As this is essentially an addition of the input by the solution of a simple dynamical system, it should be possible to improve on this. 
+
+Lastly, efforts should be made to make the resulting network structure-preserving, i.e. symplectic, in a similar way as was done for SympNets. 
+
+\section{Software Requirements}
+
+The project will be implemented in Julia. Aspects of the \href{https://github.com/LuxDL/Lux.jl}{Lux} \cite{pal2022lux} and \href{https://github.com/FluxML/Flux.jl}{Flux} \cite{Flux.jl-2018} libraries will be used for the machine learning part and the library \href{https://github.com/JuliaGNI/GeometricIntegrators.jl}{GeometricIntegrators} \cite{Kraus:2020:GeometricIntegrators} will be used for generating training data. The results will be integrated into the library \href{https://github.com/JuliaGNI/GeometricMachineLearning.jl}{GeometricMachineLearning}.
+
+
+\printbibliography
+\end{document}
