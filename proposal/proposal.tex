@@ -42,7 +42,7 @@ Some efforts have already been made to include elements of the transformer archi
 
 The original transformer paper \cite{vaswani2017attention} proposed a relatively simple neural network architecture that is easy to train (allows for straightforward parallelization) and shows remarkable success when applied to NLP tasks. 
 
-Even though the transformer contains many components (for example vanilla feedforward neural networks), the two core components are a ``positional encoding'' and a ``attention mechanism''; both of these appear several times in the architecture.
+Even though the transformer contains many components (for example vanilla feedforward neural networks), the two core components are a ``positional encoding'' and a ``attention mechanism''; the second component appears several times in the transformer.
 The positional encoding is a mapping that takes a set of vectors $\xi_1, \ldots, \xi_T$ (i.e. time-series data; in the original paper $\xi_i$ represents the $i$-th word in a sentence of length $T$) and produces a new set of vectors $\tilde{\xi}_1, \ldots, \tilde{\xi}_T$ that ``are aware'' of their position in the sentence/time series.
 For the original transformer paper this was done in the following way: 
 \begin{equation}
@@ -56,7 +56,7 @@ In mathematical terms this positional encoding adds an element of the torus $\ma
 
 The other core component is an ``attention mechanism'' whose inputs are sets of ``queries'' $Q$, ``keys'' $K$ and ``values'' $V$ (in the original paper each row of these matrices represents a word in a sentence) and performs a reweighting of $\hat{V}:= VW^V$ based on $\hat{Q}:=QW^Q$ and $\hat{K}:=KW^K$:
 \begin{equation}
-    \mathrm{Attention}(\hat{Q},\hat{K},\hat{V}) = \mathrm{softmax}\left(\frac{\hat{Q}\hat{K}^T}{e}\right)\hat{V}.
+    \mathrm{Attention}(\hat{Q},\hat{K},\hat{V}) = \mathrm{softmax}\left(\frac{\hat{Q}\hat{K}^T}{\sqrt{e}}\right)\hat{V}.
     \label{eq:attention}
 \end{equation}
 This realizes a position-dependent reweighting of the each row in $\hat{V}$ (each row of $V$ or $\hat{V}$ represents a word, previously called $\xi_i$); the matrices $W^Q$, $W^K$ and $W^V$ are ``projection matrices'' that are learned during training. For NLP tasks this reweighting step is crucial as it assigns higher value to words that contain meaning and lesser value to words such as arcticles (``a'', ``the'') that do not. 
@@ -70,7 +70,7 @@ The project can roughly be divided into four steps.
 
 In the initial stage of the project some familiarity with the transformer architecture should be gained; this may involve implementing the original transformer \cite{vaswani2017attention}. 
 
-The next stage will involve adjusting the attention mechanism (equation \eqref{eq:attention}) to dynamical systems: this will perhaps require changing the activation function from a softmax to something different. 
+The next stage will be adjusting the attention mechanism (equation \eqref{eq:attention}) to dynamical systems: this will perhaps require changing the activation function from a softmax to something different. 
 
 A third step will be investigating different choices of input embeddings to the original one (equation \eqref{eq:embedding}). As this is essentially an addition of the input by the solution of a simple dynamical system, it should be possible to improve on this. 
 
