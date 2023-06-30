@@ -1,0 +1,21 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{enumerate}
+    \item Make sure everyone can run transformer scripts on their laptops. Possibly on GPU. 
+    \item Experiment with hyperparameters on a simple data set (i.e. MNIST). Ideally the transformer should perform much better than a feedfofward neural network (or even LSTM) while only needing a few layers. 
+        A big success at this stage would be if we could demonstrate these superior properties (maybe even compare with LSTMs) for only a few multihead attention layers and no normalization and no addition. 
+    \item Apply all of this to a physical system, should also be of dimension $\approx50$.
+
+    \item Are multihead-attention layers with weights on the Stiefel manifold universal approximators? (Probably not!) Invistigate this and find their approximation capabilities.
+
+\end{enumerate}
+
+\begin{equation}
+    X \mapsto [P^V_1X\mathrm{softmax}((P^K_1X)^TP^Q_1X), \ldots, P^V_{N_h}X\mathrm{softmax}((P^K_{N_h}X)^TP^Q_{N_h}X)].
+\end{equation}
+
+\end{document}
