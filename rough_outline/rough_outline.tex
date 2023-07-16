@@ -10,11 +10,13 @@
     \item Experiment with hyperparameters on a simple data set (i.e. MNIST). Ideally the transformer should perform much better than a feedfofward neural network (or even LSTM) while only needing a few layers. 
         A big success at this stage would be if we could demonstrate these superior properties (maybe even compare with LSTMs) for only a few multihead attention layers and no normalization and no addition. 
     
-        \item Apply all of this to a physical system, should also be of dimension $\approx50$.
+    \item Apply all of this to a physical system, should also be of dimension $\approx50$.\footnote{Maybe this also works with systems of lower dimension, i.e. 6 dimensions with 3 heads.}
 
     \item Are multihead-attention layers with weights on the Stiefel manifold universal approximators? (Probably not!) Invistigate this and find their approximation capabilities. Do we need to append another feedforward neural network or can we do without?
 
-    \item Investigate the reason for this \textit{prioritization} of the certain aspects of the input data by self-attention!
+    \item Investigate the reason for this \textit{prioritization} of the certain aspects of the input data by self-attention! For MNIST this is probably because certain features (curls, curve, etc.) appearing together imply a specific number.
+
+    \item compare the new neural-network based ``integrators'' with traditional ones (i.e. ResNets).
 \end{enumerate}
 
 A multihead attention layer looks like this: 
