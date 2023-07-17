@@ -16,11 +16,13 @@ patch_number = (image_dim÷patch_length)^2
 train_x, train_y = MLDatasets.MNIST(split=:train)[:]
 test_x, test_y = MLDatasets.MNIST(split=:test)[:]
 
+apply_positional_encoding=true
+
 # preprocessing steps (also perform rescaling so that the images have values between 0 and 1)
 function preprocess_x(x)
     x_reshaped = zeros(Float32, patch_length^2, patch_number, size(x, 3))
     for i in axes(x, 3)
-        x_reshaped[:, :, i] = split_and_flatten(x[:, :, i], patch_length)/255
+        x_reshaped[:, :, i] = apply_positional_encoding ? sc_embed(split_and_flatten(x[:, :, i], patch_length)/255) : split_and_flatten(x[:, :, i], patch_length)/255
     end
     x_reshaped
 end
@@ -41,7 +43,7 @@ train_y_encoded = encode_y(train_y)
 test_y_encoded = encode_y(test_y)
 
 L = 4
-use_softmax=true
+use_softmax=false
 
 #named tuple of models that are compared
 models = (
