@@ -20,6 +20,6 @@ and the solution manifold: $\mathcal{M} = \{ u(\vartheta)\in{}V:\vartheta\in\The
 ### Approximation (with neural networks)
 
 - linear approximation by a *finite-dimensional linear space*: $V_n = \mathrm{span}(v_i)_{i=1}^n$. 
-- nonlinear approximation: $V_n = \left{ \sum_{i=1}^nc_iv_i : c_i\in\mathbb{R}, v_i\in\mathcal{D} \right}$
+- nonlinear approximation: $V_n = \{ \sum_{i=1}^nc_iv_i : c_i\in\mathbb{R}, v_i\in\mathcal{D} \}$
 - nonlinear parametric manifold: $V_n = \{ D(c): c\in\mathbb{R}^n \}$ (a nonlinear approximation)
 
