@@ -63,8 +63,13 @@ models = (
                      Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax))
 )
 
+
 const num = 60000
+#write_to_file = ""
+write_to_file = read("training_results.txt", String) 
+
 function training(model::Lux.Chain, batch_size=32, n_epochs=.01, o=AdamOptimizer(), enable_cuda=false, give_training_error=false)
+    o.t = 0
     ps, st = enable_cuda ? Lux.setup(CUDA.device(), Random.default_rng(), model) : Lux.setup(Random.default_rng(), model)
                     
     function loss(ps, x, y)
@@ -100,18 +105,25 @@ function training(model::Lux.Chain, batch_size=32, n_epochs=.01, o=AdamOptimizer
                     
     end
     #println("final loss: ", loss_array[end])
-    enable_cuda ? println("final test loss: ", loss(ps, test_x_reshaped |> cu, test_y_encoded |> cu),"\n") : println("final test loss: ", loss(ps, test_x_reshaped, test_y_encoded),"\n")
-                    
+    test_loss = enable_cuda ? loss(ps, test_x_reshaped |> cu, test_y_encoded |> cu) : loss(ps, test_x_reshaped, test_y_encoded)
+    println("final test loss: ", test_loss, "\n")
+    
+    global write_to_file *= "L = "*string(L)*", n_epochs = "*string(n_epochs)*", Optimizer = "*string(o)*", test_loss = "*string(test_loss)*"\n"
     (loss_array=loss_array, ps=ps)
 end
 
 batch_size = 128
-n_epochs = 5
-o = AdamOptimizer(0.001f0, 0.9f0, 0.99f0, 1.0f-8)
-enable_cuda = false
+n_epochs = 10 
+o = AdamOptimizer(.001f0, 0.9f0, 0.99f0, 1.0f-8)
+enable_cuda = true
 give_training_error = false
 
 loss_arrays = NamedTuple{keys(models)}(Tuple(training(model, batch_size, n_epochs, o, enable_cuda, give_training_error) for model in models))
+
+write_to_file *= "\n"
+open("training_results.txt", "w") do file
+	write(file, write_to_file)
+end
 
 function plot_stuff()
     p = plot() 
