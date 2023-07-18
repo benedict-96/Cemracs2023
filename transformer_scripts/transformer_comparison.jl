@@ -16,7 +16,7 @@ patch_number = (image_dim÷patch_length)^2
 train_x, train_y = MLDatasets.MNIST(split=:train)[:]
 test_x, test_y = MLDatasets.MNIST(split=:test)[:]
 
-apply_positional_encoding=true
+apply_positional_encoding=false
 
 # preprocessing steps (also perform rescaling so that the images have values between 0 and 1)
 function preprocess_x(x)
@@ -42,19 +42,24 @@ end
 train_y_encoded = encode_y(train_y)
 test_y_encoded = encode_y(test_y)
 
-L = 4
-use_softmax=false
+L = 8
+use_softmax=true
+function relu(x::T) where T<:Real
+    max(zero(T), x)
+end
+activation=relu
+#activation=tanh
 
 #named tuple of models that are compared
 models = (
-    model₀ = Lux.Chain(Tuple(map(_ -> ResNet(49, tanh), 1:L))..., Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    #model₁ = Lux.Chain( Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=false),
+    model₀ = Lux.Chain(Tuple(map(_ -> ResNet(49, activation), 1:L))..., Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
+    #model₁ = Lux.Chain( Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=false, activation=activation),
     #                    Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    model₂ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=false),
+    model₂ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=false, activation=activation),
                         Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    #model₃ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=true),
+    #model₃ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=true, activation=activation),
     #                    Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    model₄ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=true),
+    model₄ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=true, activation=activation),
                      Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax))
 )
 
@@ -97,12 +102,12 @@ function training(model::Lux.Chain, batch_size=32, n_epochs=.01, o=AdamOptimizer
     #println("final loss: ", loss_array[end])
     enable_cuda ? println("final test loss: ", loss(ps, test_x_reshaped |> cu, test_y_encoded |> cu),"\n") : println("final test loss: ", loss(ps, test_x_reshaped, test_y_encoded),"\n")
                     
-    loss_array
+    (loss_array=loss_array, ps=ps)
 end
 
-batch_size = 64
-n_epochs = 1
-o = AdamOptimizer(0.003f0, 0.9f0, 0.99f0, 1.0f-8)
+batch_size = 128
+n_epochs = 5
+o = AdamOptimizer(0.001f0, 0.9f0, 0.99f0, 1.0f-8)
 enable_cuda = false
 give_training_error = false
 
