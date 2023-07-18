@@ -29,6 +29,7 @@ end
 
 train_x_reshaped = preprocess_x(train_x)
 test_x_reshaped = preprocess_x(test_x)
+const num = 60000
 
 # preprocessing/encoding for y
 function encode_y(y)
@@ -42,29 +43,24 @@ end
 train_y_encoded = encode_y(train_y)
 test_y_encoded = encode_y(test_y)
 
-L = 8
-use_softmax=true
-function relu(x::T) where T<:Real
-    max(zero(T), x)
-end
-activation=relu
-#activation=tanh
-
-#named tuple of models that are compared
-models = (
-    model₀ = Lux.Chain(Tuple(map(_ -> ResNet(49, activation), 1:L))..., Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    #model₁ = Lux.Chain( Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=false, activation=activation),
-    #                    Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    model₂ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=false, activation=activation),
+function neural_network_setup_and_training(L=8, n_epochs=1)
+	
+   use_softmax=true
+   function relu(x::T) where T<:Real
+       max(zero(T), x)
+   end
+   activation=relu
+   #activation=tanh
+ 
+   #named tuple of models that are compared
+   models = (
+        model₀ = Lux.Chain(Tuple(map(_ -> ResNet(49, activation), 1:L))..., Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
+        model₁ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=false, activation=activation),
                         Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    #model₃ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=false, Stiefel=true, activation=activation),
-    #                    Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
-    model₄ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=true, activation=activation),
+        model₂ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=true, activation=activation),
                      Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax))
-)
+ )
 
-
-const num = 60000
 #write_to_file = ""
 write_to_file = read("training_results.txt", String) 
 
@@ -108,12 +104,11 @@ function training(model::Lux.Chain, batch_size=32, n_epochs=.01, o=AdamOptimizer
     test_loss = enable_cuda ? loss(ps, test_x_reshaped |> cu, test_y_encoded |> cu) : loss(ps, test_x_reshaped, test_y_encoded)
     println("final test loss: ", test_loss, "\n")
     
-    global write_to_file *= "L = "*string(L)*", n_epochs = "*string(n_epochs)*", Optimizer = "*string(o)*", test_loss = "*string(test_loss)*"\n"
+    global write_to_file *= "L = "*string(L)*", n_epochs = "*string(n_epochs)*", batch_size = "*string(batch_size)*", Optimizer = "*string(o)*", test_loss = "*string(test_loss)*"\n"
     (loss_array=loss_array, ps=ps)
 end
 
 batch_size = 128
-n_epochs = 10 
 o = AdamOptimizer(.001f0, 0.9f0, 0.99f0, 1.0f-8)
 enable_cuda = true
 give_training_error = false
@@ -133,3 +128,13 @@ end
 
 p = give_training_error ? plot_stuff : nothing 
 display(p)
+
+end
+
+L_choices = (2,4,8,16)
+n_epochs_choices = (2,4,8,16,32)
+for L in L_choices
+	for n_epochs in n_epochs_choices
+		neural_network_setup_and_training(L, n_epochs)
+	end
+end
