@@ -4,6 +4,7 @@ using LinearAlgebra: norm
 using ProgressMeter: @showprogress
 using Zygote: gradient 
 using Plots: plot, plot!
+using CUDA
 import MLDatasets
 import Lux
 import Random
@@ -48,11 +49,9 @@ function relu(x::T) where T<:Real
 end
 
 write_to_file = read("training_results.txt", String)
-function neural_network_setup_and_training(L=8, n_epochs=1, use_softmax=true, activation=relu, batch_size=128)
-
+function neural_network_setup_and_training(L=8, n_epochs=1; use_softmax=true, activation=relu, batch_size=64, o=AdamOptimizer(.01f0, 0.9f0, 0.99f0, 1.0f-8))
     #named tuple of models that are compared
     models = (
-        model₀ = Lux.Chain(Tuple(map(_ -> ResNet(49, activation), 1:L))..., Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
         model₁ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=false, activation=activation),
                         Classification(patch_length^2, 10, use_bias=false, use_average=false, use_softmax=use_softmax)),
         model₂ = Lux.Chain(Transformer(patch_length^2, n_heads, L, add_connection=true, Stiefel=true, activation=activation),
@@ -70,7 +69,8 @@ function neural_network_setup_and_training(L=8, n_epochs=1, use_softmax=true, ac
         end
                     
         # the number of training steps is calculated based on the number of epochs and the batch size
-        training_steps = Int(ceil(n_epochs*num/batch_size))
+        training_steps_per_epoch = Int(ceil(num/batch_size))
+	training_steps = n_epochs*training_steps_per_epoch
         # this records the training error
         loss_array = zeros(training_steps + 1)
         loss_array[1] = give_training_error ? (enable_cuda ? loss(ps, train_x_reshaped |> cu, train_y_encoded |> cu) : loss(ps, train_x_reshaped, train_y_encoded)) : 0.
@@ -94,7 +94,8 @@ function neural_network_setup_and_training(L=8, n_epochs=1, use_softmax=true, ac
 
             # compute the loss at the current step
             loss_array[1+i] = give_training_error ? (enable_cuda ? loss(ps, train_x_reshaped |> cu, train_y_encoded |> cu) : loss(ps, train_x_reshaped, train_y_encoded)) : 0.
-        end
+            i % training_steps_per_epoch == 0 ? println("Current training error is: "*string(loss(ps, train_x_reshaped |> cu, train_y_encoded |> cu))) : nothing
+    	end
         #println("final loss: ", loss_array[end])
         test_loss = enable_cuda ? loss(ps, test_x_reshaped |> cu, test_y_encoded |> cu) : loss(ps, test_x_reshaped, test_y_encoded)
         println("final test loss: ", test_loss, "\n")
@@ -102,8 +103,7 @@ function neural_network_setup_and_training(L=8, n_epochs=1, use_softmax=true, ac
         global write_to_file *= "L = "*string(L)*", n_epochs = "*string(n_epochs)*", batch_size = "*string(batch_size)*", Optimizer = "*string(o)*", test_loss = "*string(test_loss)*"\n"
         (loss_array=loss_array, ps=ps)
     end
-    
-    o = AdamOptimizer(.001f0, 0.9f0, 0.99f0, 1.0f-8)
+
     enable_cuda = true
     give_training_error = false
 
@@ -122,11 +122,17 @@ function neural_network_setup_and_training(L=8, n_epochs=1, use_softmax=true, ac
 
 end
 
-L_choices = (2,4)
-n_epochs_choices = (2,4)
+L_choices = (1, 2, 4)
+n_epochs_choices = (64,)
+use_softmax_choices = (true, false)
+activation = tanh
+
 for L in L_choices
 	for n_epochs in n_epochs_choices
-		neural_network_setup_and_training(L, n_epochs)
+		for use_softmax in use_softmax_choices
+			println("L = "*string(L)*", n_epochs = "*string(n_epochs)*", use_softmax = "*string(use_softmax)*", activation = "*string(activation))
+			neural_network_setup_and_training(L, n_epochs; use_softmax=use_softmax, activation=activation)
+		end
 	end
 end
 open("training_results.txt", "w") do file
