@@ -79,7 +79,6 @@ plist
 data = Dict("qlist" => qlist[1:3000],"plist" => plist[1:3000])
 filename="pendulum_3000PureSamples_200steps_qlist_plist_2707.jld2"
 save(filename,data)
-
 q,p = pendulum_data()
 q.parent
 minimum
