@@ -1,6 +1,8 @@
 using Pkg
 cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
 Pkg.activate(".")
+# using Threads
+Threads.nthreads()
 
 using Lux
 using JLD2
@@ -11,11 +13,11 @@ using Optimisers
 using Zygote
 using Plots
 using LinearAlgebra:norm
-using GeometricMachineLearning:Transformer
+using GeometricMachineLearning:Transformer,initialparameters
 
-# filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
+filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
-filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_400Samples_1000steps_3107.jld2"
+# filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_400Samples_1000steps_3107.jld2"
 
 p1list = load(filename,"p1list")
 p2list = load(filename,"p2list")
@@ -43,7 +45,7 @@ data = permutedims(data,perm)
 # # 4*8*8937
 
 train_input = data[:,1:100,:]
-train_target= data[:,101,:]
+train_target= data[:,2:101,:]
 
 
 
@@ -51,44 +53,46 @@ train_target= data[:,101,:]
 # target is 20- 120,120-220,...820-920 for each sample 
 
 (x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=8/9, shuffle=false)
-batchsize = 50
+batchsize = 8
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
 
 input_dims = output_dims = 4
 # model = Recurrence(LSTMCell(input_dims => output_dims),return_sequence = true)
 
-model = Transformer(4, 4, 3, Stiefel=false)
-rng = Random.default_rng()
-Random.seed!(rng, 0)
-ps,st=setup(rng,model)
+model = Transformer(input_dims, output_dims, 3, Stiefel=false)
+# rng = Random.default_rng()
+# Random.seed!(rng, 0)
+# ps,st=setup(rng,model)
+ps = initialparameters(Float64, model)
 
-for (x,y) in train_loader
-    @show size(x)
-    @show size(y)
-    y_pred, st = Lux.apply(model,x,ps,st)
-    @show y
-    @show y_pred
-    break 
-end
+# for (x,y) in train_loader
+#     @show size(x)
+#     @show size(y)
+#     # @show y
+
+#     y_pred= model(x, ps)
+#     @show size(y_pred)
+#     break 
+# end
 
 
+function compute_loss(x, y, model, ps)
+    # @show size(y)
+    y_pred = model(x, ps)
+    # @show size(y_pred)
 
-
-function compute_loss(x, y, model, ps, st)
-    @show size(y)
-    y_pred, st = model(x, ps, st)
-    @show size(y_pred)
-
-    seq_len = size(y,2)
-    batchsize = size(y,3)
+    # seq_len = size(y,2)
+    # batchsize = size(y,3)
     # @show batchsize
     # @show size(y_pred[1])
     # error = sum(sum(abs.(y[:,i,:] - y_pred[i]) for i in 1:seq_len)/seq_len)/batchsize
-    error = sum(sum((abs.(y[:,i,:] - y_pred[i])).^2 for i in 1:seq_len))/(seq_len^(0.5) * batchsize)
+    # error = sum(sum((abs.(y[:,i,:] - y_pred[i])).^2 for i in 1:seq_len))/(seq_len^(0.5) * batchsize)
+    error = norm(y-y_pred)/size(y,2)^(0.5) 
+
     # @show error
     # @show size(error)
-    return error, y_pred, st
+    return error, y_pred
 end
 
 
@@ -99,21 +103,21 @@ st_opt = Optimisers.setup(opt, ps)
 #Start the Training Process
 epochs = 500
 err_ls = []  
-@showprogress for epoch in 1:epochs
+@time @showprogress for epoch in 1:epochs
     err = 0  
     for (x,y) in train_loader
         # @show size(x)
         # y, st = model(x, ps, st)
-        gs = Zygote.gradient(p -> compute_loss(x,y,model,p,st)[1],ps)[1]
+        gs = Zygote.gradient(p -> compute_loss(x,y,model,p)[1],ps)[1]
         st_opt, ps = Optimisers.update(st_opt, ps, gs)
         # @show y
         # @show size(y)
-        err += compute_loss(x,y,model,ps,st)[1]
+        err += compute_loss(x,y,model,ps)[1]
         # push!(err_ls,err)
-        break
+        # break
     end
     push!(err_ls,err/length(train_loader))
-    break 
+    # break 
 end
 
 err_ls
@@ -123,20 +127,24 @@ plot(err_ls)
 
 plot_train_loader = DataLoader((x_train,y_train),batchsize=1,shuffle = false)
 y_pred = []
+output=[]
+
 for (x,y) in plot_train_loader
-    for _ in range(1,5)
+    for _ in range(1,200)
         # @show size(x)
         # @show size(y)
-        y_pred, st = model(x, ps, st)
-        # @show size(y_pred[end-test_len:end])
+        y_pred = model(x, ps)
+        # @show size(y_pred)
+        # @show size(y_pred[:,end,:])
+
         # for i in 1:test_len
-        y_pred = cat(y_pred...,dims=3)
-        perm = [1,3,2]
-        y_pred = permutedims(y_pred,perm)
+        # y_pred = cat(y_pred...,dims=3)
+        # perm = [1,3,2]
+        # y_pred = permutedims(y_pred,perm)
         # @show size(y_pred)
         # @show size(y_pred[:,end-shift+1:end,:])
 
-        x = cat(x, y_pred[:,end-shift+1:end,:], dims=2)
+        x = cat(x, y_pred[:,end,:], dims=2)
         # @show size(x)
         # end
         # @show size(x)
@@ -151,17 +159,36 @@ for (x,y) in plot_train_loader
     break
 end
 
+for (x,y) in train_loader
+    @show size(x)
+    @show size(y)
+    @show y[:,end,1]
+
+    y_pred= model(x, ps)
+    @show y_pred[:,end,1]
+    break 
+end
+
+
 #Find the truth to compare 
 output = output[:,:,1]
-truth = data[:,1:200,1]
+
+truth = data[:,1:300,1]
 # See whether the right sample to compare
 output[:,99:106]
 truth[:,99:106]
 
 pre_seq_len = size(output,2)
 
-plot(truth[1,95:130],truth[2,95:130],label="Truth")
-plot!(output[1,95:130],output[2,95:130],label="Prediction")
+plot(truth[1,1:300],truth[2,1:300],label="Truth")
+plot!(output[1,1:300],output[2,1:300],label="Prediction")
+
+plot(truth[1,1:300],label="Truth")
+plot!(output[1,1:300],label="Prediction")
+
+norm(truth[:,100:300]-output[:,100:300])
+JLD2.jldsave("/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Trans_shift1_params9.jld2";ps)
+
 
 # Momenta
 fig = plot(1,xlim = (-0.2, 0.2),ylim = (-0.3, 0.3))
@@ -255,14 +282,14 @@ end
 
 #Find the truth to compare 
 output = output[:,:,1]
-truth = data[:,992:1001,1]
+truth = data[:,1:105,1]
 
 # See whether the right sample to compare
-# output[:,99:106]
-# truth[:,99:106]
+output[:,99:105]
+truth[:,99:105]
 
-plot(truth[1,:],truth[2,:],label="Truth")
-plot!(output[1,:],output[2,:],label="Prediction")
+plot(truth[1,99:105],truth[2,99:105],label="Truth")
+plot!(output[1,99:105],output[2,99:105],label="Prediction")
 
 
 fig = plot(1,xlim = (-0.2, 0.5),ylim = (-0.3, 0.3))
