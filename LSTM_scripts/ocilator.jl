@@ -11,7 +11,13 @@ using GeometricIntegrators
 using Plots
 
 
-params = (m1 = 1, m2 = 2, k1 = 0.1, k2 = 0.1, k = 0.2)
+params = (m1 = 3, m2 = 5, k1 = 0.1, k2 = 0.1, k = 0.2)
+x0 = 0.5
+x1 = 1
+pode = PODEProblem(q̇, ṗ, (0.0, 100.0), 1., [x0,0.4], [x1, 0.]; parameters = params)
+sol = integrate(pode,ImplicitMidpoint())
+plot(sol.q[:,1].parent,sol.q[:,2].parent)
+
 
 function q̇(v, t, q, p, params)
     v[1] = p[1]/params.m1
@@ -34,8 +40,10 @@ q2list = []
 p1list = []
 p2list = []
 
-for x0 in LinRange(0.1, 2, 3) 
-    for x1 in LinRange(0.1, 2, 3) 
+# for m1 in [1,2,3,4,5]
+#     for m2 in [1,2,3,4,5]
+@showprogress for x0 in 0.:0.05:2
+    for x1 in 0.:0.05:2
         params = (m1 = 2, m2 = 2, k1 = 1.5, k2 = 0.1, k = 0.2)
         pode = PODEProblem(q̇, ṗ, (0.0, 1000.0), 1., [x0,0.4], [x1, 0.]; parameters = params)
         sol = integrate(pode,ImplicitMidpoint())
@@ -49,11 +57,12 @@ for x0 in LinRange(0.1, 2, 3)
         # plot!(p2, sol.q[:,1], sol.q[:,2])
     end
 end
-
+#     end
+# end
 
 data = Dict("q1list" => q1list,
             "q2list" => q2list,
             "p1list" => p1list,
             "p2list" => p2list,)
-filename="Ocilator_9Samples_1000steps_2707.jld2"
+filename="Ocilator_400Samples_1000steps_3107.jld2"
 save(filename,data)

@@ -10,7 +10,7 @@ using ProgressMeter
 
 # filename="pendulum_100samples_10001steps_qlist_plist_2607.jld2"
 # filename="pendulum_3000samples_200steps_qlist_plist_2607.jld2"
-filename="pendulum_3000PureSamples_200steps_qlist_plist_2707.jld2"
+filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/pendulum_3000PureSamples_200steps_qlist_plist_2707.jld2"
 
 plist = load(filename,"plist")
 qlist = load(filename,"qlist")
@@ -116,18 +116,18 @@ output = []
 train_loader = DataLoader((x_train,y_train),batchsize=1,shuffle = false)
 for (x,y) in val_loader
     for _ in range(1,5)
-        # @show size(x)
-        # @show size(y)
+        @show size(x)
+        @show y
         y_pred, st = model(x, ps, st)
-        # @show size(y_pred)
+        @show y_pred
         # @show size(y_pred[end-test_len:end])
-        for i in 1:test_len
-            x = cat(x, y_pred[end-test_len+i], dims=2)
-        end
+        # for i in 1:test_len
+        #     x = cat(x, y_pred[end-test_len+i], dims=2)
+        # end
         # @show size(x)
         # x = x[:, 2:end, :]
         # @show x
-        # break
+        break
     end
     @show size(x)
     output = x
