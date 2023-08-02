@@ -15,9 +15,10 @@ using Plots
 using LinearAlgebra:norm
 using GeometricMachineLearning:Transformer,initialparameters
 
-filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
+# filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_400Samples_1000steps_3107.jld2"
+filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_cos_25Samples_1000steps_0208.jld2"
 
 p1list = load(filename,"p1list")
 p2list = load(filename,"p2list")
@@ -45,15 +46,15 @@ data = permutedims(data,perm)
 # # 4*8*8937
 
 train_input = data[:,1:100,:]
-train_target= data[:,2:101,:]
+train_target= data[:,11:110,:]
 
 
 
 # input is (4, 100, 81),i.e. the first 9*100 steps for each sample 
 # target is 20- 120,120-220,...820-920 for each sample 
 
-(x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=8/9, shuffle=false)
-batchsize = 8
+(x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=20/25, shuffle=false)
+batchsize = 5
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
 
@@ -130,7 +131,7 @@ y_pred = []
 output=[]
 
 for (x,y) in plot_train_loader
-    for _ in range(1,200)
+    for _ in range(1,20)
         # @show size(x)
         # @show size(y)
         y_pred = model(x, ps)
@@ -144,7 +145,7 @@ for (x,y) in plot_train_loader
         # @show size(y_pred)
         # @show size(y_pred[:,end-shift+1:end,:])
 
-        x = cat(x, y_pred[:,end,:], dims=2)
+        x = cat(x, y_pred[:,end-9:end,:], dims=2)
         # @show size(x)
         # end
         # @show size(x)
@@ -172,7 +173,6 @@ end
 
 #Find the truth to compare 
 output = output[:,:,1]
-
 truth = data[:,1:300,1]
 # See whether the right sample to compare
 output[:,99:106]
@@ -187,7 +187,9 @@ plot(truth[1,1:300],label="Truth")
 plot!(output[1,1:300],label="Prediction")
 
 norm(truth[:,100:300]-output[:,100:300])
-JLD2.jldsave("/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Trans_shift1_params9.jld2";ps)
+norm(truth[:,100:120]-output[:,100:120])
+
+JLD2.jldsave("/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Trans_shift10_params9.jld2";ps)
 
 
 # Momenta
