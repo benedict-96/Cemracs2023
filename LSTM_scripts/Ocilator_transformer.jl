@@ -34,6 +34,7 @@ data = cat(p1list,p2list,q1list,q2list,dims=3)
 perm = [3,2,1]
 data = permutedims(data,perm)
 
+plot(data[1,1:1000,1])
 
 # sequence_len = 100
 # shift = 20
@@ -45,8 +46,8 @@ data = permutedims(data,perm)
 # end
 # # 4*8*8937
 
-train_input = data[:,1:100,:]
-train_target= data[:,11:110,:]
+train_input = data[:,1:300,:]
+train_target= data[:,6:305,:]
 
 
 
@@ -54,7 +55,7 @@ train_target= data[:,11:110,:]
 # target is 20- 120,120-220,...820-920 for each sample 
 
 (x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=20/25, shuffle=false)
-batchsize = 5
+batchsize = 20
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
 
@@ -130,8 +131,9 @@ plot_train_loader = DataLoader((x_train,y_train),batchsize=1,shuffle = false)
 y_pred = []
 output=[]
 
+
 for (x,y) in plot_train_loader
-    for _ in range(1,20)
+    for _ in range(1,40)
         # @show size(x)
         # @show size(y)
         y_pred = model(x, ps)
@@ -145,7 +147,7 @@ for (x,y) in plot_train_loader
         # @show size(y_pred)
         # @show size(y_pred[:,end-shift+1:end,:])
 
-        x = cat(x, y_pred[:,end-9:end,:], dims=2)
+        x = cat(x, y_pred[:,end-4:end,:], dims=2)
         # @show size(x)
         # end
         # @show size(x)
@@ -160,31 +162,31 @@ for (x,y) in plot_train_loader
     break
 end
 
-for (x,y) in train_loader
+for (x,y) in plot_train_loader
     @show size(x)
     @show size(y)
-    @show y[:,end,1]
+    @show y[:,end-51:end-45,1]
 
     y_pred= model(x, ps)
-    @show y_pred[:,end,1]
+    @show y_pred[:,end-51:end-45,1]
     break 
 end
 
 
 #Find the truth to compare 
 output = output[:,:,1]
-truth = data[:,1:300,1]
+truth = data[:,1:500,1]
 # See whether the right sample to compare
-output[:,99:106]
-truth[:,99:106]
+output[:,299:306]
+truth[:,299:306]
 
 pre_seq_len = size(output,2)
 
 plot(truth[1,1:300],truth[2,1:300],label="Truth")
 plot!(output[1,1:300],output[2,1:300],label="Prediction")
 
-plot(truth[1,1:300],label="Truth")
-plot!(output[1,1:300],label="Prediction")
+plot(truth[1,1:500],label="Truth")
+plot!(output[1,1:500],label="Prediction")
 
 norm(truth[:,100:300]-output[:,100:300])
 norm(truth[:,100:120]-output[:,100:120])
