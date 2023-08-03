@@ -1,5 +1,5 @@
 using Pkg
-cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
+cd("Cemracs2023/LSTM_scripts")
 Pkg.activate(".")
 # using Threads
 Threads.nthreads()
@@ -18,7 +18,7 @@ using GeometricMachineLearning:Transformer,initialparameters
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_400Samples_1000steps_3107.jld2"
-filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_cos_25Samples_1000steps_0208.jld2"
+filename="Ocilator_cos_25Samples_1000steps_0208.jld2"
 
 p1list = load(filename,"p1list")
 p2list = load(filename,"p2list")

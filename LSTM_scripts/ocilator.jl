@@ -1,5 +1,6 @@
 using Pkg
-cd("/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/GeometricMachineLearning.jl")
+# cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
+cd("./Cemracs2023/LSTM_scripts/")
 Pkg.activate(".")
 
 using Lux
