@@ -1,5 +1,5 @@
 using Pkg
-cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
+cd("Cemracs2023/LSTM_scripts/")
 Pkg.activate(".")
 
 using Lux
@@ -14,47 +14,54 @@ using LinearAlgebra:norm
 
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
-filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_400Samples_1000steps_3107.jld2"
+# filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
+
+# p1list = load(filename,"p1list")
+# p2list = load(filename,"p2list")
+# q1list = load(filename,"q1list")
+# q2list = load(filename,"q2list")
+
+# p1list = hcat(p1list...)'
+# p2list = hcat(p2list...)'
+# q1list = hcat(q1list...)'
+# q2list = hcat(q2list...)'
+
+# data = cat(p1list,p2list,q1list,q2list,dims=3)
+# perm = [3,2,1]
+# data = permutedims(data,perm)
 
 
-
-p1list = load(filename,"p1list")
-p2list = load(filename,"p2list")
-q1list = load(filename,"q1list")
-q2list = load(filename,"q2list")
-
-p1list = hcat(p1list...)'
-p2list = hcat(p2list...)'
-q1list = hcat(q1list...)'
-q2list = hcat(q2list...)'
-
-data = cat(p1list,p2list,q1list,q2list,dims=3)
-perm = [3,2,1]
-data = permutedims(data,perm)
-
-
-# sequence_len = 10
+# sequence_len = 20
 # shift = 1
-# train_input = data[:,1:10,:]
+# train_input = data[:,1:20,:]
 # train_target = data[:,sequence_len+shift,:]
-# for i in 1:94
-#     train_input = cat(train_input,data[:,i*sequence_len+1:(i+1)*sequence_len,:],dims=3)
-#     train_target = cat(train_target,data[:,(i+1)*sequence_len+shift,:],dims=2)
+# for _ in 1:3000
+#     start_point = rand(1:49980)
+#     train_input = cat(train_input,data[:,start_point:start_point+sequence_len-1,:],dims=3)
+#     train_target = cat(train_target,data[:,start_point+sequence_len,:],dims=2)
 # end
 # train_input
 # train_target
 
-train_input = data[:,1:100,:]
-train_target= data[:,101,:]
+# train_input = data[:,1:sequence_len,:]
+# train_target= data[:,1+shift:sequence_len+shift,:]
 
 
 
 
 # input is (4, 100, 81),i.e. the first 9*100 steps for each sample 
 # target is 20- 120,120-220,...820-920 for each sample 
+filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
+train_input = load(filename,"train_input")
+train_target = load(filename,"train_target")
 
-(x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=0.9, shuffle=false)
-batchsize = 50
+train_input = train_input[:,:,1:63000]
+train_target = train_target[:,1:63000]
+
+
+
+(x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=0.999, shuffle=false)
+batchsize = 100
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
 
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
@@ -69,8 +76,8 @@ function compute_loss(x, y, model, ps, st)
     # @show size(y)
     y_pred, st = model(x, ps, st)
     
-    # seq_len = size(y,2)
-    # batchsize = size(y,3)
+    seq_len = size(y,2)
+    batchsize = size(y,3)
     # @show batchsize
     # @show size(y_pred[1])
     # error = sum(sum(abs.(y[:,i,:] - y_pred[i]) for i in 1:seq_len)/seq_len)/batchsize
@@ -89,9 +96,9 @@ opt = Optimisers.ADAM(0.1)
 st_opt = Optimisers.setup(opt, ps)
 
 #Start the Training Process
-epochs = 1000
+epochs = 10
 err_ls = []  
-@showprogress for epoch in 1:epochs
+@time @showprogress for epoch in 1:epochs
     err = 0  
     for (x,y) in train_loader
         # @show size(x)
@@ -105,6 +112,7 @@ err_ls = []
         # break
     end
     push!(err_ls,err/length(train_loader))
+    epoch %5 == 0 ? println(err/length(train_loader)) : nothing 
     # break 
 end
 
