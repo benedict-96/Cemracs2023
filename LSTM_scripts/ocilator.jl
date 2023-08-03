@@ -1,5 +1,6 @@
 using Pkg
-cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
+# cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
+cd("./Cemracs2023/LSTM_scripts/")
 Pkg.activate(".")
 
 using Lux
@@ -108,4 +109,54 @@ data = Dict("q1list" => q1list,
             "p1list" => p1list,
             "p2list" => p2list,)
 filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_cos_25Samples_1000steps_0208.jld2"
+save(filename,data)
+
+
+#####
+
+params_collection = (  (m1=2, m2=2, k1=1.5, k2=0.1, k=0.2),
+            (m1=2, m2=1, k1=1.5, k2=0.1, k=0.2),
+            (m1=2, m2=.5, k1=1.5, k2=0.1, k=0.2),
+            (m1=2, m2=.25, k1=1.5, k2=0.1, k=0.2)
+)
+
+initial_conditions_collection = ( (q=[1.,0.], p=[2.,0.]),
+                    (q=[1.,0.], p=[1.,0.]),
+                    (q=[1.,0.], p=[0.5,0.])
+)
+
+t_integration = 1000
+                  
+function q̇(v, t, q, p, params)
+    v[1] = p[1]/params.m1
+    v[2] = p[2]/params.m2
+end
+
+function ṗ(f, t, q, p, params)
+    f[1] = -params.k1 * q[1] - params.k * (q[1] - q[2]) #* (cos(10*q[1]) + 1) + params.k /2 * (q[1] - q[2])^2 * 10 * sin(10 * q[1])
+    f[2] = -params.k2 * q[2] + params.k * (q[1] - q[2]) #* (cos(10*q[1]) + 1) 
+end
+
+q1list = []
+q2list = []
+p1list = []
+p2list = []
+for params in params_collection
+    for initial_conditions in initial_conditions_collection
+        pode = PODEProblem(q̇, ṗ, (0.0, t_integration), .1, initial_conditions; parameters = params)
+        sol = integrate(pode,ImplicitMidpoint())
+
+        push!(q1list, sol.q[:,1].parent)
+        push!(q2list, sol.q[:,2].parent)
+
+        push!(p1list, sol.p[:,1].parent)
+        push!(p2list, sol.p[:,2].parent)    
+    end
+end
+
+data = Dict("q1list" => q1list,
+            "q2list" => q2list,
+            "p1list" => p1list,
+            "p2list" => p2list,)
+filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_quad_25Samples_1000steps_0208.jld2"
 save(filename,data)
