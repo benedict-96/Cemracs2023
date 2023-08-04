@@ -4,19 +4,25 @@ using GeometricIntegrators, KernelAbstractions
 params_collection = (  (m1=2, m2=0.25, k1=1.5, k2=0.1, k=2),
 )
 
-initial_conditions_collection = ( (q=[1.,0.], p=[0.66,0.]),)
+for k0 in LinRange(1.5, 2.5, 4) 
+    global params_collection = (params_collection...,  (m1=2, m2=0.25, k1=1.5, k2=0.1, k=k0))
+end
+
+
+initial_conditions_collection = ((q=[1.,0.], p=[1.,0.]),
+)
 function extend_tuple(tuple, p0)
     (tuple...,  (q = [1.0, 0.0], p = [p0, 0.0]))
 end
 
-for p0 in LinRange(0.1, 2, 10) 
+for p0 in LinRange(0.1, 2, 8) 
     global initial_conditions_collection = extend_tuple(initial_conditions_collection, p0)
 end
 
 
 
 
-t_integration = 5000
+t_integration = 2500
 
 function q̇(v, t, q, p, params)
     v[1] = p[1]/params.m1
