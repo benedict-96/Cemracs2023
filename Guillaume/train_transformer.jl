@@ -18,17 +18,27 @@ dim, n_params, n_time_steps = size(data_raw)
 data = KernelAbstractions.allocate(backend, T, size(data_raw))
 copyto!(data, data_raw)
 
-model = Chain(  MultiHeadAttention(dim,2,Stiefel=false),
+model = Chain(  MultiHeadAttention(dim,4,Stiefel=false),
                 ResNet(dim,tanh),
-                MultiHeadAttention(dim,2,Stiefel=false),
+                MultiHeadAttention(dim,4,Stiefel=false),
                 ResNet(dim,tanh),
-                MultiHeadAttention(dim,2,Stiefel=false),
+                MultiHeadAttention(dim,4,Stiefel=false),
                 ResNet(dim))
+
+model = Chain(  MultiHeadAttention(dim,4,Stiefel=false),
+                Gradient(4,10, tanh; change_q=true),
+                Gradient(4,10, tanh; change_q=false),
+                MultiHeadAttention(dim,4,Stiefel=false),
+                Gradient(4,10, tanh; change_q=true),
+                Gradient(4,10, tanh; change_q=false),
+                Gradient(4,4; change_q=true),
+                Gradient(4,4; change_q=false))
+
 ps = initialparameters(backend, T, model)
 
-const seq_length = 20
+const seq_length = 40
 const batch_size = 200
-const n_epochs = 200
+const n_epochs = 100
 
 o = Optimizer(AdamOptimizer(), ps)
 
@@ -123,10 +133,10 @@ end
 
 
 # Constructing 8 time steps to be unrolled for the transformer
-n_int = 1000
-xt = [1, 0., 0.75, 0.]
+n_int = 500
+xt = [1, 0., 0.9, 0.]
 n_rolled_steps = 1
-params = (m1=2, m2=0.25, k1=1.5, k2=0.1, k=2)
+params = (m1=2, m2=0.25, k1=1.5, k2=0.1, k=1.9)
 pode = PODEProblem(q̇, ṗ1, (0.0, 0.1 * seq_length), 0.1, xt[1:2],  xt[3:4]; parameters = params)
 sol = integrate(pode,ImplicitMidpoint())
 x_transformer = []
@@ -159,5 +169,7 @@ end
 pode = PODEProblem(q̇, ṗ1, (0.0, n_int*0.1), 0.1, [Float64(xt[1]), Float64(xt[2])],[Float64(xt[3]), Float64(xt[4])]; parameters = params)
 sol = integrate(pode,ImplicitMidpoint())
 p1 = plot(xlims=[0,n_int], xlab="t", ylab="x(t)", legend=:bottomright)
-plot!(p1,X.q1, label="NN model")
+
 plot!(p1,sol.q[:,1], label="numeric")
+plot!(p1,X.q1, label="NN model")
+# png(p1, "./Images/transformer_10000_NN")
