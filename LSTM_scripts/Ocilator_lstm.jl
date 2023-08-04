@@ -76,8 +76,8 @@ function compute_loss(x, y, model, ps, st)
     # @show size(y)
     y_pred, st = model(x, ps, st)
     
-    seq_len = size(y,2)
-    batchsize = size(y,3)
+    # seq_len = size(y,2)
+    # batchsize = size(y,3)
     # @show batchsize
     # @show size(y_pred[1])
     # error = sum(sum(abs.(y[:,i,:] - y_pred[i]) for i in 1:seq_len)/seq_len)/batchsize
@@ -92,11 +92,11 @@ end
 
 
 #Define a Optimisers
-opt = Optimisers.ADAM(0.1)
+opt = Optimisers.ADAM(0.001)
 st_opt = Optimisers.setup(opt, ps)
 
 #Start the Training Process
-epochs = 10
+epochs = 100
 err_ls = []  
 @time @showprogress for epoch in 1:epochs
     err = 0  
@@ -112,7 +112,7 @@ err_ls = []
         # break
     end
     push!(err_ls,err/length(train_loader))
-    epoch %5 == 0 ? println(err/length(train_loader)) : nothing 
+    epoch %20 == 0 ? println(err/length(train_loader)) : nothing 
     # break 
 end
 
@@ -131,29 +131,31 @@ end
 
 
 
-y_pred = []
+output = []
 for (x,y) in plot_train_loader
-    for _ in range(1,5)
+    truth = x 
+    for _ in range(1,100)
         # @show size(x)
         # @show size(y)
         y_pred, st = model(x, ps, st)
-        @show y_pred
-        @show y
+        @show size(y_pred)
+        @show (y)
         # @show size(y_pred[end-test_len:end])
         # for i in 1:test_len
-        y_pred = cat(y_pred...,dims=3)
-        perm = [1,3,2]
-        y_pred = permutedims(y_pred,perm)
+        # y_pred = cat(y_pred...,dims=3)
+        # perm = [1,3,2]
+        # y_pred = permutedims(y_pred,perm)
         # @show size(y_pred)
         # @show size(y_pred[:,end-shift+1:end,:])
 
-        x = cat(x, y_pred[:,end-shift+1:end,:], dims=2)
+        x = cat(x, y_pred, dims=2)
+        truth = cat(truth,y, dims= 2)
         # @show size(x)
         # end
         # @show size(x)
         # x = x[:, 2:end, :]
         # @show x
-        break
+        # break
     end
     @show size(x)
     output = x
@@ -164,7 +166,7 @@ end
 
 #Find the truth to compare 
 output = output[:,:,1]
-truth = data[:,1:15,1]
+truth = train_input[:,:,1]
 # See whether the right sample to compare
 output[:,9:15]
 truth[:,9:15]
@@ -274,6 +276,11 @@ truth = data[:,992:1001,1]
 # See whether the right sample to compare
 # output[:,99:106]
 # truth[:,99:106]
+
+@save "lstm_ps_63000samples_seqlen 20_shift1.jld2" {compress = true} ps st
+
+
+
 
 plot(truth[1,:],truth[2,:],label="Truth")
 plot!(output[1,:],output[2,:],label="Prediction")

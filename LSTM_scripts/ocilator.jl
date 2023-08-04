@@ -197,6 +197,11 @@ for p0 in LinRange(0.1, 2, 10)
     global initial_conditions_collection = extend_tuple(initial_conditions_collection, p0)
 end
 
+initial_conditions_collection
+for initial_conditions in initial_conditions_collection
+    @show initial_conditions
+end
+
 q1list = []
 q2list = []
 p1list = []
