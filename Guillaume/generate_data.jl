@@ -1,28 +1,30 @@
 using GeometricIntegrators, KernelAbstractions
 
+integration_time_step = 0.4
+
 # here the second point mass is altered
-params_collection = (  (m1=2, m2=0.25, k1=1.5, k2=0.1, k=2),
+params_collection = (  (m1=2, m2=1., k1=1.5, k2=0.3, k=2),
 )
 
-for k0 in LinRange(1.5, 2.5, 4) 
-    global params_collection = (params_collection...,  (m1=2, m2=0.25, k1=1.5, k2=0.1, k=k0))
+for k0 in LinRange(1, 4, 40) 
+    global params_collection = (params_collection...,  (m1=2, m2=1., k1=1.5, k2=0.3, k=k0))
 end
 
 
-initial_conditions_collection = ((q=[1.,0.], p=[1.,0.]),
+initial_conditions_collection = ((q=[1.,0.], p=[2.,0.]),
 )
 function extend_tuple(tuple, p0)
     (tuple...,  (q = [1.0, 0.0], p = [p0, 0.0]))
 end
 
-for p0 in LinRange(0.1, 2, 8) 
-    global initial_conditions_collection = extend_tuple(initial_conditions_collection, p0)
-end
+# for p0 in LinRange(0.1, 2, 8) 
+#     global initial_conditions_collection = extend_tuple(initial_conditions_collection, p0)
+# end
 
 
 
 
-t_integration = 2500
+t_integration = 1000
 
 function q̇(v, t, q, p, params)
     v[1] = p[1]/params.m1
@@ -74,7 +76,7 @@ function generate_data()
     sols = []
     for params in params_collection
         for initial_conditions in initial_conditions_collection
-            pode = PODEProblem(q̇, ṗ1, (0.0, t_integration), .1, initial_conditions; parameters = params)
+            pode = PODEProblem(q̇, ṗ1, (0.0, t_integration), integration_time_step , initial_conditions; parameters = params)
             sol = integrate(pode,ImplicitMidpoint())
             push!(sols, sol)
         end
