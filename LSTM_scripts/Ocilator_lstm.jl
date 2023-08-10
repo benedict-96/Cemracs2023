@@ -15,31 +15,32 @@ using LinearAlgebra:norm
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
 # filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
+filename="Ocilator_sigmoid_60020Samples_1000steps_0708.jld2"
 
-# p1list = load(filename,"p1list")
-# p2list = load(filename,"p2list")
-# q1list = load(filename,"q1list")
-# q2list = load(filename,"q2list")
+p1list = load(filename,"p1list")
+p2list = load(filename,"p2list")
+q1list = load(filename,"q1list")
+q2list = load(filename,"q2list")
 
-# p1list = hcat(p1list...)'
-# p2list = hcat(p2list...)'
-# q1list = hcat(q1list...)'
-# q2list = hcat(q2list...)'
+p1list = hcat(p1list...)'
+p2list = hcat(p2list...)'
+q1list = hcat(q1list...)'
+q2list = hcat(q2list...)'
 
-# data = cat(p1list,p2list,q1list,q2list,dims=3)
-# perm = [3,2,1]
-# data = permutedims(data,perm)
+data = cat(p1list,p2list,q1list,q2list,dims=3)
+perm = [3,2,1]
+data = permutedims(data,perm)
 
 
-# sequence_len = 20
-# shift = 1
-# train_input = data[:,1:20,:]
-# train_target = data[:,sequence_len+shift,:]
-# for _ in 1:3000
-#     start_point = rand(1:49980)
-#     train_input = cat(train_input,data[:,start_point:start_point+sequence_len-1,:],dims=3)
-#     train_target = cat(train_target,data[:,start_point+sequence_len,:],dims=2)
-# end
+sequence_len = 20
+shift = 1
+train_input = data[:,1:20,:]
+train_target = data[:,sequence_len+shift,:]
+for _ in 1:3000
+    start_point = rand(1:4980)
+    train_input = cat(train_input,data[:,start_point:start_point+sequence_len-1,:],dims=3)
+    train_target = cat(train_target,data[:,start_point+sequence_len,:],dims=2)
+end
 # train_input
 # train_target
 
@@ -51,19 +52,17 @@ using LinearAlgebra:norm
 
 # input is (4, 100, 81),i.e. the first 9*100 steps for each sample 
 # target is 20- 120,120-220,...820-920 for each sample 
-filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
-train_input = load(filename,"train_input")
-train_target = load(filename,"train_target")
+# train_input = load(filename,"train_input")
+# train_target = load(filename,"train_target")
 
-train_input = train_input[:,:,1:63000]
-train_target = train_target[:,1:63000]
+# train_input = train_input[:,:,1:63000]
+# train_target = train_target[:,1:63000]
 
 
 
 (x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=0.999, shuffle=false)
 batchsize = 100
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
-
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
 
 input_dims = output_dims = 4
@@ -277,10 +276,7 @@ truth = data[:,992:1001,1]
 # output[:,99:106]
 # truth[:,99:106]
 
-@save "lstm_ps_63000samples_seqlen 20_shift1.jld2" {compress = true} ps st
-
-
-
+@save "lstm_63000samples_seqlen20_shift1_0708.jld2" {compress = true} ps st
 
 plot(truth[1,:],truth[2,:],label="Truth")
 plot!(output[1,:],output[2,:],label="Prediction")
