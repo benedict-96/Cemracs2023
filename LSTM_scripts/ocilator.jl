@@ -3,14 +3,10 @@ cd("/Users/zeyuan/Documents/GitHub/GeometricMachineLearning.jl")
 # cd("./Cemracs2023/LSTM_scripts/")
 Pkg.activate(".")
 
-using Lux
-using JLD2
-using MLUtils: DataLoader,splitobs
-using Random
-using ProgressMeter
-using GeometricIntegrators
-using Plots
 
+using Random
+using GeometricIntegrators
+using JLD2
 
 params = (m1 = 3, m2 = 5, k1 = 0.1, k2 = 0.1, k = 0.2)
 x0 = 0.5
@@ -163,8 +159,8 @@ save(filename,data)
 
 
 
-params_collection = (  (m1=2, m2=0.25, k1=1.5, k2=0.1, k=2),)
-initial_conditions_collection = ( (q=[1.,0.], p=[0.66,0.]),)
+params_collection = (  (m1=2, m2=1, k1=1.5, k2=0.3, k=2),)
+initial_conditions_collection = ( (q=[1.,0.], p=[2.,0.]),)
 
 
 t_integration = 5000
@@ -209,7 +205,7 @@ p2list = []
 
 for params in params_collection
     for initial_conditions in initial_conditions_collection
-        pode = PODEProblem(q̇, ṗ1, (0.0, t_integration), .1, initial_conditions; parameters = params)
+        pode = PODEProblem(q̇, ṗ1, (0.0, t_integration), .4, initial_conditions; parameters = params)
         sol = integrate(pode,ImplicitMidpoint())
         # push!(sols, sol)
         push!(q1list, sol.q[:,1].parent)
@@ -252,3 +248,60 @@ data = Dict("q1list" => q1list,
 
 filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
 save(filename,data)
+
+
+###############07.08.2023
+params_collection = (  (m1=2, m2=1, k1=1.5, k2=0.3, k=2),)
+initial_conditions_collection = (q=[1.,0.], p=[2.,0.])
+
+
+t_integration = 1000
+
+function q̇(v, t, q, p, params)
+    v[1] = p[1]/params.m1
+    v[2] = p[2]/params.m2
+end
+
+function σ(x::T) where T
+    T(1)/(T(1)+exp(-x))
+end
+
+function ṗ1(f, t, q, p, params)
+    f[1] = -params.k1 * q[1] - params.k * (q[1] - q[2]) * σ(q[1]) - params.k /2 * (q[1] - q[2])^2 * σ(q[1])^2 * exp(-q[1])
+    f[2] = -params.k2 * q[2] + params.k * (q[1] - q[2]) * σ(q[1])
+end
+
+function ṗ2(f, t, q, p, params)
+    f[1] = -params.k1 * q[1] - params.k * (q[1] - q[2]) * cos(q[1]) + params.k /2 * (q[1] - q[2])^2 * sin(q[1])
+    f[2] = -params.k2 * q[2] + params.k * (q[1] - q[2]) * cos(q[1])
+end
+
+q1list = []
+q2list = []
+p1list = []
+p2list = []
+
+for kk in 0.1:0.1:4
+    params= (m1=2, m2=1, k1=1.5, k2=0.3, k=kk)
+    pode = PODEProblem(q̇, ṗ1, (0.0, t_integration), .1, initial_conditions_collection; parameters = params)
+    sol = integrate(pode,ImplicitMidpoint())
+    # push!(sols, sol)
+    push!(q1list, sol.q[:,1].parent)
+    push!(q2list, sol.q[:,2].parent)
+
+    push!(p1list, sol.p[:,1].parent)
+    push!(p2list, sol.p[:,2].parent)    
+end
+
+data = Dict("q1list" => q1list,
+            "q2list" => q2list,
+            "p1list" => p1list,
+            "p2list" => p2list,
+            )
+
+
+filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_sigmoid_60020Samples_1000steps_0708.jld2"
+save(filename,data)
+
+
+

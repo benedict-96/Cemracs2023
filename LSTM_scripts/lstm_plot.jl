@@ -66,7 +66,7 @@ rng = Random.default_rng()
 Random.seed!(rng, 0)
 # ps,st=Lux.setup(Random.default_rng(),model)
 
-@load "/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/lstm_ps_63000samples_seqlen20_shift1.jld2"  ps st
+@load "/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/lstm_63000samples_seqlen20_shift1_0708.jld2"  ps st
 model(input,ps,st)[1]
 
 
