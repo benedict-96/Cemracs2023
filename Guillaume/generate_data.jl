@@ -6,7 +6,7 @@ integration_time_step = 0.4
 params_collection = (  (m1=2, m2=1., k1=1.5, k2=0.3, k=2),
 )
 
-for k0 in LinRange(1, 4, 40) 
+for k0 in LinRange(1, 4, 5) 
     global params_collection = (params_collection...,  (m1=2, m2=1., k1=1.5, k2=0.3, k=k0))
 end
 

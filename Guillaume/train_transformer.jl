@@ -4,11 +4,11 @@ using GeometricMachineLearning, KernelAbstractions, LinearAlgebra, ProgressMeter
 using ChainRulesCore
 using CUDA
 using Random
-using Plots
+# using Plots
 
-# include("generate_data.jl")
+include("generate_data.jl")
 
-backend = CUDABackend()
+backend = CPU()
 T = Float32
 
 data_raw = generate_data()
@@ -22,31 +22,32 @@ copyto!(data, data_raw)
 const transformer_dim = 20
 const num_heads = 4
 const seq_length = 20
-const n_epochs = 500
+const n_epochs = 10
 const batch_size = 128
-const prediction_window = 5
+const prediction_window = 1
 
 model = Chain(  Attention(dim),
                 Gradient(dim,10*dim,tanh,change_q=true),
-                Attention(dim),
 		        Gradient(dim,10*dim,tanh,change_q=false),
-		        Attention(dim),
-                Gradient(dim,10*dim,tanh,change_q=false),
                 Attention(dim),
-		        Gradient(dim,10*dim,tanh,change_q=true), 
-		        Attention(dim),
                 Gradient(dim,10*dim,tanh,change_q=true),
-                Attention(dim),
-		        Gradient(dim,10*dim,tanh,change_q=false),
-                Gradient(dim,10*dim,identity,change_q=true),
-		        Gradient(dim,10*dim,identity,change_q=false))
+		        Gradient(dim,10*dim,tanh,change_q=false)
+		    )
 
 # model = Chain(Dense(dim, transformer_dim, tanh),
 #               MultiHeadAttention(transformer_dim, num_heads),
 #               ResNet(transformer_dim, tanh),
 #               MultiHeadAttention(transformer_dim, num_heads),
 #               ResNet(transformer_dim, tanh),
+#               ResNet(transformer_dim, tanh),
 #               Dense(transformer_dim, dim, identity)
+#               )
+
+# model = Chain(Dense(dim, transformer_dim, tanh),
+#             ResNet(transformer_dim, tanh),
+#             ResNet(transformer_dim, tanh),
+#             ResNet(transformer_dim, tanh),
+#             Dense(transformer_dim, dim, identity)
 #               )
 
 ps = initialparameters(backend, T, model)
@@ -140,7 +141,8 @@ function ChainRulesCore.rrule(::typeof(assign_output_estimate), batch::AbstractA
     return output_estimate, assign_output_estimate_pullback
 end     
 
-
+loss_val, pullback = Zygote.pullback(loss, ps)
+dx = pullback(1)[1]
 
 
 n_training_steps_per_epoch = Int(ceil(n_time_steps/batch_size))
@@ -150,8 +152,8 @@ p = Progress(n_epochs; enabled=true)
 for epochs in 1:n_epochs
     for t in 1:n_training_steps_per_epoch
         draw_batch!(batch, output)
-        loss_val, pullback = Zygote.pullback(loss, ps)
-        dx = pullback(1)[1]
+        # global loss_val, pullback = Zygote.pullback(loss, ps)
+        # global dx = pullback(1)[1]
         optimization_step!(o, model, ps, dx)
         # t % n_training_steps_per_epoch == 0 ? println(loss(ps)) : nothing
     end
@@ -160,16 +162,16 @@ end
 
 
 
+
 # Constructing 8 time steps to be unrolled for the transformer
-n_int = 50
+n_int = 100
 xt = [1, 0., 2, 0.]
 n_rolled_steps = 1
-params = (m1=2, m2=0.25, k1=1.5, k2=0.1, k=1.9)
+params = (m1=2, m2=1., k1=1.5, k2=0.3, k=2.5)
 pode = PODEProblem(q̇, ṗ1, (0.0, integration_time_step * seq_length), integration_time_step, xt[1:2],  xt[3:4]; parameters = params)
 sol = integrate(pode,ImplicitMidpoint())
 x_transformer = []
 push!(x_transformer, [sol.q[:,1], sol.q[:,2], sol.p[:,1], sol.p[:,2]])
-
 
 @kernel function to_matrix!(matrix, x)
     i,j,k = @index(Global, NTuple)
@@ -202,4 +204,4 @@ p1 = plot(xlims=[0,n_int], xlab="t", ylab="x(t)", legend=:bottomright)
 
 plot!(p1,sol.q[:,1], label="numeric")
 plot!(p1,X.q1, label="NN model")
-# png(p1, "./Images/transformer_10000_NN")
+# png(p1, "./Images/Respnet_100")
