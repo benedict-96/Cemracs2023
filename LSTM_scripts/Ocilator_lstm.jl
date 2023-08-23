@@ -15,31 +15,32 @@ using LinearAlgebra:norm
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_2707.jld2"
 # filename="/Users/zeyuan/Documents/GitHub/Cemracs2023/LSTM_scripts/Ocilator_9Samples_1000steps_different.jld2"
 # filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
+filename="Ocilator_sigmoid_60020Samples_1000steps_0708.jld2"
 
-# p1list = load(filename,"p1list")
-# p2list = load(filename,"p2list")
-# q1list = load(filename,"q1list")
-# q2list = load(filename,"q2list")
+p1list = load(filename,"p1list")
+p2list = load(filename,"p2list")
+q1list = load(filename,"q1list")
+q2list = load(filename,"q2list")
 
-# p1list = hcat(p1list...)'
-# p2list = hcat(p2list...)'
-# q1list = hcat(q1list...)'
-# q2list = hcat(q2list...)'
+p1list = hcat(p1list...)'
+p2list = hcat(p2list...)'
+q1list = hcat(q1list...)'
+q2list = hcat(q2list...)'
 
-# data = cat(p1list,p2list,q1list,q2list,dims=3)
-# perm = [3,2,1]
-# data = permutedims(data,perm)
+data = cat(p1list,p2list,q1list,q2list,dims=3)
+perm = [3,2,1]
+data = permutedims(data,perm)
 
 
-# sequence_len = 20
-# shift = 1
-# train_input = data[:,1:20,:]
-# train_target = data[:,sequence_len+shift,:]
-# for _ in 1:3000
-#     start_point = rand(1:49980)
-#     train_input = cat(train_input,data[:,start_point:start_point+sequence_len-1,:],dims=3)
-#     train_target = cat(train_target,data[:,start_point+sequence_len,:],dims=2)
-# end
+sequence_len = 20
+shift = 1
+train_input = data[:,1:20,:]
+train_target = data[:,sequence_len+shift,:]
+for _ in 1:3000
+    start_point = rand(1:4980)
+    train_input = cat(train_input,data[:,start_point:start_point+sequence_len-1,:],dims=3)
+    train_target = cat(train_target,data[:,start_point+sequence_len,:],dims=2)
+end
 # train_input
 # train_target
 
@@ -51,19 +52,17 @@ using LinearAlgebra:norm
 
 # input is (4, 100, 81),i.e. the first 9*100 steps for each sample 
 # target is 20- 120,120-220,...820-920 for each sample 
-filename="Ocilator_sigmoid_63021Samples_1000steps_0208.jld2"
-train_input = load(filename,"train_input")
-train_target = load(filename,"train_target")
+# train_input = load(filename,"train_input")
+# train_target = load(filename,"train_target")
 
-train_input = train_input[:,:,1:63000]
-train_target = train_target[:,1:63000]
+# train_input = train_input[:,:,1:63000]
+# train_target = train_target[:,1:63000]
 
 
 
 (x_train,y_train),(x_val,y_val) = splitobs((train_input, train_target); at=0.999, shuffle=false)
 batchsize = 100
 train_loader = DataLoader((x_train,y_train),batchsize=batchsize,shuffle = false)
-
 val_loader = DataLoader((x_val,y_val),batchsize=1,shuffle = false)
 
 input_dims = output_dims = 4
@@ -76,8 +75,8 @@ function compute_loss(x, y, model, ps, st)
     # @show size(y)
     y_pred, st = model(x, ps, st)
     
-    seq_len = size(y,2)
-    batchsize = size(y,3)
+    # seq_len = size(y,2)
+    # batchsize = size(y,3)
     # @show batchsize
     # @show size(y_pred[1])
     # error = sum(sum(abs.(y[:,i,:] - y_pred[i]) for i in 1:seq_len)/seq_len)/batchsize
@@ -92,11 +91,11 @@ end
 
 
 #Define a Optimisers
-opt = Optimisers.ADAM(0.1)
+opt = Optimisers.ADAM(0.001)
 st_opt = Optimisers.setup(opt, ps)
 
 #Start the Training Process
-epochs = 10
+epochs = 100
 err_ls = []  
 @time @showprogress for epoch in 1:epochs
     err = 0  
@@ -112,7 +111,7 @@ err_ls = []
         # break
     end
     push!(err_ls,err/length(train_loader))
-    epoch %5 == 0 ? println(err/length(train_loader)) : nothing 
+    epoch %20 == 0 ? println(err/length(train_loader)) : nothing 
     # break 
 end
 
@@ -131,29 +130,31 @@ end
 
 
 
-y_pred = []
+output = []
 for (x,y) in plot_train_loader
-    for _ in range(1,5)
+    truth = x 
+    for _ in range(1,100)
         # @show size(x)
         # @show size(y)
         y_pred, st = model(x, ps, st)
-        @show y_pred
-        @show y
+        @show size(y_pred)
+        @show (y)
         # @show size(y_pred[end-test_len:end])
         # for i in 1:test_len
-        y_pred = cat(y_pred...,dims=3)
-        perm = [1,3,2]
-        y_pred = permutedims(y_pred,perm)
+        # y_pred = cat(y_pred...,dims=3)
+        # perm = [1,3,2]
+        # y_pred = permutedims(y_pred,perm)
         # @show size(y_pred)
         # @show size(y_pred[:,end-shift+1:end,:])
 
-        x = cat(x, y_pred[:,end-shift+1:end,:], dims=2)
+        x = cat(x, y_pred, dims=2)
+        truth = cat(truth,y, dims= 2)
         # @show size(x)
         # end
         # @show size(x)
         # x = x[:, 2:end, :]
         # @show x
-        break
+        # break
     end
     @show size(x)
     output = x
@@ -164,7 +165,7 @@ end
 
 #Find the truth to compare 
 output = output[:,:,1]
-truth = data[:,1:15,1]
+truth = train_input[:,:,1]
 # See whether the right sample to compare
 output[:,9:15]
 truth[:,9:15]
@@ -274,6 +275,8 @@ truth = data[:,992:1001,1]
 # See whether the right sample to compare
 # output[:,99:106]
 # truth[:,99:106]
+
+@save "lstm_63000samples_seqlen20_shift1_0708.jld2" {compress = true} ps st
 
 plot(truth[1,:],truth[2,:],label="Truth")
 plot!(output[1,:],output[2,:],label="Prediction")
