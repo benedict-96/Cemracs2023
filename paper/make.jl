@@ -23,7 +23,9 @@ makedocs(;
     pages=[
         "Introduction" => "introduction.md",
         "Rigid Body" => "rigid_body.md",
+        "Transformer" => "transformer.md",
         "VPFF" => "volume_preserving_feed_forward.md",
+        "VPT" => "volume_preserving_transformer.md",
         "References" => "references.md",
     ],
 )
