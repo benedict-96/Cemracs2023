@@ -8,7 +8,6 @@ using GeometricEquations: EnsembleProblem
 using LinearAlgebra: norm 
 import Random 
 
-Random.seed!(123)
 const ics₁ = [(q = [sin(val), 0., cos(val)], ) for val in 0.1:.01:(2*π)]
 const ics₂ = [(q = [0., sin(val), cos(val)], ) for val in 0.1:.01:(2*π)]
 const ics = [ics₁..., ics₂...]
@@ -18,34 +17,38 @@ const tspan = (0., 20.)
 
 const sys_dim = length(ics[1].q)
 
-const n_blocks = 4
-const n_linear = 2
+const n_blocks = 2
+const n_linear = 1
 const activation = tanh
-
-const batch_size = 16384
-const opt_method = AdamOptimizer()
-const n_epochs = 20000
+const model = VolumePreservingFeedForward(sys_dim, n_blocks, n_linear, activation)
 
 const backend = CUDABackend()
 # const T = backend == CPU() ? Float64 : Float32
-const T = Float64
+const T = Float32
 
-const t_validation = 5
+const batch_size = 16384
+const opt_method = AdamOptimizer(T)
+const n_epochs = 1000
+
+const t_validation = 14
 
 ensemble_problem = EnsembleProblem(odeproblem().equation, tspan, tstep, ics, default_parameters)
 ensemble_solution = integrate(ensemble_problem, ImplicitMidpoint())
-dl₁ = DataLoader(ensemble_solution)
-dl = backend == CPU() ? dl₁ : DataLoader(dl₁.input |> CuArray{T})
+const dl₁ = DataLoader(ensemble_solution)
 
-model = VolumePreservingFeedForward(sys_dim, n_blocks, n_linear, activation)
+function train_network(T::Type{<:Number}, backend::Backend)
+    dl = backend == CPU() ? dl₁ : DataLoader(dl₁.input |> CuArray{T})
 
-nn = NeuralNetwork(model, backend, T)
+    nn = NeuralNetwork(model, backend, T)
 
-o = Optimizer(opt_method, nn)
+    o = Optimizer(opt_method, nn)
 
-batch = Batch(batch_size, 1)
+    batch = Batch(batch_size, 1)
 
-loss_array₁ =  o(nn, dl, batch, n_epochs)
+    loss_array₁ =  o(nn, dl, batch, n_epochs)
+end
+
+loss_array₁ = train_network(T, backend)
 
 ic = (q = [sin(1.1), 0., cos(1.1)], )
 
@@ -95,7 +98,7 @@ nn₁ = NeuralNetwork(GeometricMachineLearning.DummyNNIntegrator(), nn.model, ma
 
 p_validation = make_validation_plot(t_validation, nn₁)
 
-p_validation₂ = make_validation_plot(20, nn₁)
+p_validation₂ = make_validation_plot(100, nn₁)
 ########################### plot training loss
 
 p_training_loss = plot(loss_array₁, label = "volume-preserving feedforward", color = 2, linewidth = 2, yaxis = :log)
@@ -103,7 +106,7 @@ p_training_loss = plot(loss_array₁, label = "volume-preserving feedforward", c
 
 ########################### plot trajectories on the sphere
 
-p_validation3d = make_validation_plot3d(20, nn₁)
+p_validation3d = make_validation_plot3d(100, nn₁)
 
 ########################### save figures
 
