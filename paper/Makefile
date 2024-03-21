@@ -1,5 +1,7 @@
 all: linux_images train_networks generate_tex copy_edps_files chapter_to_section introduction_gets_no_label compile_tex
 
+pdf_without_training: linux_images generate_tex copy_edps_files chapter_to_section introduction_gets_no_label compile_tex
+
 linux_images:
 	$(MAKE) linux -C src/tikz
 
