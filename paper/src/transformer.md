@@ -39,8 +39,8 @@ This softmax function maps the correlation matrix to the a sequence of *probabil
 
 <!--
 \begin{remark}
-\Cref{fig:transformer} indicates the use of a *multi-head attention layer* as opposed to a *single-head attention layer*. What we described in this section is single-head attention. A multi-head attention layer is slightly more complex: it is a concatenation of multiple single-head attention layers. This is useful for NLP tasks[^2] but introduces additional complexity that makes it harder to imbue the multi-head attention layer with structure-preserving properties.
+\Cref{fig:transformer} indicates the use of a *multi-head attention layer* as opposed to a *single-head attention layer*. What we described in this section is single-head attention. A multi-head attention layer is slightly more complex: it is a concatenation of multiple single-head attention layers. This is useful for NLP tasks[^3] but introduces additional complexity that makes it harder to imbue the multi-head attention layer with structure-preserving properties.
 \end{remark}
 
-[^2]: Intuitively, multi-head attention layers allow for attending to different parts of the sequence in different ways (i.e. different heads in the multi-head attention layer *attend to* different parts of the input sequence) and can therefore extract richer contextual information.
+[^3]: Intuitively, multi-head attention layers allow for attending to different parts of the sequence in different ways (i.e. different heads in the multi-head attention layer *attend to* different parts of the input sequence) and can therefore extract richer contextual information.
 -->
