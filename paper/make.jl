@@ -27,6 +27,7 @@ makedocs(;
         "VPFF" => "volume_preserving_feed_forward.md",
         "VPT" => "volume_preserving_transformer.md",
         "Results" => "results.md",
+        "acknowledgements" => "acknowledgements.md",
         "References" => "references.md",
     ],
 )
