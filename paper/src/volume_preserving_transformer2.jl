@@ -3,7 +3,7 @@ using GeometricMachineLearning
 using GeometricMachineLearning: map_to_cpu
 using Plots
 using GeometricIntegrators: integrate, ImplicitMidpoint
-using GeometricProblems.RigidBody: odeensemble, default_parameters
+using GeometricProblems.RigidBody: odeproblem, odeensemble, default_parameters
 import Random 
 
 # hyperparameters for the problem 
@@ -37,14 +37,14 @@ const T = Float32
 const dl = backend == CPU() ? DataLoader(dl₁.input) : DataLoader(dl₁.input |> MtlArray{T})
 
 # hyperparameters concerning training 
-const n_epochs = 500
+const n_epochs = 100
 const batch_size = 16384
 const seq_length = 3
 const opt_method = AdamOptimizer(T)
 const resnet_activation = tanh
 
 # parameters for evaluation 
-ics_val = (q = [sin(1.1), 0., cos(1.1)], )
+ics_val = [sin(1.1), 0., cos(1.1)]
 const t_validation = 14
 const t_validation_long = 100
 
@@ -67,9 +67,9 @@ transformer_batch = Batch(batch_size, seq_length)
 
 model₂ = VolumePreservingFeedForward(sys_dim, n_blocks * L, n_linear, resnet_activation)
 
-model₃ = VolumePreservingTransformer(sys_dim, seq_length, n_blocks, n_linear, L, resnet_activation; skew_sym = skew_sym)
+model₃ = VolumePreservingTransformer(sys_dim, seq_length; n_blocks = n_blocks, n_linear = n_linear, L = L, activation = resnet_activation, skew_sym = skew_sym)
 
-model₄ = RegularTransformerIntegrator(sys_dim, sys_dim, n_heads, L; resnet_activation = resnet_activation add_connection = false)
+model₄ = RegularTransformerIntegrator(sys_dim, sys_dim, n_heads; n_blocks = n_blocks, L = L, resnet_activation = resnet_activation, add_connection = false)
 
 # nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch, transformer=true)
 # nn₁ = NeuralNetwork(GeometricMachineLearning.DummyTransformer(seq_length), nn₁.model, nn₁.params)
@@ -77,7 +77,7 @@ nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
 nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch)
 nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch)
 
-function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_val::NamedTuple)
+function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_val::Vector)
     validation_problem = odeproblem(ics_val; tspan = (0.0, t_integration), tstep = tstep, parameters = default_parameters)
     sol = integrate(validation_problem, ImplicitMidpoint())
 
@@ -96,8 +96,8 @@ function plot_validation(t_validation; nn₂ = nn₂, nn₃ = nn₃, nn₄ = nn�
 
     # nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
     nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
-    nn₃_solution = iterate(nn₃, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
-    nn₄_solution = iterate(nn₄, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, seq_length)
+    nn₃_solution = iterate(nn₃, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
+    nn₄_solution = iterate(nn₄, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
 
     ########################### plot validation
 
