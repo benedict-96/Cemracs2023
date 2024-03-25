@@ -1,25 +1,25 @@
-using CUDA
+using Metal
 using GeometricMachineLearning
-using GeometricMachineLearning: transformer_loss, map_to_cpu, DummyTransformer, DummyNNIntegrator
+using GeometricMachineLearning: map_to_cpu, DummyTransformer, DummyNNIntegrator
 using Plots
 using GeometricIntegrators: integrate, ImplicitMidpoint
-using GeometricProblems.RigidBody: odeproblem, default_parameters
+using GeometricProblems.RigidBody: odeensemble, default_parameters
 import Random 
 
 # hyperparameters for the problem 
 const tstep = .2
 const tspan = (0., 20.)
-const ics₁ = [(q = [sin(val), 0., cos(val)], ) for val in 0.1:.01:(2*π)]
-const ics₂ = [(q = [0., sin(val), cos(val)], ) for val in 0.1:.01:(2*π)]
+const ics₁ = [[sin(val), 0., cos(val)] for val in 0.1:.01:(2*π)]
+const ics₂ = [[0., sin(val), cos(val)] for val in 0.1:.01:(2*π)]
 const ics = [ics₁..., ics₂...]
 
-ensemble_problem = GeometricMachineLearning.EnsembleProblem(odeproblem().equation, tspan, tstep, ics, default_parameters)
+ensemble_problem = odeensemble(ics; tspan = tspan, tstep = tstep, parameters = default_parameters)
 ensemble_solution = integrate(ensemble_problem, ImplicitMidpoint())
 
-dl_nt = DataLoader(ensemble_solution)
+dl₁ = DataLoader(ensemble_solution)
 
 # hyperparameters concerning architecture 
-const sys_dim = size(dl_nt.input, 1)
+const sys_dim = size(dl₁.input, 1)
 const n_heads = 1
 const L = 1 # transformer blocks 
 const activation = tanh
@@ -29,13 +29,13 @@ const skew_sym = false
 const transformer_dim = 5
 
 # backend 
-const backend = CUDABackend()
+const backend = MetalBackend()
 
 # data type 
-const T = Float64
+const T = Float32
 
 # data loader 
-const dl = backend == CPU() ? DataLoader(dl_nt.input) : DataLoader(dl_nt.input |> CuArray{T})
+const dl = backend == CPU() ? DataLoader(dl₁.input |> Array{T}) : DataLoader(dl₁.input |> MtlArray{T})
 
 # hyperparameters concerning training 
 const n_epochs = 3000
@@ -49,19 +49,19 @@ const upscaling_activation = identity
 ics_val = (q = [sin(1.1), 0., cos(1.1)], )
 const t_validation = 10
 
-function setup_and_train(model::Union{GeometricMachineLearning.Architecture, GeometricMachineLearning.Chain}, batch::Batch; transformer::Bool=true)
+function setup_and_train(model::Union{GeometricMachineLearning.Architecture, GeometricMachineLearning.Chain}, batch::Batch)
     Random.seed!(123)
 
     nn₀ = NeuralNetwork(model, backend, T)
     o₀ = Optimizer(opt_method, nn₀)
 
-    loss_array = transformer ? o₀(nn₀, dl, batch, n_epochs, transformer_loss) : o₀(nn₀, dl, batch, n_epochs)
+    loss_array = o₀(nn₀, dl, batch, n_epochs)
 
     GeometricMachineLearning.map_to_cpu(nn₀), loss_array
 end
 
-feedforward_batch = Batch(batch_size, 1)
-transformer_batch = Batch(batch_size, seq_length)
+feedforward_batch = Batch(batch_size)
+transformer_batch = Batch(batch_size, seq_length, seq_length)
 
 # attention only
 model₁ = Chain(Dense(sys_dim, transformer_dim, tanh), VolumePreservingAttention(transformer_dim, seq_length; skew_sym = skew_sym), Linear(transformer_dim, sys_dim))
@@ -72,10 +72,10 @@ model₃ = Chain(Dense(sys_dim, transformer_dim, tanh), Chain(VolumePreservingTr
 
 model₄ = RegularTransformerIntegrator(sys_dim, transformer_dim, n_heads, L, upscaling_activation, resnet_activation; add_connection = false)
 
-nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch, transformer=true)
-nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch, transformer=false)
-nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch, transformer=true)
-nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch, transformer=true)
+nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch) 
+nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
+nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch) 
+nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch) 
 
 function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_val::NamedTuple)
     validation_problem = odeproblem(ics_val; tspan = (0.0, t_integration), tstep = tstep, parameters = default_parameters)
