@@ -37,15 +37,17 @@ The main difficulty in adapting a transformer-like architecture to be symplectic
 
 where we have:
 ```math
-     \Phi_{ij} = \begin{cases} c_{ij} & \text{if $i<j$}  \\ -c_{ji} & \text{if $i>j$} \\ 0 & \text{else.}\end{cases} \qquad\text{ and }\qquad \mathrm{Cayley}(Y) = \frac{1}{2}(\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
+\Phi_{ij} = \begin{cases} c_{ij} & \text{if $i<j$}  \\ -c_{ji} & \text{if $i>j$} \\ 0 & \text{else.}\end{cases} \qquad\text{ and }\qquad \mathrm{Cayley}(Y) = \frac{1}{2}(\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
 ```
 
-The Cayley transform maps skew-symmetric matrices to orthonormal matrices[^3], and $\Phi$ maps arbitrary matrices to skew-symmetric ones. This results in a new activation function for our attention mechanism which we denote by $\Lambda(Z) = \sigma (Z^T A Z)$. Because $\Lambda(Z)$ is orthonormal the entire mapping is equivalent to a multiplication by a symplectic matrix. To see this note that the attention layer has the following action:
-\begin{equation}
-    Z \mapsto Z\Lambda(Z).
-    \label{eq:Lambda_right}
-\end{equation}
-In the transformed coordinate system (in terms of the vector $Z_\mathrm{vec}$ from \cref{eq:big_vector}), this is equivalent to multiplication by a sparse matrix $\tilde\Lambda(Z)$ from the left:
+The Cayley transform maps skew-symmetric matrices to orthonormal matrices[^3], and ``\Phi`` maps arbitrary matrices to skew-symmetric ones. This results in a new activation function for our attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Because ``\Lambda(Z)`` is orthonormal the entire mapping is equivalent to a multiplication by a symplectic matrix. To see this note that the attention layer has the following action:
+
+```math
+Z \mapsto Z\Lambda(Z).
+\label{eq:LambdaRight}
+```
+
+In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` from \\ldots), this is equivalent to multiplication by a sparse matrix ``\tilde\Lambda(Z)`` from the left:
 
 [^3]: The orthonormal matrices ``\{B\in\mathbb{R}^{d\times{}d}:B^TB=\mathbb{I}_d\}`` form a Lie group under regular matrix multiplication. The associated Lie algebra is the vector space of skew-symmetric matrices ``\mathfrak{g}=\{C:C+C^T\}`` and the Lie algebra is mapped to the Lie group via the Cayley transform. More details on this can be found in e.g. [hairer2006geometric](@cite).
 
@@ -62,7 +64,7 @@ In the transformed coordinate system (in terms of the vector $Z_\mathrm{vec}$ fr
 
 ![Volume-Preserving Transformer](tikz/vp_transformer.png)
 
-Cref{eq:Lambda_right} is equivalent to a multiplication by a symplectic matrix if we can show that ``\tilde{\Lambda}(Z)^T\mathbb{J}_{2nT}\tilde{\Lambda}(Z) = \mathbb{J}_{2nT}``, where we have defined a big symplectic matrix[^4]:
+M[eq:LambdaRight]m(@latex) is equivalent to a multiplication by a symplectic matrix if we can show that ``\tilde{\Lambda}(Z)^T\mathbb{J}_{2nT}\tilde{\Lambda}(Z) = \mathbb{J}_{2nT}``, where we have defined a big symplectic matrix[^4]:
 ```math
 \mathbb{J}_{2dT} = \begin{pmatrix} \mathbb{O} & \mathbb{I}_{dT} \\ -\mathbb{I}_{dT} & \mathbb{O} \end{pmatrix}.
 ```
