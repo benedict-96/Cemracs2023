@@ -1,4 +1,4 @@
-using Metal
+using CUDA
 using GeometricMachineLearning
 using GeometricMachineLearning: map_to_cpu
 using Plots
@@ -9,8 +9,8 @@ import Random
 # hyperparameters for the problem 
 const tstep = .2
 const tspan = (0., 20.)
-const ics₁ = [[sin(val), 0., cos(val)] for val in 0.1:.01:(2*π)]
-const ics₂ = [[0., sin(val), cos(val)] for val in 0.1:.01:(2*π)]
+const ics₁ = [[sin(val), 0., cos(val)] for val in .1:.01:(2*π)]
+const ics₂ = [[0., sin(val), cos(val)] for val in .1:.01:(2*π)]
 const ics = [ics₁..., ics₂...]
 
 ensemble_problem = odeensemble(ics; tspan = tspan, tstep = tstep, parameters = default_parameters)
@@ -21,24 +21,24 @@ dl₁ = DataLoader(ensemble_solution)
 # hyperparameters concerning architecture 
 const sys_dim = size(dl₁.input, 1)
 const n_heads = 1
-const L = 1 # transformer blocks 
+const L = 6 # transformer blocks 
 const activation = tanh
 const n_linear = 1
-const n_blocks = 2
+const n_blocks = 1
 const skew_sym = true
 
 # backend 
-const backend = MetalBackend()
+const backend = CUDABackend()
 
 # data type 
 const T = Float32
 
 # data loader 
-const dl = backend == CPU() ? DataLoader(dl₁.input) : DataLoader(dl₁.input |> MtlArray{T})
+const dl = backend == CPU() ? DataLoader(dl₁.input) : DataLoader(dl₁.input |> CuArray{T})
 
 # hyperparameters concerning training 
-const n_epochs = 100
-const batch_size = 16384
+const n_epochs = 10000
+const batch_size = 8192
 const seq_length = 3
 const opt_method = AdamOptimizer(T)
 const resnet_activation = tanh
@@ -46,7 +46,7 @@ const resnet_activation = tanh
 # parameters for evaluation 
 ics_val = [sin(1.1), 0., cos(1.1)]
 const t_validation = 14
-const t_validation_long = 100
+const t_validation_long = 30
 
 function setup_and_train(model::Union{GeometricMachineLearning.Architecture, GeometricMachineLearning.Chain}, batch::Batch)
     Random.seed!(1234)
@@ -60,7 +60,7 @@ function setup_and_train(model::Union{GeometricMachineLearning.Architecture, Geo
 end
 
 feedforward_batch = Batch(batch_size)
-transformer_batch = Batch(batch_size, seq_length)
+transformer_batch = Batch(batch_size, seq_length, seq_length)
 
 # attention only
 # model₁ = Chain(VolumePreservingAttention(sys_dim, seq_length; skew_sym = skew_sym))
@@ -73,7 +73,7 @@ model₄ = RegularTransformerIntegrator(sys_dim, sys_dim, n_heads; n_blocks = n_
 
 # nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch, transformer=true)
 # nn₁ = NeuralNetwork(GeometricMachineLearning.DummyTransformer(seq_length), nn₁.model, nn₁.params)
-nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
+# nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
 nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch)
 nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch)
 
@@ -90,22 +90,22 @@ function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_v
     T.(numerical_solution), T.(t_array) 
 end
 
-function plot_validation(t_validation; nn₂ = nn₂, nn₃ = nn₃, nn₄ = nn₄, plot_regular_transformer = false, plot_vp_transformer = false)
+function plot_validation(t_validation; nn₃ = nn₃, nn₄=nn₄, plot_regular_transformer = false, plot_vp_transformer = false)
 
     numerical, t_array = numerical_solution(sys_dim, t_validation, tstep, ics_val)
 
     # nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
-    nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
+    # nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
     nn₃_solution = iterate(nn₃, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
     nn₄_solution = iterate(nn₄, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
 
     ########################### plot validation
 
-    p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2)
+    p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
 
     # plot!(p_validation, t_array, nn₁_solution[1, :], label = "attention only", color = 2, linewidth = 2)
 
-    plot!(p_validation, t_array, nn₂_solution[1, :], label = "feedforward", color = 3, linewidth = 2)
+    # plot!(p_validation, t_array, nn₂_solution[1, :], label = "feedforward", color = 3, linewidth = 2)
 
     if plot_vp_transformer
         plot!(p_validation, t_array, nn₃_solution[1, :], label = "transformer", color = 4, linewidth = 2)
@@ -123,11 +123,11 @@ p_validation_long = plot_validation(t_validation_long)
 
 ########################### plot training loss
 
-p_training_loss = plot(loss_array₂, label = "feedforward", color = 3, linewidth = 2, yaxis = :log)
+p_training_loss = plot(loss_array₃, label = "transformer", color = 4, linewidth = 2, yaxis = :log, dpi = 400)
 
 # plot!(loss_array₁, label = "attention only", color = 2, linewidth = 2)
 
-plot!(p_training_loss, loss_array₃, label = "transformer", color = 4, linewidth = 2)
+# plot!(p_training_loss, loss_array₂, label = "feedforward", color = 3, linewidth = 2)
 
 plot!(p_training_loss, loss_array₄, label = "standard transformer", color = 5, linewidth = 2)
 
@@ -136,11 +136,12 @@ plot!(p_training_loss, loss_array₄, label = "standard transformer", color = 5,
 function make_validation_plot3d(t_validation::Int, nn::NeuralNetwork)
     numerical, _ = numerical_solution(sys_dim, t_validation, tstep, ics_val)
 
-    nn₁_solution = iterate(nn, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
+    prediction_window = typeof(nn) <: NeuralNetwork{<:GeometricMachineLearning.TransformerIntegrator} ? seq_length : 1
+    nn₁_solution = iterate(nn, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = prediction_window)
 
     ########################### plot validation
 
-    p_validation = plot(numerical[1, :], numerical[2, :], numerical[3, :], label = "numerical solution", color = 1, linewidth = 2)
+    p_validation = plot(numerical[1, :], numerical[2, :], numerical[3, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
 
     plot!(p_validation, nn₁_solution[1, :], nn₁_solution[2,:], nn₁_solution[3, :], label = "volume-preserving transformer", color = 4, linewidth = 2)
 
