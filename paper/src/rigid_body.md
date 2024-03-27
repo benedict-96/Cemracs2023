@@ -2,15 +2,15 @@
 
 The differential equation for the rigid body (see [hairer2006geometric](@cite)) describes a solid object fixed at a point.
 
-![](tikz/ellipsoid.png)
+![Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through ``I_1``, ``I_2`` and ``I_3``.](tikz/ellipsoid.png)
 
 The motion of a point ``(x, y, z)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
 
 ```math
-v = \omega\times{}\begin{pmatrix} x \\ y \\ z \end{pmatrix} = \begin{pmatrix} \omega_2z - \omega_3y \\ \omega_3x - \omega_1z \\ \omega_1y - \omega_2x \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x \\ y \\ z \end{pmatrix}.
+v = \omega\times{}\begin{pmatrix} x \\ y \\ z \end{pmatrix} = \begin{pmatrix} \omega_2z - \omega_3y \\ \omega_3x - \omega_1z \\ \omega_1y - \omega_2x \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x \\ y \\ z \end{pmatrix},
 ```
 
-In order to get the entire kinetic energy of ``\mathcal{B}`` we have to integrate over the entire volume of the body:
+where ``\omega`` is the angular velocity. In order to get the entire kinetic energy of ``\mathcal{B}`` we have to integrate over the entire volume of the body:
 
 ```math
 T   & = \frac{1}{2}\int_\mathcal{B}||\omega\times{}x||^2dm \\
@@ -51,25 +51,25 @@ These are the equations we will treat. For simplicity we write: ``x := L_1``, ``
 \frac{d}{dt}\begin{pmatrix} x \\  y \\ z  \end{pmatrix}  = \begin{pmatrix} Ayz \\ Bxz \\ Cxy \end{pmatrix}. 
 ```
 
-We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In the following we plot some of the trajectories:
+We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In m[fig:RigidBodyCurves]m(@latex) we show some trajectories.
 
 ```@eval 
-using GeometricProblems.RigidBody: odeproblem, tspan, tstep, default_parameters
+using GeometricProblems.RigidBody: odeensemble, tspan, tstep, default_parameters
 using GeometricIntegrators: integrate, ImplicitMidpoint
 using GeometricEquations: EnsembleProblem
 using GeometricSolutions: GeometricSolution
 using Plots; pyplot()
 
 ics = [
-        (q = [sin(1.1), 0., cos(1.1)], ),
-        (q = [sin(2.1), 0., cos(2.1)], ),
-        (q = [sin(2.2), 0., cos(2.2)], ),
-        (q = [0., sin(1.1), cos(1.1)], ),
-        (q = [0., sin(1.5), cos(1.5)], ), 
-        (q = [0., sin(1.6), cos(1.6)], )
+        [sin(1.1), 0., cos(1.1)],
+        [sin(2.1), 0., cos(2.1)],
+        [sin(2.2), 0., cos(2.2)],
+        [0., sin(1.1), cos(1.1)],
+        [0., sin(1.5), cos(1.5)], 
+        [0., sin(1.6), cos(1.6)]
 ]
 
-ensemble_problem = EnsembleProblem(odeproblem().equation, tspan, tstep, ics, default_parameters)
+ensemble_problem = odeensemble(ics; tspan = tspan, tstep = tstep, parameters = default_parameters)
 ensemble_solution = integrate(ensemble_problem, ImplicitMidpoint())
 
 function plot_geometric_solution!(p::Plots.Plot, solution::GeometricSolution; kwargs...)
@@ -86,7 +86,7 @@ function sphere(r, C)   # r: radius; C: center [cx,cy,cz]
            return x, y, z
        end
 
-p = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false)
+p = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400)
 
 for (i, solution) in zip(1:length(ensemble_solution), ensemble_solution)
     plot_geometric_solution!(p, solution; color = i, label = "trajectory "*string(i))
@@ -97,4 +97,10 @@ savefig(p, "rigid_body.png")
 nothing
 ```
 
-![](rigid_body.png)
+```@raw latex
+\begin{figure}
+\includegraphics[width=.5\textwidth]{rigid_body.png}
+\caption{Trajectories for $I_1 = 1$, $I_2 = 2$ and $I_3 = 2/3$ and various initial conditions.}
+\label{fig:RigidBodyCurves}
+\end{figure}
+```
