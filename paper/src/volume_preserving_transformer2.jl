@@ -31,27 +31,26 @@ const skew_sym = true
 const backend = CUDABackend()
 
 # data type 
-const T = Float32
+const T = Float64
 
 # data loader 
 const dl = backend == CPU() ? DataLoader(dl₁.input) : DataLoader(dl₁.input |> CuArray{T})
 
 # hyperparameters concerning training 
-const n_epochs = 10000
-const batch_size = 8192
+const n_epochs = 50000
+const batch_size = 16384
 const seq_length = 3
-const opt_method = AdamOptimizer(T)
+const opt_method = AdamOptimizerWithDecay(n_epochs, T; η₂ = 1e-5)
 const resnet_activation = tanh
 
 # parameters for evaluation 
 ics_val = [sin(1.1), 0., cos(1.1)]
 const t_validation = 14
-const t_validation_long = 30
+const t_validation_long = 100
 
-function setup_and_train(model::Union{GeometricMachineLearning.Architecture, GeometricMachineLearning.Chain}, batch::Batch)
+function train_the_network(nn₀::GeometricMachineLearning.NeuralNetwork, batch::Batch)
     Random.seed!(1234)
 
-    nn₀ = NeuralNetwork(model, backend, T)
     o₀ = Optimizer(opt_method, nn₀)
 
     loss_array = o₀(nn₀, dl, batch, n_epochs)
@@ -59,11 +58,28 @@ function setup_and_train(model::Union{GeometricMachineLearning.Architecture, Geo
     GeometricMachineLearning.map_to_cpu(nn₀), loss_array
 end
 
+function setup_and_train(model::GeometricMachineLearning.Architecture, batch::Batch)
+    Random.seed!(1234)
+
+    nn₀ = NeuralNetwork(model, backend, T)
+
+    train_the_network(nn₀, batch)
+end
+
+function setup_and_train(model::GeometricMachineLearning.Chain, batch::Batch)
+    Random.seed!(1234)
+
+    nn₀ = NeuralNetwork(model, backend, T)
+    nn₀ = NeuralNetwork(GeometricMachineLearning.DummyTransformer(seq_length), nn₀.model, nn₀.params)
+
+    train_the_network(nn₀, batch)
+end
+
 feedforward_batch = Batch(batch_size)
 transformer_batch = Batch(batch_size, seq_length, seq_length)
 
 # attention only
-# model₁ = Chain(VolumePreservingAttention(sys_dim, seq_length; skew_sym = skew_sym))
+model₁ = Chain(VolumePreservingAttention(sys_dim, seq_length; skew_sym = skew_sym))
 
 model₂ = VolumePreservingFeedForward(sys_dim, n_blocks * L, n_linear, resnet_activation)
 
@@ -71,9 +87,8 @@ model₃ = VolumePreservingTransformer(sys_dim, seq_length; n_blocks = n_blocks,
 
 model₄ = RegularTransformerIntegrator(sys_dim, sys_dim, n_heads; n_blocks = n_blocks, L = L, resnet_activation = resnet_activation, add_connection = false)
 
-# nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch, transformer=true)
-# nn₁ = NeuralNetwork(GeometricMachineLearning.DummyTransformer(seq_length), nn₁.model, nn₁.params)
-# nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
+nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch)
+nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
 nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch)
 nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch)
 
@@ -90,12 +105,12 @@ function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_v
     T.(numerical_solution), T.(t_array) 
 end
 
-function plot_validation(t_validation; nn₃ = nn₃, nn₄=nn₄, plot_regular_transformer = false, plot_vp_transformer = false)
+function plot_validation(t_validation; nn₁=nn₁, nn₂=nn₂, nn₃=nn₃, nn₄=nn₄, plot_regular_transformer = false, plot_vp_transformer = false)
 
     numerical, t_array = numerical_solution(sys_dim, t_validation, tstep, ics_val)
 
-    # nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
-    # nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
+    nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
+    nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
     nn₃_solution = iterate(nn₃, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
     nn₄_solution = iterate(nn₄, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
 
@@ -103,9 +118,9 @@ function plot_validation(t_validation; nn₃ = nn₃, nn₄=nn₄, plot_regular_
 
     p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
 
-    # plot!(p_validation, t_array, nn₁_solution[1, :], label = "attention only", color = 2, linewidth = 2)
+    plot!(p_validation, t_array, nn₁_solution[1, :], label = "attention only", color = 2, linewidth = 2)
 
-    # plot!(p_validation, t_array, nn₂_solution[1, :], label = "feedforward", color = 3, linewidth = 2)
+    plot!(p_validation, t_array, nn₂_solution[1, :], label = "feedforward", color = 3, linewidth = 2)
 
     if plot_vp_transformer
         plot!(p_validation, t_array, nn₃_solution[1, :], label = "transformer", color = 4, linewidth = 2)
@@ -123,11 +138,11 @@ p_validation_long = plot_validation(t_validation_long)
 
 ########################### plot training loss
 
-p_training_loss = plot(loss_array₃, label = "transformer", color = 4, linewidth = 2, yaxis = :log, dpi = 400)
+p_training_loss = plot(loss_array₃, label = "transformer", color = 4, linewidth = 2, yaxis = :log, dpi = 400, xlabel = "training loss", ylabel = "epoch")
 
-# plot!(loss_array₁, label = "attention only", color = 2, linewidth = 2)
+plot!(loss_array₁, label = "attention only", color = 2, linewidth = 2)
 
-# plot!(p_training_loss, loss_array₂, label = "feedforward", color = 3, linewidth = 2)
+plot!(p_training_loss, loss_array₂, label = "feedforward", color = 3, linewidth = 2)
 
 plot!(p_training_loss, loss_array₄, label = "standard transformer", color = 5, linewidth = 2)
 
