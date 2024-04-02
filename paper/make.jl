@@ -22,12 +22,14 @@ makedocs(;
     format = format,
     pages=[
         "Introduction" => "introduction.md",
-        "Rigid Body" => "rigid_body.md",
         "Transformer" => "transformer.md",
         "VPFF" => "volume_preserving_feed_forward.md",
         "VPT" => "volume_preserving_transformer.md",
+        "Rigid Body" => "rigid_body.md",
         "Results" => "results.md",
-        "acknowledgements" => "acknowledgements.md",
+        "Parameter-Dependent Equations" => "parameter_dependent_equations.md",
+        "Conclusion" => "conclusion.md",
+        "Acknowledgements" => "acknowledgements.md",
         "References" => "references.md",
     ],
 )

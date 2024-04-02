@@ -1,0 +1,5 @@
+# Conclusion
+
+We have introduced a new neural network architecture for learning the dynamics of systems described by divergence-free vector fields. We call this new architecture *volume-preserving transformer*. It is based on the classical transformer, but modifies the attention mechanism such the resulting *integrator* is volume-preserving. We have shown superior behaviour of the new network when compared to the classical transformer, while also demonstrating that it can resolve time series data. The example used in the numerical experiments was the rigid body. 
+
+Future work will focus on the application of our new architecture to different systems and also investigate its application to parameter-dependent equations as well as a more thourough study into why and when classical attention fails (as was demonstrated in this work).
