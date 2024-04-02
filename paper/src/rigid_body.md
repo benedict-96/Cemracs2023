@@ -1,36 +1,43 @@
 # The rigid body
 
-The differential equation for the rigid body (see [hairer2006geometric](@cite)) describes a solid object fixed at a point.
+```@raw latex
+\begin{figure}
+\includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
+\caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$}.
+\label{fig:RigidBody}
+\end{figure}
+```
 
-![Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through ``I_1``, ``I_2`` and ``I_3``.](tikz/ellipsoid.png)
-
-The motion of a point ``(x, y, z)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
+The differential equation for the rigid body (see [hairer2006geometric](@cite)) describes a solid object fixed at a point. It is the equation describing arbitrary motion of a rigid body modulo translations in space. A rigid body is shown in m[fig:RigidBody]m(@latex) and, as is alluded to in that figure, it can always be described by an ellipsoid. This can easily be seen when considering the derivation of the rigid body equations. The motion of a point ``(x, y, z)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
 
 ```math
-v = \omega\times{}\begin{pmatrix} x \\ y \\ z \end{pmatrix} = \begin{pmatrix} \omega_2z - \omega_3y \\ \omega_3x - \omega_1z \\ \omega_1y - \omega_2x \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x \\ y \\ z \end{pmatrix},
+v := \begin{pmatrix} \dot{x_1} \\ \dot{x_2} \\ \dot{x_3} \end{pmatrix} = \omega\times{}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} \omega_2x_3 - \omega_3x_2 \\ \omega_3x_1 - \omega_1x_3 \\ \omega_1x_2 - \omega_2x_1 \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix},
 ```
 
 where ``\omega`` is the angular velocity. In order to get the entire kinetic energy of ``\mathcal{B}`` we have to integrate over the entire volume of the body:
 
 ```math
-T   & = \frac{1}{2}\int_\mathcal{B}||\omega\times{}x||^2dm \\
-    & = \frac{1}{2}\int_\mathcal{B}\left( (\omega_2x_3 - \omega_3x_2)^2 + (\omega_3x_1 - \omega_1x_3)^2 + (\omega_1x_2 - \omega_2x_1)^2 \right)dm = \frac{1}{2}\omega^T\Theta\omega,        
+T  = \frac{1}{2}\int_\mathcal{B}||v||^2dm = \frac{1}{2}\int_\mathcal{B}\left( (\omega_2x_3 - \omega_3x_2)^2 + (\omega_3x_1 - \omega_1x_3)^2 + (\omega_1x_2 - \omega_2x_1)^2 \right)dm = \frac{1}{2}\omega^T\Theta\omega,        
 ```
 
 where 
 
 ```math
-\begin{aligned}
-    \Theta_{ij} = \begin{cases} \int_\mathcal{B}(x_k^2 + x_\ell^2)dm \text{ if }i = j, \\  
+\Theta_{ij} = \begin{cases} \int_\mathcal{B}(x_k^2 + x_\ell^2)dm \text{ if }i = j, \\  
                              -  \int_\mathcal{B}x_ix_jdm, \end{cases}
-\end{aligned}
 ```
 
-with ``i\neq{}k\neq\ell\neq{}i`` for the first case.
+with ``i\neq{}k\neq\ell\neq{}i`` for the first case and ``dm`` indicates an integral over the mass density of the rigid body.
 
-For the mathematical description of a rigid body (modulo rotations) we do not need to know the entire shape of the body! It is enough to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3``.
+For the mathematical description of a rigid body (modulo rotations) we do not need to know the entire shape of the body! Because ``\Theta`` is a symmetric matrix we can write the kinetic energy as:
 
-We can now use Newtorn's first law, that the angular momentum of the body stays constant, to reformulate these equations. The angular momentum is: 
+```math
+T = \frac{1}{2}\omega^T\Theta\omega = \frac{1}{2}\omega^TU^T\begin{pmatrix} I_1 & 0 & 0 \\ 0 & I_2 & 0 \\ 0 & 0 & I_3 \end{pmatrix}U\omega,
+```
+
+and we can see that it is enough to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3``.
+
+We can now use Newton's first law, which states that the angular momentum of the body stays constant, to reformulate these equations. The angular momentum is: 
 
 ```math 
 L = \int_\mathcal{B}(x\times{}v)dm = \int_\mathcal{B}\left(x \times (\omega \times x)\right)dm.
@@ -43,6 +50,7 @@ We then obtain:
 ```math
 \begin{pmatrix} \dot{L}_1 \\ \dot{L}_2 \\ \dot{L}_3 \end{pmatrix} = \begin{pmatrix} (I_3^{-1} - I_2^{-1})L_3L_2 
 \\ (I_1^{-1} - I_3^{-1})L_1L_3 \\ (I_2^{-1} - I_1^{-1})L_2L_1 \end{pmatrix}.
+\label{eq:RigidBody}
 ```
 
 These are the equations we will treat. For simplicity we write: ``x := L_1``, ``y := L_2``, ``z := L_3``, ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. The differential equation for ``L`` thus becomes: 
