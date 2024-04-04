@@ -22,12 +22,12 @@ makedocs(;
     format = format,
     pages=[
         "Introduction" => "introduction.md",
+        "Divergence-Free Vector Fields" => "divergence_free_vector_fields.md",
         "Transformer" => "transformer.md",
         "VPFF" => "volume_preserving_feed_forward.md",
         "VPT" => "volume_preserving_transformer.md",
         "Rigid Body" => "rigid_body.md",
         "Results" => "results.md",
-        "Parameter-Dependent Equations" => "parameter_dependent_equations.md",
         "Conclusion" => "conclusion.md",
         "Acknowledgements" => "acknowledgements.md",
         "References" => "references.md",
