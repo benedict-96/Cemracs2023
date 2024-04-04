@@ -13,7 +13,7 @@ pdf_without_training_mac: mac_images pdf_without_training_and_images;
 	$(MAKE) compile_tex
 
 pdf_without_training_and_images: generate_tex;
-	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label make_tex_references give_equations_labels
+	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks
 
 linux_images:
 	$(MAKE) linux -C src/tikz
@@ -51,6 +51,20 @@ introduction_gets_no_label:
 give_equations_labels:
 	sed -i'' -e 's/equation\*/equation/g' build/V*.tex;
 	sed -i'' -e 's/\\label{\(.*\)}\\end{split}/\\end{split}\\label{\1}/g' build/V*.tex
+
+do_correct_quotation_marks:
+	sed -i'' -e 's/{\\textquotedbl}/"/g' build/V*.tex;
+	sed -i'' -e 's/ "/ ``/g' build/V*.tex
+
+do_correct_footnotes:
+	sed -i'' -e 's/\\footnotemark\[[0-9]*\]/\\footnotemark/g' build/V*.tex;
+	sed -i'' -e 's/\\footnotetext\[[0-9]*\]/\\footnotetext/g' build/V*.tex;
+
+do_correct_references_to_section:
+	sed -i'' -e 's/\\hyperlinkref{\([0-9]\+\)}{[^0-9]\+}/\\cref{\1}/g' build/V*.tex
+
+do_correct_remarks:
+	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{remark}\1\\end{remark}/g' build/V*.tex
 
 clear: 
 	$(MAKE) empty -C src/tikz;
