@@ -1,6 +1,6 @@
-# Volume-Preserving Transformer
+# Volume-preserving transformer
 
-In this section we introduce a new attention mechanism that we call *structure-preserving attention*. This is strongly inspired by traiditon *multi-step methods* (see [feng1998step](@cite)). To this end, we first have to define what volume preservation means for the product space ``\mathbb{R}^{d}\times\cdots\times\mathbb{R}^{d}\equiv\times_\text{$T$ times}\mathbb{R}^{d}``.
+In this section we introduce a new attention mechanism that we call *volume-preserving attention*. This is strongly inspired by traditional *multi-step methods* (see [feng1998step](@cite)). To this end, we first have to define what volume preservation means for the product space ``\mathbb{R}^{d}\times\cdots\times\mathbb{R}^{d}\equiv\times_\text{$T$ times}\mathbb{R}^{d}``.
 
 Now consider an isomorphism ``\hat{}: \times_\text{($T$ times)}\mathbb{R}^{d}\stackrel{\sim}{\longrightarrow}\mathbb{R}^{dT}``. Specifically, this isomorphism takes the form:
 ```math
