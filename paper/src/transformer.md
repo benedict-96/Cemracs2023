@@ -1,6 +1,6 @@
 # The transformer
 
-The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The neural network architecture is visualized in m[fig:TransformerArchitecture]m(@latex)[^1].
+The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in m[fig:TransformerArchitecture]m(@latex)[^1].
 
 [^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is reweighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" (see [vaswani2017attention](@cite)).
 
@@ -13,7 +13,7 @@ Here the transformer is essentially a combination of an attention layer (explain
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .3\textwidth]{tikz/transformer.png}
-\caption{Visualization of the transformer architecture.}
+\caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out.}
 \label{fig:TransformerArchitecture}
 \end{figure}
 ```
@@ -42,7 +42,7 @@ In the next step, a softmax function is applied column-wise to ``C`` and returns
 ```math
 y_i^{(j)} = [\mathrm{softmax}(C)]_{ij} := e^{c_{ij}}/\left(\sum_{i'=1}^Te^{c_{i'j}}\right).
 ```
-This softmax function maps the correlation matrix to the a sequence of *probability vectors*, i.e. vecors in the space ``\mathcal{P}:=\{\mathbf{y}\in[0,1]^d: \sum_{i=1}^dy_i = 1\}``. Every one of these ``d`` probability vectors is then used to compute a convex combination of the input vectors ``[z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}]``, i.e. we get ``\sum_{i=1}^Ty_i^{(j)}z_\mu^{(i)}`` for ``j=1,\ldots,T``.
+This softmax function maps the correlation matrix to a sequence of *probability vectors*, i.e. vecors in the space ``\mathcal{P}:=\{\mathbf{y}\in[0,1]^d: \sum_{i=1}^dy_i = 1\}``. Every one of these ``d`` probability vectors is then used to compute a convex combination of the input vectors ``[z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}]``, i.e. we get ``\sum_{i=1}^Ty_i^{(j)}z_\mu^{(i)}`` for ``j=1,\ldots,T``.
 
 
 REMARK::
