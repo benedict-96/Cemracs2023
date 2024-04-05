@@ -63,7 +63,7 @@ do_correct_footnotes:
 	sed -i'' -e 's/\\footnotemark /\\footnotemark{} /g' build/V*.tex
 
 do_correct_references_to_section:
-	sed -i'' -e 's/\\hyperlinkref{\([0-9]\+\)}{[^0-9]\+}/\\cref{\1}/g' build/V*.tex
+	sed -i'' -e 's/\\hyperlinkref{\([0-9][0-9]*\)}{[^0-9][^0-9]*}/\\cref{\1}/g' build/V*.tex
 
 do_correct_remarks:
 	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{remark}\1\\end{remark}/g' build/V*.tex;
