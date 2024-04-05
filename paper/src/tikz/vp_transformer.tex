@@ -20,7 +20,7 @@
 \node (input) {Input};
 \node[above of=input, attmodule, align=center, yshift=.3cm] (att) {Volume-Preserving\\Attention};
 \node[above of=att, addmodule, align=center] (add1) {\st{Add}};
-\node[above of=add1, ffnnmodule, align=center] (ffnn) {VPFF\\Net};
+\node[above of=add1, ffnnmodule, align=center, yshift=.1cm] (ffnn) {VPFF\\Net};
 \node[above of=ffnn, addmodule, align=center] (add2) {Add};
 \node[above of=add2] (output) {Output};
 
