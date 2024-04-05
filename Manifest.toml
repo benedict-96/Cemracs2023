@@ -158,15 +158,9 @@ version = "0.1.8"
 
 [[deps.BlockArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra"]
-<<<<<<< HEAD
-git-tree-sha1 = "3c62e3006c23082d2ae524b468298d27788a8502"
-uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.16.40"
-=======
 git-tree-sha1 = "1b8a8f5980d2f6ec204514e21f73efa4540c1322"
 uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
 version = "0.16.42"
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -712,11 +706,7 @@ version = "0.13.3"
 
 [[deps.GeometricMachineLearning]]
 deps = ["AbstractNeuralNetworks", "BandedMatrices", "ChainRules", "ChainRulesCore", "ChainRulesTestUtils", "Distances", "Documenter", "GeometricBase", "GeometricEquations", "GeometricIntegrators", "HDF5", "InteractiveUtils", "KernelAbstractions", "LinearAlgebra", "NNlib", "Printf", "ProgressMeter", "Random", "SafeTestsets", "SparseArrays", "StatsBase", "TimerOutputs", "Zygote"]
-<<<<<<< HEAD
 git-tree-sha1 = "f173ae0fdad7701c2b085d6cff16e8431bbb38a1"
-=======
-git-tree-sha1 = "4a5143241c8de8da3dbfbdeb0fd86ec3853e3bb9"
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 repo-rev = "volume_preserving_transformer"
 repo-url = "https://github.com/JuliaGNI/GeometricMachineLearning.jl.git"
 uuid = "194d25b2-d3f5-49f0-af24-c124f4aa80cc"
@@ -963,10 +953,7 @@ deps = ["CEnum", "LLVMExtra_jll", "Libdl", "Preferences", "Printf", "Requires", 
 git-tree-sha1 = "ab01dde107f21aa76144d0771dccc08f152ccac7"
 uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
 version = "6.6.2"
-<<<<<<< HEAD
 weakdeps = ["BFloat16s"]
-=======
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 
     [deps.LLVM.extensions]
     BFloat16sExt = "BFloat16s"
@@ -1823,17 +1810,10 @@ uuid = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 version = "0.2.7"
 
 [[deps.SymbolicIndexingInterface]]
-<<<<<<< HEAD
-deps = ["ArrayInterface", "MacroTools", "RuntimeGeneratedFunctions", "StaticArraysCore"]
-git-tree-sha1 = "dd94edee1542e9da422cb2f12494ef09ea823e48"
-uuid = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
-version = "0.3.13"
-=======
 deps = ["Accessors", "ArrayInterface", "MacroTools", "RuntimeGeneratedFunctions", "StaticArraysCore"]
 git-tree-sha1 = "4b7f4c80449d8baae8857d55535033981862619c"
 uuid = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
 version = "0.3.15"
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 
 [[deps.SymbolicLimits]]
 deps = ["SymbolicUtils"]
@@ -1849,15 +1829,9 @@ version = "1.5.1"
 
 [[deps.Symbolics]]
 deps = ["ArrayInterface", "Bijections", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "DynamicPolynomials", "ForwardDiff", "IfElse", "LaTeXStrings", "LambertW", "Latexify", "Libdl", "LinearAlgebra", "LogExpFunctions", "MacroTools", "Markdown", "NaNMath", "PrecompileTools", "RecipesBase", "Reexport", "Requires", "RuntimeGeneratedFunctions", "SciMLBase", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicIndexingInterface", "SymbolicLimits", "SymbolicUtils"]
-<<<<<<< HEAD
-git-tree-sha1 = "d1b0db65977dfc2f942dbf76a0a54c99a9465f71"
-uuid = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-version = "5.26.0"
-=======
 git-tree-sha1 = "280c17e091a24283a59eedfc00a02026ec984b09"
 uuid = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 version = "5.27.1"
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 
     [deps.Symbolics.extensions]
     SymbolicsGroebnerExt = "Groebner"
@@ -1920,15 +1894,9 @@ weakdeps = ["StatsBase"]
     ToeplitzMatricesStatsBaseExt = "StatsBase"
 
 [[deps.TranscodingStreams]]
-<<<<<<< HEAD
-git-tree-sha1 = "14389d51751169994b2e1317d5c72f7dc4f21045"
-uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.10.6"
-=======
 git-tree-sha1 = "71509f04d045ec714c4748c785a59045c3736349"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.10.7"
->>>>>>> 70ae5c0147e1c0bf26e116034485c4d8660e44b7
 weakdeps = ["Random", "Test"]
 
     [deps.TranscodingStreams.extensions]
