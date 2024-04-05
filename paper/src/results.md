@@ -1,6 +1,6 @@
 # Experimental results
 
-We now compare three different neural network architectures that we all train on the data coming from a rigid body (see [The rigid body](@ref)). Those architectures are:
+We now compare three different neural network architectures that we all train on data coming from a rigid body (see [The rigid body](@ref)). Those architectures are:
 
 | architecture    | `n_linear` | `n_blocks` | L | total number of parameters |
 | :-------------  |:---------: |:---------: |:-:|:-------------------------: |
@@ -68,7 +68,7 @@ With these settings we get the following training times for the different networ
 
 [^1]: Times given as HOURS:MINUTES:SECONDS.
 
-The time evolution of the different training losses is shown in m[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at rather high levels (``0.05``). What this means in practice is shown in m[fig:Validation]m(@latex). Here we show the time evolution of the first component of m[eq:FinalRigidBodyEquations]m(@latex) ``z_1`` for implicit midpoint (i.e. the numerical solution) and the three neural network integrators. 
+The time evolution of the different training losses is shown in m[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at a rather high level (``0.05``). What this means in practice is shown in m[fig:Validation]m(@latex). There the time evolution of the first component of m[eq:FinalRigidBodyEquations]m(@latex), i.e. ``z_1``, for implicit midpoint (i.e. the numerical solution) and the three neural network integrators is shown. 
 
 ```@raw latex
 \begin{figure}
@@ -81,7 +81,7 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .5\textwidth]{simulations/vpt_Float32/validation_3.png}
-\caption{The first component $x$ plotted for the time interval [0, 14].}
+\caption{The first component $z_1$ plotted for the time interval [0, 14].}
 \label{fig:Validation}
 \end{figure}
 ```
@@ -89,7 +89,7 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .5\textwidth]{simulations/vpt_Float32/validation3d_3.png}
-\caption{Validation plot in 3d.}
+\caption{Validation plot in 3d. We plot the solution obtained with the volume-preserving transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}.}
 \label{fig:Validation3d}
 \end{figure}
 ```
@@ -119,9 +119,9 @@ The output of the attention layers then is:
 \left[\begin{matrix} \mathrm{softmax}(p^{(1)}) & \mathrm{softmax}(p^{(2)}) & \mathrm{softmax}(p^{(3)}) \end{matrix}\right].
 ```
 
-The results in figure m[fig:Validation]m(@latex) seem as if ``\mathrm{softmax}(p^{(i)})`` is the same[^2] regardless of the integer ``i = 1, 2, 3``. For the volume-preserving attention mechanism introduced in this work this can never happen as the three columns are not treated independently: the result is always a matrix with three independent columns that has determinant 1 or -1. 
+The results in figure m[fig:Validation]m(@latex) seem as if ``\mathrm{softmax}(p^{(i)})`` is the same[^2] regardless of the integer ``i = 1, 2, 3``. For the volume-preserving attention mechanism introduced in this work this can never happen as the three columns are not treated independently: the result is always a matrix with three independent columns that has determinant 1 or -1. We can never run into a problem of a *step function-like behavior*. 
 
-[^2]: By investigating the weight matrix of the attention layer further, we saw that the output of m[eq:ScalarProductResult]m(@latex) is a matrix whose entries are all roughly the same. 
+[^2]: By investigating the weight matrix of the attention layer further (not shown here), we saw that the output of m[eq:ScalarProductResult]m(@latex) is a matrix whose entries are all roughly the same. 
 
 
 ## A note on parameter-dependent equations
