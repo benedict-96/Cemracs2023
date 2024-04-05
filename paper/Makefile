@@ -13,7 +13,7 @@ pdf_without_training_mac: mac_images pdf_without_training_and_images;
 	$(MAKE) compile_tex
 
 pdf_without_training_and_images: generate_tex;
-	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks
+	$(MAKE) copy_edps_files chapter_to_section introduction_acknowledgements_get_no_label make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks
 
 linux_images:
 	$(MAKE) linux -C src/tikz
@@ -45,8 +45,9 @@ make_tex_references:
 	sed -i'' -e 's/m\[\([^ ]*\)\]m(@latex)/\\cref{\1}/g' build/V*.tex;
 	sed -i'' -e 's/M\[\([^ ]*\)\]m(@latex)/\\Cref{\1}/g' build/V*.tex
 
-introduction_gets_no_label:
-	sed -i'' -e 's/\\section{Introduction}/\\section*{Introduction}/g' build/V*.tex
+introduction_acknowledgements_get_no_label:
+	sed -i'' -e 's/\\section{Introduction}/\\section*{Introduction}/g' build/V*.tex;
+	sed -i'' -e 's/\\section{Acknowledgements}/\\section*{Acknowledgements}/g' build/V*.tex
 
 give_equations_labels:
 	sed -i'' -e 's/equation\*/equation/g' build/V*.tex;
@@ -59,12 +60,14 @@ do_correct_quotation_marks:
 do_correct_footnotes:
 	sed -i'' -e 's/\\footnotemark\[[0-9]*\]/\\footnotemark/g' build/V*.tex;
 	sed -i'' -e 's/\\footnotetext\[[0-9]*\]/\\footnotetext/g' build/V*.tex;
+	sed -i'' -e 's/\\footnotemark /\\footnotemark{} /g' build/V*.tex
 
 do_correct_references_to_section:
 	sed -i'' -e 's/\\hyperlinkref{\([0-9]\+\)}{[^0-9]\+}/\\cref{\1}/g' build/V*.tex
 
 do_correct_remarks:
-	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{remark}\1\\end{remark}/g' build/V*.tex
+	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{remark}\1\\end{remark}/g' build/V*.tex;
+	sed -i'' -e 's/DEFINITION::\(.*\)::/\\begin{definition}\1\\end{definition}/g' build/V*.tex
 
 clear: 
 	$(MAKE) empty -C src/tikz;
