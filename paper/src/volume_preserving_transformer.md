@@ -2,7 +2,7 @@
 
 In this section we introduce a new attention mechanism that we call *volume-preserving attention*. This is strongly inspired by traditional *multi-step methods* (see [feng1998step](@cite)). To this end, we first have to define what volume preservation means for the product space ``\mathbb{R}^{d}\times\cdots\times\mathbb{R}^{d}\equiv\times_\text{$T$ times}\mathbb{R}^{d}``.
 
-Now consider an isomorphism ``\hat{}: \times_\text{($T$ times)}\mathbb{R}^{d}\stackrel{\approx}{\longrightarrow}\mathbb{R}^{dT}``. Specifically, this isomorphism takes the form:
+Consider an isomorphism ``\hat{}: \times_\text{($T$ times)}\mathbb{R}^{d}\stackrel{\approx}{\longrightarrow}\mathbb{R}^{dT}``. Specifically, this isomorphism takes the form:
 ```math
 Z =  \left[\begin{array}{cccc}
             z_1^{(1)} &  z_1^{(2)} & \quad\cdots\quad & z_1^{(T)} \\
@@ -14,20 +14,20 @@ Z =  \left[\begin{array}{cccc}
 \label{eq:isomorphism}
 ```
 
-The inverse of ``Z \mapsto \hat{Z} `` we refer to as ``Y \mapsto \tilde{Y}``. In the following we also write``\hat{\varphi}`` fpr the mapping ``\,\hat{}\circ\varphi\circ\tilde{}\,``.
+The inverse of ``Z \mapsto \hat{Z} `` we refer to as ``Y \mapsto \tilde{Y}``. In the following we also write ``\hat{\varphi}`` for the mapping ``\,\hat{}\circ\varphi\circ\tilde{}\,``.
 
 DEFINITION::
 We say that a mapping ``\varphi: \times_\text{$T$ times}\mathbb{R}^{d} \to \times_\text{$T$ times}\mathbb{R}^{d}`` is **volume-preserving** if the associated ``\hat{\varphi}`` is volume-preserving.::
 
-The main difficulty in adapting a transformer-like architecture to be symplectic or structure-preserving is to adapt the activation function. Indeed, the softmax acts vector-wise and cannot preserve symplecticity. We thus replace the softmax by a different activation function. This new activation function is based on the Cayley transform:
+The main difficulty in adapting a transformer-like architecture to be volume-preserving is to adapt the activation function. Indeed, the softmax acts vector-wise and cannot preserve volume. We thus replace the softmax by a different activation function. This new activation function is based on the Cayley transform:
 
 ```math
 \sigma(Y) = \mathrm{Cayley}(Y) = \frac{1}{2}(\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
 ```
 
-The Cayley transform maps skew-symmetric matrices to orthonormal matrices[^1]. This results in a new activation function for our attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Further note that the input into the Cayley transform has to be a skew-symmetric matrix. For this reason we need to constrain ``A`` to be also skew-symmetric. With this ``\Lambda(Z)`` is an orthonormal matrix and the entire mapping is equivalent to a multiplication by a symplectic matrix. To see this note that the attention layer performs the following:
+The Cayley transform maps skew-symmetric matrices to orthogonal matrices[^1]. This results in a new activation function for our attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Further note that the input into the Cayley transform has to be a skew-symmetric matrix. For this reason we need to constrain ``A`` to be also skew-symmetric. With this ``\Lambda(Z)`` is an orthogonal matrix and the entire mapping is equivalent to a multiplication by a orthogonal matrix in the *big vector representation* shown in m[eq:isomorphism]m(@latex). To see this note that the attention layer performs the following:
 
-[^1]: The orthonormal matrices ``\{B\in\mathbb{R}^{d\times{}d}:B^TB=\mathbb{I}_d\}`` form a Lie group under regular matrix multiplication. The associated Lie algebra is the vector space of skew-symmetric matrices ``\mathfrak{g}=\{C:C+C^T\}`` and the Lie algebra is mapped to the Lie group via the Cayley transform. More details on this can be found in e.g. [hairer2006geometric](@cite).
+[^1]: The orthogonal matrices ``\{B\in\mathbb{R}^{d\times{}d}:B^TB=\mathbb{I}_d\}`` form a Lie group under regular matrix multiplication. The associated Lie algebra is the vector space of skew-symmetric matrices ``\mathfrak{g}=\{C:C+C^T = \mathbb{O}\}`` and the Lie algebra is mapped to the Lie group via the Cayley transform. More details on this can be found in e.g. [hairer2006geometric](@cite).
 
 ```math
 Z \mapsto Z\Lambda(Z).
@@ -58,6 +58,6 @@ In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` 
 \end{figure}
 ```
 
-For the remaining parts of the transformer, the feedforward neural network is replaced by a volume-preserving feedforward network and the first add connection is removed[^2], as shown in figure m[fig:VolumePreservingTransformerArchitecture]m(@latex).
+For the remaining parts of the transformer, the feedforward neural network is replaced by a volume-preserving feedforward network and the first add connection is removed[^2]. The architecture is shown in m[fig:VolumePreservingTransformerArchitecture]m(@latex).
 
 [^2]: Removal of the add connection is necessary as the addition with the input is not a volume-preserving operation. 
