@@ -1,17 +1,9 @@
 # The rigid body
 
-```@raw latex
-\begin{figure}
-\includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
-\caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$}.
-\label{fig:RigidBody}
-\end{figure}
-```
-
-The differential equation for the rigid body (see [hairer2006geometric](@cite)) describes a solid object fixed at a point. It is the equation describing arbitrary motion of a rigid body modulo translations in space. A rigid body is shown in m[fig:RigidBody]m(@latex) and, as is alluded to in that figure, it can always be described by an ellipsoid. This can easily be seen when considering the derivation of the rigid body equations. The motion of a point ``(x, y, z)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
+The differential equation for the rigid body (see [hairer2006geometric, arnold1978mathematical](@cite)) describes a solid object fixed at a point. It is the equation describing arbitrary motion of a rigid body modulo translations in space. A rigid body is shown in m[fig:RigidBody]m(@latex) and, as is alluded to in that figure, it can always be described by an ellipsoid. This can easily be seen when considering the derivation of the rigid body equations. The motion of a point ``(x_1, x_2, x_3)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
 
 ```math
-v := \begin{pmatrix} \dot{x_1} \\ \dot{x_2} \\ \dot{x_3} \end{pmatrix} = \omega\times{}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} \omega_2x_3 - \omega_3x_2 \\ \omega_3x_1 - \omega_1x_3 \\ \omega_1x_2 - \omega_2x_1 \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix},
+v := \frac{d}{dt}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \omega\times{}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} \omega_2x_3 - \omega_3x_2 \\ \omega_3x_1 - \omega_1x_3 \\ \omega_1x_2 - \omega_2x_1 \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix},
 ```
 
 where ``\omega`` is the angular velocity. In order to get the entire kinetic energy of ``\mathcal{B}`` we have to integrate over the entire volume of the body:
@@ -32,34 +24,66 @@ with ``i\neq{}k\neq\ell\neq{}i`` for the first case and ``dm`` indicates an inte
 For the mathematical description of a rigid body (modulo rotations) we do not need to know the entire shape of the body! Because ``\Theta`` is a symmetric matrix we can write the kinetic energy as:
 
 ```math
-T = \frac{1}{2}\omega^T\Theta\omega = \frac{1}{2}\omega^TU^T\begin{pmatrix} I_1 & 0 & 0 \\ 0 & I_2 & 0 \\ 0 & 0 & I_3 \end{pmatrix}U\omega,
+T = \frac{1}{2}\omega^T\Theta\omega = \frac{1}{2}\omega^TU^T\begin{pmatrix} I_1 & 0 & 0 \\ 0 & I_2 & 0 \\ 0 & 0 & I_3 \end{pmatrix}U\omega = \frac{1}{2}\omega^TU^TIU\omega,
 ```
 
-and we can see that it is enough to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3``.
+and we can see that it is enough to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3``. From this point of view every rigid body is an ellipsoid. 
 
-We can now use Newton's first law, which states that the angular momentum of the body stays constant, to reformulate these equations. The angular momentum is: 
-
-```math 
-L = \int_\mathcal{B}(x\times{}v)dm = \int_\mathcal{B}\left(x \times (\omega \times x)\right)dm.
+```@raw latex
+\begin{figure}
+\includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
+\caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$}.
+\label{fig:RigidBody}
+\end{figure}
 ```
 
-This leads to ``L = \Theta\omega`` or in the distinct basis mentioned above: ``L_k = I_k\omega_k`` (for ``k=1,2,3``). 
+## Formulation of the equations of motion via Euler-Poincaré
 
-We then obtain: 
+The dynamics of the rigid body can be described through a rotational matrix ``Q(t)``, i.e. each point of the rigid body ``x(0)\in\mathcal{B}`` can be described through ``x(t) = Q(t)x(0)`` where ``Q(t)^TQ(t) = \mathbb{I}``. We can therefore describe the evolution of the rigid body through a differential equation on the Lie group ``G := \{Q\in\mathbb{R}^{d\times{}d}:Q^TQ = \mathbb{I}\}``. The associated tangent vector ``\dot{Q}\in{}T_QG`` can be mapped to the Lie algebra[^1] ``\mathfrak{g}=T_\mathbb{I}G`` by:
 
 ```math
-\begin{pmatrix} \dot{L}_1 \\ \dot{L}_2 \\ \dot{L}_3 \end{pmatrix} = \begin{pmatrix} (I_3^{-1} - I_2^{-1})L_3L_2 
-\\ (I_1^{-1} - I_3^{-1})L_1L_3 \\ (I_2^{-1} - I_1^{-1})L_2L_1 \end{pmatrix}.
-\label{eq:RigidBody}
+W := \dot{Q}Q^T = \begin{pmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix} \in \mathfrak{g}. 
+\label{eq:LieAlgebraRepresentation}
 ```
+[^1]: This is the Lie algebra of skew-symmetric matrices: ``\mathfrak{g} = \{W\in\mathbb{R}^{d\times{}d}:W^T = -W\}``.
 
-These are the equations we will treat. For simplicity we write: ``x := L_1``, ``y := L_2``, ``z := L_3``, ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. The differential equation for ``L`` thus becomes: 
+As was indicated in equation m[eq:LieAlgebraRepresentation]m(@latex) the components of the skew-symmetric matrix ``W`` are equivalent to those of the angular velocity ``\omega`` as can easily be checked: 
 
 ```math
-\frac{d}{dt}\begin{pmatrix} x \\  y \\ z  \end{pmatrix}  = \begin{pmatrix} Ayz \\ Bxz \\ Cxy \end{pmatrix}. 
+\dot{x} = \frac{d}{dt}Q(t)x(0) = \dot{Q}(t)x(0) = \dot{Q}(t)Q^T(t)x(t) = W(t)x(t) = Wx = \begin{pmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \\ \begin{pmatrix}  -\omega_3x_2 + \omega_2x_3 \\ \omega_3x_1 - \omega_1x_3 \\ -\omega_2x_1 + \omega_1x_2 \end{pmatrix} = \omega\times{}x.
 ```
 
-We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In m[fig:RigidBodyCurves]m(@latex) we show some trajectories.
+With this description the kinetic energy can be written as: 
+
+```math
+T = \frac{1}{2}\mathrm{tr}(WDW^T),
+\label{eq:KineticEnergyForLieGroup}
+```
+where ``D`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 = d_3 + d_1`` and ``I_3 = d_1 + d_2``. We now write ``z := I^{-1}\omega`` and introduce the following notation: 
+
+```math
+\hat{z} = \widehat{\begin{pmatrix} z_1 \\ z_2 \\ z_3 \end{pmatrix}} = \widehat{\begin{pmatrix} \frac{\omega_1}{I_1} \\ \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} \end{pmatrix}} = {\begin{pmatrix} 0 & -\frac{\omega_3}{I_3} & \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} & 0 & -\frac{\omega_1}{I_1} \\ -\frac{\omega_2}{I_2} & \frac{\omega_1}{I_1} & 0 \end{pmatrix}}.
+```
+
+[^2]: This matrix is equivalent to the diagonal entries of the *coefficient of inertia matrix* in [holm2009geometric](@cite).
+
+and obtain via the Euler-Poincaré equations[^3] for m[eq:KineticEnergyForLieGroup]m(@latex): 
+
+[^3]: For the Euler-Poincaré equations we have to compute variations of m[eq:KineticEnergyForLieGroup]m(@latex) with respect to ``\delta{}W = \delta(\dot{Q}Q^{-1} = \dot{\Sigma} - [W,\Sigma]`` where ``\Sigma := \delta{}QQ^{-1}``. For more details on this see [holm2009geometric](@cite).
+
+```math
+\widehat{I\dot{\omega}} = [\widehat{I\omega}, W],
+```
+
+or equivalently:
+
+```math
+\frac{d}{dt}\begin{pmatrix} z_1 \\  z_2 \\ z_3  \end{pmatrix}  = \begin{pmatrix} Az_2z_3 \\ Bz_1z_3 \\ Cz_1z_2 \end{pmatrix}.
+\label{eq:FinalRigidBodyEquations}
+```
+
+In the above equation we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3`` throughout this paper, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In m[fig:RigidBodyCurves]m(@latex) we show some trajectories. We also see that m[fig:RigidBodyCurves]m(@latex) is trivially divergence-free.
+
 
 ```@eval 
 using GeometricProblems.RigidBody: odeensemble, tspan, tstep, default_parameters
