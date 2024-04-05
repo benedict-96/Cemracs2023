@@ -66,8 +66,8 @@ do_correct_references_to_section:
 	sed -i'' -e 's/\\hyperlinkref{\([0-9][0-9]*\)}{[^0-9][^0-9]*}/\\cref{\1}/g' build/V*.tex
 
 do_correct_remarks:
-	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{remark}\1\\end{remark}/g' build/V*.tex;
-	sed -i'' -e 's/DEFINITION::\(.*\)::/\\begin{definition}\1\\end{definition}/g' build/V*.tex
+	sed -i'' -e 's/REMARK::\(.*\)::/\\begin{rmrk}\1\\end{rmrk}/g' build/V*.tex;
+	sed -i'' -e 's/DEFINITION::\(.*\)::/\\begin{dfntn}\1\\end{dfntn}/g' build/V*.tex
 
 clear: 
 	$(MAKE) empty -C src/tikz;
