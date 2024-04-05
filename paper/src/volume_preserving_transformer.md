@@ -53,7 +53,7 @@ In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` 
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .3\textwidth]{tikz/vp_transformer.png}
-\caption{Architecture for the volume-preserving transformer.}
+\caption{Architecture for the volume-preserving transformer. "VPFF" refers to the volume-preserving feedforward neural network from \cref{fig:VolumePreservingFeedForward}.}
 \label{fig:VolumePreservingTransformerArchitecture}
 \end{figure}
 ```
