@@ -1,4 +1,4 @@
-# Volume-Preserving Feedforward Neural Networks
+# Volume-preserving feedforward neural networks
 
 As a first step to construct a *structure-preserving transformer* we replace the ResNet in the transformer with a feedforward neural network that is volume-preserving. The *volume-preseving feedforward layers* here are inspired by the linear and activation modules from [jin2020sympnets](@cite). Here our key ingredients are upper-triangular matrices ``U`` and lower-triangular matrices ``L`` for whose components we have that ``u_{ij} = 0`` if ``i \geq j`` and ``l_{ij} = 0`` if ``i \leq j``.
 
@@ -11,9 +11,17 @@ L = \begin{pmatrix}
      \vdots & \ddots & \ddots & \vdots \\
      a_{n1} & \cdots & a_{n(n-1)}      & 0 
 \end{pmatrix}.
+\label{eq:LinearLower}
 ```
 
-The Jacobian of a layer ``x \mapsto x + \sigma(Lx + b)`` then is of the form
+The Jacobian of a layer 
+
+```math
+x \mapsto x + \sigma(Lx + b)
+\label{eq:VPFF}
+``` 
+
+then is of the form
 
 ```math 
 J = \begin{pmatrix}
@@ -28,7 +36,7 @@ and the determinant of ``J`` is 1, i.e. the map is volume-preserving.
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .3\textwidth]{tikz/vp_feedforward.png}
-\caption{Architecture for the volume-preserving feedforward neural network.}
+\caption{Architecture for the volume-preserving feedforward neural network. "LinearLowerLayer" refers to $x \mapsto x + Lx$ (and similarly for "LinearUpperLayer"). "NonLinearLowerLayer" is shown in \cref{eq:VPFF}. "Bias" is the addition with a bias vector.}
 \label{fig:VolumePreservingFeedForward}
 \end{figure}
 ```
