@@ -4,6 +4,7 @@ using GeometricMachineLearning
 using GeometricMachineLearning: map_to_cpu
 using GeometricIntegrators: integrate, ImplicitMidpoint
 using GeometricProblems.RigidBody: odeproblem, odeensemble, default_parameters
+using LaTeXStrings
 import Random 
 
 # hyperparameters for the problem 
@@ -117,7 +118,7 @@ function plot_validation(t_validation; nn₂=nn₂, nn₃=nn₃, nn₄=nn₄, pl
 
     ########################### plot validation
 
-    p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
+    p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400, ylabel = "z", xlabel = "time")
 
     # plot!(p_validation, t_array, nn₁_solution[1, :], label = "attention only", color = 2, linewidth = 2)
 
@@ -139,7 +140,7 @@ p_validation_long = plot_validation(t_validation_long)
 
 ########################### plot training loss
 
-p_training_loss = plot(loss_array₃, label = "transformer", color = 4, linewidth = 2, yaxis = :log, dpi = 400, xlabel = "training loss", ylabel = "epoch")
+p_training_loss = plot(loss_array₃, label = "transformer", color = 4, linewidth = 2, yaxis = :log, dpi = 400, ylabel = "training loss", xlabel = "epoch")
 
 # plot!(loss_array₁, label = "attention only", color = 2, linewidth = 2)
 
@@ -170,8 +171,8 @@ function make_validation_plot3d(t_validation::Int, nn::NeuralNetwork)
 
     ########################### plot validation
 
-    p_validation = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400)
-
+    p_validation = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400, xlabel = L"z_1", ylabel = L"z_2", zlabel = L"z_3", xlims = (-1, 1), ylims = (-1, 1), zlims = (-1, 1), aspect_ratio = :equal)
+    
     plot!(p_validation, numerical[1, :], numerical[2, :], numerical[3, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
     plot!(p_validation, numerical₂[1, :], numerical₂[2, :], numerical₂[3, :], label = nothing, color = 1, linewidth = 2, dpi = 400)
 
