@@ -92,7 +92,7 @@ We see that the regular transformer very clearly fails on this task (discussed b
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width = .5\textwidth]{simulations/vpt_Float32/error_evolution_long_3.png}
+\includegraphics[width = .5\textwidth]{simulations/vpt_Float32/error_evolution_3.png}
 \caption{Comparison between the time evolution of the relative error of the volume-preserving feedforward neural network and the volume-preserving transformer.}
 \label{fig:VPFFvsVPT}
 \end{figure}
