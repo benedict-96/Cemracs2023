@@ -68,7 +68,7 @@ With these settings we get the following training times for the different networ
 
 [^1]: Times given as HOURS:MINUTES:SECONDS.
 
-The time evolution of the different training losses is shown in m[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at a rather high level (``0.05``). What this means in practice is shown in m[fig:Validation]m(@latex). There the time evolution of the first component of m[eq:FinalRigidBodyEquations]m(@latex), i.e. ``z_1``, for implicit midpoint (i.e. the numerical solution) and the three neural network integrators is shown. 
+The time evolution of the different training losses is shown in m[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at a rather high level (``0.05``). What this means in practice is shown in m[fig:Validation3d]m(@latex). Here show the prediction for two initial conditions, ``\begin{pmatrix} \sin(1.1) & 0 & \cos(1.1) \end{pmatrix}^T`` and ``\begin{pmatrix} 0 & \sin(1.1) & \cos(1.1) \end{pmatrix}^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in m[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
 
 ```@raw latex
 \begin{figure}
@@ -80,48 +80,28 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width = .5\textwidth]{simulations/vpt_Float32/validation_3.png}
-\caption{The first component $z_1$ plotted for the time interval [0, 14].}
-\label{fig:Validation}
-\end{figure}
-```
-
-```@raw latex
-\begin{figure}
-\includegraphics[width = .5\textwidth]{simulations/vpt_Float32/validation3d_3.png}
-\caption{Validation plot in 3d. We plot the solution obtained with the volume-preserving transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}.}
+\includegraphics[width = .33\textwidth]{simulations/vpt_Float32/feedforward_validation3d_3.png}%
+\includegraphics[width = .33\textwidth]{simulations/vpt_Float32/validation3d_3.png}%
+\includegraphics[width = .33\textwidth]{simulations/vpt_Float32/standard_transformer_validation3d_3.png}
+\caption{Validation plot in 3d. We plot the solution obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}.}
 \label{fig:Validation3d}
 \end{figure}
 ```
 
-We see that the regular transformer very clearly fails on this task (discussed below) and that the volume-preserving feedforward network manages to predict the time evolution of the rigid body up to a certain point, but then drifts off. The volume-preserving transformer manages to stay close to the numerical solution much better.
+We see that the regular transformer very clearly fails on this task (discussed below) and that the volume-preserving feedforward network and the volume-preserving transformer manage to stay close to the numerical solution much better. We further compare those two networks and plot the time evolution of the relative error (compared to the solution with implicit midpoint). These results are shown in m[fig:VPFFvsVPT]m(@latex).
 
-In m[fig:Validation3d]m(@latex) we show the prediction for two initial conditions, ``\begin{pmatrix} \sin(1.1) & 0 & \cos(1.1) \end{pmatrix}^T`` and ``\begin{pmatrix} 0 & \sin(1.1) & \cos(1.1) \end{pmatrix}^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in m[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
+```@raw latex
+\begin{figure}
+\includegraphics[width = .5\textwidth]{simulations/vpt_Float32/error_evolution_3.png}
+\caption{Comparison between the time evolution of the relative error of the volume-preserving feedforward neural network and the volume-preserving transformer.}
+\label{fig:VPFFvsVPT}
+\end{figure}
+```
+
 
 ## Why does regular attention fail? 
 
-We can see in m[fig:Validation]m(@latex) that the regular transformer looks like a step function, i.e. it predicts a step and then stays there for another two steps before going to a different value again. 
-
-To see how this can happen we look at the input of the attention layer: 
-
-```math
-\left[\begin{matrix}
-(z^{(1)})^TAz^{(1)} & (z^{(1)})^TAz^{(2)} & (z^{(1)})^TAz^{(3)} \\ 
-(z^{(2)})^TAz^{(1)} & (z^{(2)})^TAz^{(2)} & (z^{(2)})^TAz^{(3)} \\ 
-(z^{(3)})^TAz^{(1)} & (z^{(3)})^TAz^{(2)} & (z^{(3)})^TAz^{(3)}
-\end{matrix}\right] =: \left[\begin{matrix} p^{(1)} & p^{(2)} & p^{(3)} \end{matrix}\right].
-\label{eq:ScalarProductResult}
-```
-
-The output of the attention layers then is: 
-
-```math
-\left[\begin{matrix} \mathrm{softmax}(p^{(1)}) & \mathrm{softmax}(p^{(2)}) & \mathrm{softmax}(p^{(3)}) \end{matrix}\right].
-```
-
-The results in figure m[fig:Validation]m(@latex) seem as if ``\mathrm{softmax}(p^{(i)})`` is the same[^2] regardless of the integer ``i = 1, 2, 3``. For the volume-preserving attention mechanism introduced in this work this can never happen as the three columns are not treated independently: the result is always a matrix with three independent columns that has determinant 1 or -1. We can never run into a problem of a *step function-like behavior*. 
-
-[^2]: By investigating the weight matrix of the attention layer further (not shown here), we saw that the output of m[eq:ScalarProductResult]m(@latex) is a matrix whose entries are all roughly the same. 
+We can see in m[fig:Validation3d]m(@latex) that the regular transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction.  
 
 
 ## A note on parameter-dependent equations
@@ -145,6 +125,6 @@ where ``\mathbb{P}`` is a set of parameters on which the differential equation c
 \mathcal{NN}_\mathrm{ff}: \mathbb{R}^d\to\mathbb{R}^d.
 ```
 
-But a feedforward neural network can only approximate the flow of a differential equation with fixed parameters as the prediction becomes ambiguous in the case when we have data coming from solutions for different parameters. In this case a transformer neural network[^3] is needed as it is able to *consider the history of the trajectory up to that point*. 
+But a feedforward neural network can only approximate the flow of a differential equation with fixed parameters as the prediction becomes ambiguous in the case when we have data coming from solutions for different parameters. In this case a transformer neural network[^2] is needed as it is able to *consider the history of the trajectory up to that point*. 
 
-[^3]: It should be noted that recurrent neural networks such as LSTMs [hochreiter1997long](@cite) are also able to do this. 
+[^2]: It should be noted that recurrent neural networks such as LSTMs [hochreiter1997long](@cite) are also able to do this. 

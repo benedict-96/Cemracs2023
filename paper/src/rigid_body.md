@@ -90,6 +90,7 @@ using GeometricProblems.RigidBody: odeensemble, tspan, tstep, default_parameters
 using GeometricIntegrators: integrate, ImplicitMidpoint
 using GeometricEquations: EnsembleProblem
 using GeometricSolutions: GeometricSolution
+using LaTeXStrings
 using Plots; pyplot()
 
 ics = [
@@ -118,7 +119,7 @@ function sphere(r, C)   # r: radius; C: center [cx,cy,cz]
            return x, y, z
        end
 
-p = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400)
+p = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400, xlabel = L"z_1", ylabel = L"z_2", zlabel = L"z_3", xlims = (-1, 1), ylims = (-1, 1), zlims = (-1, 1), aspect_ratio = :equal)
 
 for (i, solution) in zip(1:length(ensemble_solution), ensemble_solution)
     plot_geometric_solution!(p, solution; color = i, label = "trajectory "*string(i))
