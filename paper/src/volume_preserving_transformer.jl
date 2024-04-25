@@ -5,6 +5,7 @@ using GeometricMachineLearning: map_to_cpu
 using GeometricIntegrators: integrate, ImplicitMidpoint
 using GeometricProblems.RigidBody: odeproblem, odeensemble, default_parameters
 using LaTeXStrings
+using LinearAlgebra: norm
 import Random 
 
 # hyperparameters for the problem 
@@ -107,18 +108,26 @@ function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_v
     T.(numerical_solution), T.(t_array) 
 end
 
+function compute_neural_network_prediction(nn::NeuralNetwork{<:GeometricMachineLearning.TransformerIntegrator}, numerical::AbstractMatrix, t_validation::Integer)
+    iterate(nn, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
+end
+
+function compute_neural_network_prediction(nn::NeuralNetwork{<:GeometricMachineLearning.NeuralNetworkIntegrator}, numerical::AbstractMatrix, t_validation::Integer)
+    iterate(nn, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
+end
+
 function plot_validation(t_validation; nn₂=nn₂, nn₃=nn₃, nn₄=nn₄, plot_regular_transformer = false, plot_vp_transformer = false)
 
     numerical, t_array = numerical_solution(sys_dim, t_validation, tstep, ics_val)
 
     # nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
-    nn₂_solution = iterate(nn₂, numerical[:, 1]; n_points = Int(floor(t_validation / tstep)) + 1)
-    nn₃_solution = iterate(nn₃, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
-    nn₄_solution = iterate(nn₄, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = seq_length)
+    nn₂_solution = compute_neural_network_prediction(nn₂, numerical, t_validation)
+    nn₃_solution = compute_neural_network_prediction(nn₃, numerical, t_validation)
+    nn₄_solution = compute_neural_network_prediction(nn₄, numerical, t_validation)
 
     ########################### plot validation
 
-    p_validation = plot(t_array, numerical[1, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400, ylabel = "z", xlabel = "time")
+    p_validation = plot(t_array, numerical[1, :], label = "implicit midpoint", color = 1, linewidth = 2, dpi = 400, ylabel = "z", xlabel = "time")
 
     # plot!(p_validation, t_array, nn₁_solution[1, :], label = "attention only", color = 2, linewidth = 2)
 
@@ -160,30 +169,70 @@ function sphere(r, C)   # r: radius; C: center [cx,cy,cz]
     return x, y, z
 end
 
-function make_validation_plot3d(t_validation::Int, nn::NeuralNetwork)
+function make_validation_plot3d(t_validation::Int, nn::NeuralNetwork, network_description = "volume-preserving transformer", color_type = 4)
     numerical, _ = numerical_solution(sys_dim, t_validation, tstep, ics_val)
     numerical₂, _ = numerical_solution(sys_dim, t_validation, tstep, ics_val₂)
 
     prediction_window = typeof(nn) <: NeuralNetwork{<:GeometricMachineLearning.TransformerIntegrator} ? seq_length : 1
 
-    nn₁_solution = iterate(nn, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = prediction_window)
-    nn₁_solution₂ = iterate(nn, numerical₂[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1, prediction_window = prediction_window)
+    nn₁_solution = compute_neural_network_prediction(nn, numerical, t_validation)
+    nn₁_solution₂ = compute_neural_network_prediction(nn, numerical₂, t_validation)
 
     ########################### plot validation
 
     p_validation = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400, xlabel = L"z_1", ylabel = L"z_2", zlabel = L"z_3", xlims = (-1, 1), ylims = (-1, 1), zlims = (-1, 1), aspect_ratio = :equal)
     
-    plot!(p_validation, numerical[1, :], numerical[2, :], numerical[3, :], label = "numerical solution", color = 1, linewidth = 2, dpi = 400)
+    plot!(p_validation, numerical[1, :], numerical[2, :], numerical[3, :], label = "implicit midpoint", color = 1, linewidth = 2, dpi = 400, legendfontsize = 15)
     plot!(p_validation, numerical₂[1, :], numerical₂[2, :], numerical₂[3, :], label = nothing, color = 1, linewidth = 2, dpi = 400)
 
-    plot!(p_validation, nn₁_solution[1, :], nn₁_solution[2,:], nn₁_solution[3, :], label = "volume-preserving transformer", color = 4, linewidth = 2)
-    plot!(p_validation, nn₁_solution₂[1, :], nn₁_solution₂[2,:], nn₁_solution₂[3, :], label = nothing, color = 4, linewidth = 2)
+    plot!(p_validation, nn₁_solution[1, :], nn₁_solution[2,:], nn₁_solution[3, :], label = network_description, color = color_type, linewidth = 2, legendfontsize = 15)
+    plot!(p_validation, nn₁_solution₂[1, :], nn₁_solution₂[2,:], nn₁_solution₂[3, :], label = nothing, color = color_type, linewidth = 2)
 
     p_validation
 end
 
 p_validation3d = make_validation_plot3d(t_validation_long, nn₃)
 
+p_validation3d_standard_transformer = make_validation_plot3d(t_validation_long, nn₄, "standard transformer", 5)
+
+p_validation3d_feedforward = make_validation_plot3d(t_validation_long, nn₂, "volume-preserving feedforward", 3)
+
+############################### plot error evolution 
+
+function plot_error_evolution(t_validation; nn₂=nn₂, nn₃=nn₃, nn₄=nn₄, plot_regular_transformer = false, plot_vp_transformer = true)
+
+    numerical, t_array = numerical_solution(sys_dim, t_validation, tstep, ics_val)
+
+    # nn₁_solution = iterate(nn₁, numerical[:, 1:seq_length]; n_points = Int(floor(t_validation / tstep)) + 1)
+    nn₂_solution = compute_neural_network_prediction(nn₂, numerical, t_validation)
+    nn₃_solution = compute_neural_network_prediction(nn₃, numerical, t_validation)
+    nn₄_solution = compute_neural_network_prediction(nn₄, numerical, t_validation)
+
+    ########################### plot validation
+    _norm(A::Matrix) = [norm(A[:, i]) for i in axes(A, 2)]
+
+    p_validation = plot(t_array, _norm(numerical - nn₂_solution) ./ _norm(numerical), label = "feedforward", color = 3, linewidth = 2, dpi = 400, ylabel = " relative error", xlabel = "time")
+
+    if plot_vp_transformer
+        plot!(p_validation, t_array, _norm(numerical - nn₃_solution) ./ _norm(numerical), label = "volume-preserving transformer", color = 4, linewidth = 2)
+    end
+
+    if plot_regular_transformer
+        plot!(p_validation, t_array, _norm(numerical - nn₄_solution) ./ _norm(numerical), label = "standard transformer", color = 5, linewidth = 2)
+    end
+
+    p_validation
+end
+
+p_error_evolution = plot_error_evolution(t_validation)
+p_error_evolution_long = plot_error_evolution(t_validation_long)
+
+##############################
+
 png(p_validation, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation_"*string(seq_length)))
 png(p_training_loss, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/training_loss_"*string(seq_length)))
 png(p_validation3d, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation3d_"*string(seq_length)))
+# png(p_validation3d_standard_transformer, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/standard_transformer_validation3d_"*string(seq_length)))
+png(p_validation3d_feedforward, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/feedforward_validation3d_"*string(seq_length)))
+png(p_error_evolution, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_"*string(seq_length)))
+png(p_error_evolution_long, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_long_"*string(seq_length)))
