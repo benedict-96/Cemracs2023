@@ -26,6 +26,7 @@ input = [z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}],
 we get the following for the output of an attention layer:
 ```math
 output = \left[ \sum_{i=1}^Ty^{(1)}_iz_\mu^{(i)}, \sum_{i=1}^Ty^{(2)}_iz_\mu^{(i)}, \ldots, \sum_{i=1}^Ty^{(T)}_iz_\mu^{(i)} \right] .
+\label{eq:StandardTransformerOutput}
 ```
 
 With all the coefficients satisfying ``\forall{}j=1,\ldots,T:\sum_{i=1}^Ty^{(j)}_i = 1``. It is important to note that the mapping 
