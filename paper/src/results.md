@@ -101,7 +101,7 @@ We see that the standard transformer very clearly fails on this task and that th
 
 ## Why does regular attention fail? 
 
-We can see in m[fig:Validation3d]m(@latex) that the regular transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We further see that there "trajectory 1" and "trajectory 4" seem to merge at some point. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
+We can see in m[fig:Validation3d]m(@latex) that the standard transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We further see that there "trajectory 1" and "trajectory 4" seem to merge at some point. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
 
 
 ## A note on parameter-dependent equations
