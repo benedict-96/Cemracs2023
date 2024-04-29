@@ -2,11 +2,11 @@
 
 We now compare three different neural network architectures that we all train on data coming from a rigid body (see [The rigid body](@ref)). Those architectures are:
 
-| architecture    | `n_linear` | `n_blocks` | L | total number of parameters |
+| Architecture    | `n_linear` | `n_blocks` | L | Total number of parameters |
 | :-------------  |:---------: |:---------: |:-:|:-------------------------: |
 | VPFF            | 1          | 6          | - | 135                        |
 | VPT             | 1          | 2          | 3 | 162                        |
-| Standard T      | -          | 2          | 3 | 213                        |
+| ST              | -          | 2          | 3 | 213                        |
 
 
 For the standard transformer we further remove the add connection (i.e. the green line in m[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation).
@@ -55,16 +55,16 @@ We train the three networks for ``5\cdot10^5`` epochs and use an Adam optimizer 
 
 where ``\eta_1`` is the initial learning rate and ``\eta_2`` is the final learning rate. We end up with the following choice of hyperparameters (mostly taken from [goodfellow2016deep](@cite)):
 
-| name  |``\eta_1`` |``\eta_2`` |``\rho_1`` |``\rho_2`` |``\delta`` |`n_epochs`     |
+| Name  |``\eta_1`` |``\eta_2`` |``\rho_1`` |``\rho_2`` |``\delta`` |`n_epochs`     |
 | ----- |:--------- |:--------- |:--------- |:--------- |:--------- |:------------- |
-| value |``10^{-2}``|``10^{-6}``|``0.9``    |``0.99``   |``10^{-8}``| ``5\cdot10^5``|
+| Value |``10^{-2}``|``10^{-6}``|``0.9``    |``0.99``   |``10^{-8}``| ``5\cdot10^5``|
 
 
 With these settings we get the following training times for the different networks[^1]: 
 
-| architecture  |   VPFF  |   VPT   |Standard T |
+| Architecture  |   VPFF  |   VPT   |   ST      |
 | ------------- | :------ | :------ | :------   |
-| training time | 4:02:09 | 5:58:57 | 3:58:06   |
+| Training time | 4:02:09 | 5:58:57 | 3:58:06   |
 
 [^1]: Times given as HOURS:MINUTES:SECONDS.
 
