@@ -1,12 +1,12 @@
 # The transformer
 
-The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in m[fig:TransformerArchitecture]m(@latex)[^1].
+The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in M[fig:TransformerArchitecture]m(@latex)[^1].
 
 [^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is reweighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" (see [vaswani2017attention](@cite)).
 
 Here the transformer is essentially a combination of an attention layer (explained below) and a residual net (ResNet[^2], see [he2016deep](@cite)). Despite its simplicity the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
 
-[^2]: The simplest form of a ResNet is a regular feed-forward neural network with an add connection: ``x \rightarrow x + \sigma (Wx + b)``. In this work we use a slightly more complicated version where the ResNet step is repeated `n_blocks` times (also confer m[fig:VolumePreservingFeedForward]m(@latex)).
+[^2]: The simplest form of a ResNet is a regular feed-forward neural network with an add connection: ``x \rightarrow x + \sigma (Wx + b)``. In this work we use a slightly more complicated version where the ResNet step is repeated `n_blocks` times (also confer M[fig:VolumePreservingFeedForward]m(@latex)).
 
 
 
