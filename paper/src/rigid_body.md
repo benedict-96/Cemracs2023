@@ -1,6 +1,6 @@
 # The rigid body
 
-The differential equation for the rigid body (see [hairer2006geometric, arnold1978mathematical](@cite)) describes a solid object fixed at a point. It is the equation describing arbitrary motion of a rigid body modulo translations in space. A rigid body is shown in m[fig:RigidBody]m(@latex) and, as is alluded to in that figure, it can always be described by an ellipsoid. This can easily be seen when considering the derivation of the rigid body equations. The motion of a point ``(x_1, x_2, x_3)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
+The differential equation for the rigid body (see [hairer2006geometric, arnold1978mathematical](@cite)) describes a solid object fixed at a point. It is the equation describing arbitrary motion of a rigid body modulo translations in space. A rigid body is shown in M[fig:RigidBody]m(@latex) and, as is alluded to in that figure, it can always be described by an ellipsoid. This can easily be seen when considering the derivation of the rigid body equations. The motion of a point ``(x_1, x_2, x_3)^T`` in the rigid body ``\mathcal{B}`` can be described through: 
 
 ```math
 v := \frac{d}{dt}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \omega\times{}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} \omega_2x_3 - \omega_3x_2 \\ \omega_3x_1 - \omega_1x_3 \\ \omega_1x_2 - \omega_2x_1 \end{pmatrix} = \begin{pmatrix} 0 & - \omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix},
@@ -32,7 +32,7 @@ and we can see that it is enough to know the eigenvalues of the matrix ``\Theta`
 ```@raw latex
 \begin{figure}
 \includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
-\caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$}.
+\caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$.}
 \label{fig:RigidBody}
 \end{figure}
 ```
@@ -47,7 +47,7 @@ W := \dot{Q}Q^T = \begin{pmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\o
 ```
 [^1]: This is the Lie algebra of skew-symmetric matrices: ``\mathfrak{g} = \{W\in\mathbb{R}^{d\times{}d}:W^T = -W\}``.
 
-As was indicated in equation m[eq:LieAlgebraRepresentation]m(@latex) the components of the skew-symmetric matrix ``W`` are equivalent to those of the angular velocity ``\omega`` as can easily be checked: 
+As was indicated in equation M[eq:LieAlgebraRepresentation]m(@latex) the components of the skew-symmetric matrix ``W`` are equivalent to those of the angular velocity ``\omega`` as can easily be checked: 
 
 ```math
 \dot{x} = \frac{d}{dt}Q(t)x(0) = \dot{Q}(t)x(0) = \dot{Q}(t)Q^T(t)x(t) = W(t)x(t) = Wx = \begin{pmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \\ \begin{pmatrix}  -\omega_3x_2 + \omega_2x_3 \\ \omega_3x_1 - \omega_1x_3 \\ -\omega_2x_1 + \omega_1x_2 \end{pmatrix} = \omega\times{}x.
@@ -67,9 +67,9 @@ where ``D`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 =
 
 [^2]: This matrix is equivalent to the diagonal entries of the *coefficient of inertia matrix* in [holm2009geometric](@cite).
 
-and obtain via the Euler-Poincaré equations[^3] for m[eq:KineticEnergyForLieGroup]m(@latex): 
+and obtain via the Euler-Poincaré equations[^3] for M[eq:KineticEnergyForLieGroup]m(@latex): 
 
-[^3]: For the Euler-Poincaré equations we have to compute variations of m[eq:KineticEnergyForLieGroup]m(@latex) with respect to ``\delta{}W = \delta(\dot{Q}Q^{-1} = \dot{\Sigma} - [W,\Sigma]`` where ``\Sigma := \delta{}QQ^{-1}``. For more details on this see [holm2009geometric](@cite).
+[^3]: For the Euler-Poincaré equations we have to compute variations of M[eq:KineticEnergyForLieGroup]m(@latex) with respect to ``\delta{}W = \delta(\dot{Q}Q^{-1} = \dot{\Sigma} - [W,\Sigma]`` where ``\Sigma := \delta{}QQ^{-1}``. For more details on this see [holm2009geometric](@cite).
 
 ```math
 \widehat{I\dot{\omega}} = [\widehat{I\omega}, W],
@@ -82,7 +82,7 @@ or equivalently:
 \label{eq:FinalRigidBodyEquations}
 ```
 
-In the above equation we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3`` throughout this paper, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In m[fig:RigidBodyCurves]m(@latex) we show some trajectories. We also see that the vector field described by m[eq:FinalRigidBodyEquations]m(@latex) is trivially divergence-free.
+In the above equation we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3`` throughout this paper, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In M[fig:RigidBodyCurves]m(@latex) we show some trajectories. We also see that the vector field described by M[eq:FinalRigidBodyEquations]m(@latex) is trivially divergence-free.
 
 
 ```@eval 

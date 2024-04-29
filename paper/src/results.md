@@ -9,18 +9,18 @@ We now compare three different neural network architectures that we all train on
 | ST              | -          | 2          | 3 | 213                        |
 
 
-For the standard transformer we further remove the add connection (i.e. the green line in m[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation).
+For the standard transformer we further remove the add connection (i.e. the green line in M[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation).
 
 ## Training data
 
-As training data we take solutions of m[eq:FinalRigidBodyEquations]m(@latex) for various initial conditions: 
+As training data we take solutions of M[eq:FinalRigidBodyEquations]m(@latex) for various initial conditions: 
 
 ```math
 \mathtt{ics} = \left\{ \begin{pmatrix} \sin(v) \\ 0 \\ \cos(v) \end{pmatrix}, \begin{pmatrix} 0 \\ \sin(v) \\ \cos(v) \end{pmatrix}: v\in0.1:0.01:2\pi \right\},
 \label{eq:Ics}
 ```
 
-where ``v\in0.1:0.01:2\pi`` means that we incrementally increase ``v`` from 0.1 to ``2\pi`` by steps of size 0.01. We then integrate m[eq:FinalRigidBodyEquations]m(@latex) for the various initial conditions in m[eq:Ics]m(@latex) with implicit midpoint for the interval ``[0,12]`` and a step size of ``0.2``. The integration is done with `GeometricIntegrators.jl` [Kraus:2020:GeometricIntegrators](@cite). In m[fig:RigidBodyCurves]m(@latex) we show some of the curves for the following initial conditions: 
+where ``v\in0.1:0.01:2\pi`` means that we incrementally increase ``v`` from 0.1 to ``2\pi`` by steps of size 0.01. We then integrate M[eq:FinalRigidBodyEquations]m(@latex) for the various initial conditions in M[eq:Ics]m(@latex) with implicit midpoint for the interval ``[0,12]`` and a step size of ``0.2``. The integration is done with `GeometricIntegrators.jl` [Kraus:2020:GeometricIntegrators](@cite). In M[fig:RigidBodyCurves]m(@latex) we show some of the curves for the following initial conditions: 
 
 ```math
 \left\{
@@ -68,7 +68,7 @@ With these settings we get the following training times for the different networ
 
 [^1]: Times given as HOURS:MINUTES:SECONDS.
 
-The time evolution of the different training losses is shown in m[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at a rather high level (``0.05``). What this means in practice is shown in m[fig:Validation3d]m(@latex). Here show the prediction for two initial conditions, ``\begin{pmatrix} \sin(1.1) & 0 & \cos(1.1) \end{pmatrix}^T`` and ``\begin{pmatrix} 0 & \sin(1.1) & \cos(1.1) \end{pmatrix}^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in m[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
+The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). Here we can see that the training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``0.0005``), whereas the standard transformer is stuck at a rather high level (``0.05``). What this means in practice is shown in M[fig:Validation3d]m(@latex). Here show the prediction for two initial conditions, ``\begin{pmatrix} \sin(1.1) & 0 & \cos(1.1) \end{pmatrix}^T`` and ``\begin{pmatrix} 0 & \sin(1.1) & \cos(1.1) \end{pmatrix}^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in M[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
 
 ```@raw latex
 \begin{figure}
@@ -88,7 +88,7 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 \end{figure}
 ```
 
-We see that the standard transformer very clearly fails on this task and that the volume-preserving feedforward network slowly drifts of. The volume-preserving transformer manage to stay close to the numerical solution much better. We further compare the two volume-preserving networks and plot the time evolution of the relative error (compared to the solution with implicit midpoint). These results are shown in m[fig:VPFFvsVPT]m(@latex).
+We see that the standard transformer very clearly fails on this task and that the volume-preserving feedforward network slowly drifts of. The volume-preserving transformer manage to stay close to the numerical solution much better. We further compare the two volume-preserving networks and plot the time evolution of the relative error (compared to the solution with implicit midpoint). These results are shown in M[fig:VPFFvsVPT]m(@latex).
 
 ```@raw latex
 \begin{figure}
@@ -101,7 +101,7 @@ We see that the standard transformer very clearly fails on this task and that th
 
 ## Why does regular attention fail? 
 
-We can see in m[fig:Validation3d]m(@latex) that the standard transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We further see that there "trajectory 1" and "trajectory 4" seem to merge at some point. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
+We can see in M[fig:Validation3d]m(@latex) that the standard transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see M[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We further see that there "trajectory 1" and "trajectory 4" seem to merge at some point. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
 
 
 ## A note on parameter-dependent equations
@@ -111,7 +111,7 @@ The training data for the example presented here was an ODE for which we generat
 ```math
 \{\varphi^t(z^0_\alpha): {t\in(t_0, t_f], z^0_\alpha\in\mathtt{ics}} \},
 ```
-where ``\varphi^t`` is the flow of the differential equation ``\dot{z} = f(z)`` (the rigid body from m[eq:FinalRigidBodyEquations]m(@latex) in our example), ``t_0`` is the initial time, ``t_f`` the final time and `ics` denotes the set of initial conditions. 
+where ``\varphi^t`` is the flow of the differential equation ``\dot{z} = f(z)`` (the rigid body from M[eq:FinalRigidBodyEquations]m(@latex) in our example), ``t_0`` is the initial time, ``t_f`` the final time and `ics` denotes the set of initial conditions. 
 
 For applications such as *reduced order modeling* (see [lee2020model, lassila2014model, fresca2021comprehensive](@cite)) we usually deal with *parametric differential equations* that are of the form: 
 

@@ -25,7 +25,7 @@ The main difficulty in adapting a transformer-like architecture to be volume-pre
 \sigma(Y) = \mathrm{Cayley}(Y) = \frac{1}{2}(\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
 ```
 
-The Cayley transform maps skew-symmetric matrices to orthogonal matrices[^1]. This results in a new activation function for our attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Further note that the input into the Cayley transform has to be a skew-symmetric matrix. For this reason we need to constrain ``A`` to be also skew-symmetric. With this ``\Lambda(Z)`` is an orthogonal matrix and the entire mapping is equivalent to a multiplication by a orthogonal matrix in the *big vector representation* shown in m[eq:isomorphism]m(@latex). To see this note that the attention layer performs the following:
+The Cayley transform maps skew-symmetric matrices to orthogonal matrices[^1]. This results in a new activation function for our attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Further note that the input into the Cayley transform has to be a skew-symmetric matrix. For this reason we need to constrain ``A`` to be also skew-symmetric. With this ``\Lambda(Z)`` is an orthogonal matrix and the entire mapping is equivalent to a multiplication by a orthogonal matrix in the *big vector representation* shown in M[eq:isomorphism]m(@latex). To see this note that the attention layer performs the following:
 
 [^1]: The orthogonal matrices ``\{B\in\mathbb{R}^{d\times{}d}:B^TB=\mathbb{I}_d\}`` form a Lie group under regular matrix multiplication. The associated Lie algebra is the vector space of skew-symmetric matrices ``\mathfrak{g}=\{C:C+C^T = \mathbb{O}\}`` and the Lie algebra is mapped to the Lie group via the Cayley transform. More details on this can be found in e.g. [hairer2006geometric](@cite).
 
@@ -34,7 +34,7 @@ Z \mapsto Z\Lambda(Z).
 \label{eq:LambdaRight}
 ```
 
-In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` defined in m[eq:isomorphism]m(@latex)), this is equivalent to multiplication by a sparse matrix ``\tilde\Lambda(Z)`` from the left:
+In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` defined in M[eq:isomorphism]m(@latex)), this is equivalent to multiplication by a sparse matrix ``\tilde\Lambda(Z)`` from the left:
 
 ```math
     \tilde{\Lambda}(Z) Z_\mathrm{vec} :=
@@ -48,16 +48,16 @@ In the transformed coordinate system (in terms of the vector ``Z_\mathrm{vec}`` 
     \label{eq:LambdaApplication}
 ```
 
-``\tilde{\Lambda}(Z)`` in m[eq:LambdaApplication]m(@latex) is easily shown to be an orthogonal matrix. 
+``\tilde{\Lambda}(Z)`` in M[eq:LambdaApplication]m(@latex) is easily shown to be an orthogonal matrix. 
 
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .3\textwidth]{tikz/vp_transformer.png}
-\caption{Architecture for the volume-preserving transformer. "VPFF" refers to the volume-preserving feedforward neural network from \cref{fig:VolumePreservingFeedForward}.}
+\caption{Architecture for the volume-preserving transformer. "VPFF" refers to the volume-preserving feedforward neural network from \Cref{fig:VolumePreservingFeedForward}.}
 \label{fig:VolumePreservingTransformerArchitecture}
 \end{figure}
 ```
 
-For the remaining parts of the transformer, the feedforward neural network is replaced by a volume-preserving feedforward network and the first add connection is removed[^2]. The architecture is shown in m[fig:VolumePreservingTransformerArchitecture]m(@latex).
+For the remaining parts of the transformer, the feedforward neural network is replaced by a volume-preserving feedforward network and the first add connection is removed[^2]. The architecture is shown in M[fig:VolumePreservingTransformerArchitecture]m(@latex).
 
 [^2]: Removal of the add connection is necessary as the addition with the input is not a volume-preserving operation. 

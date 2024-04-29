@@ -36,9 +36,9 @@ and the determinant of ``J`` is 1, i.e. the map is volume-preserving.
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .3\textwidth]{tikz/vp_feedforward.png}
-\caption{Architecture for the volume-preserving feedforward neural network. "LinearLowerLayer" refers to $x \mapsto x + Lx$ (and similarly for "LinearUpperLayer"). "NonLinearLowerLayer" is shown in \cref{eq:VPFF}. "Bias" is the addition with a bias vector.}
+\caption{Architecture for the volume-preserving feedforward neural network. "LinearLowerLayer" refers to $x \mapsto x + Lx$ (and similarly for "LinearUpperLayer"). "NonLinearLowerLayer" is shown in \Cref{eq:VPFF}. "Bias" is the addition with a bias vector.}
 \label{fig:VolumePreservingFeedForward}
 \end{figure}
 ```
 
-In practice we combine many of those layers where the activation function is either (i) a fixed nonlinearity (tanh in our case) or (ii) identity. This is shown in figure m[fig:VolumePreservingFeedForward]m(@latex).
+In practice we combine many of those layers where the activation function is either (i) a fixed nonlinearity (tanh in our case) or (ii) identity. This is shown in M[fig:VolumePreservingFeedForward]m(@latex).
