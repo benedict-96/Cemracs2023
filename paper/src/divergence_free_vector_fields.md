@@ -33,8 +33,6 @@ Numerical integrators for ODEs now always aim at approximating the flow ``\varph
 
 In recent years numerical integrators based on neural networks have emerged and it has proven crucial to also imbue these integrators with properties of the system such as symplecticity (see [jin2020sympnets, greydanus2019hamiltonian](@cite)) and volume preservation (see [bajars2023locally](@cite)). The neural network architecture presented in [Volume-preserving transformer](@ref) falls in this category. 
 
-## A note on symplectic vector fields
-
-All symplectic and Hamiltonian vector fields[^1] are also divergence-free. Symplecticity is a much stronger property however; so preserving this property is preferable to just preserving volume. If a symplectic scheme is however not available, a volume-preserving one usually also offers improvements over one that does not respect any of the properties of the vector field.
+Let us note that all symplectic and Hamiltonian vector fields[^1] are also divergence-free. Symplecticity, however, is a much stronger property; so preserving this property is preferable to just preserving volume. If a symplectic scheme is however not available, a volume-preserving one usually also offers improvements over one that does not respect any of the properties of the vector field.
 
 [^1]: Strictly speaking Hamiltonian vector fields form a subspace of the space of all symplectic vector fields (see [bishop1980tensor](@cite)).
