@@ -4,22 +4,15 @@ all: train_networks;
 all_mac: train_networks;
 	$(MAKE) pdf_without_training_mac
 
-pdf_without_training: linux_images pdf_without_training_and_images;
-	$(MAKE) compile_tex;
-	$(MAKE) compile_tex
-
-pdf_without_training_mac: mac_images pdf_without_training_and_images;
-	$(MAKE) compile_tex;
-	$(MAKE) compile_tex
+pdf_without_training: tikz_images pdf_without_training_and_images;
 
 pdf_without_training_and_images: generate_tex;
-	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks
+	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks;
+	$(MAKE) compile_tex;
+	$(MAKE) compile_tex
 
-linux_images:
+tikz_images:
 	$(MAKE) linux -C src/tikz
-
-mac_images:
-	$(MAKE) mac -C src/tikz
 
 copy_edps_files:
 	cp src/assets/edpsmath.cls build/edpsmath.cls;
