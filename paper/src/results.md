@@ -83,12 +83,12 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/feedforward_validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/standard_transformer_validation3d_3.png}
-\caption{Validation plot in 3d. We plot the solution obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}.}
+\caption{Validation plot in 3d. We plot the solution obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}. The volume-preserving feedforward neural network is provided with the initial condition (i.e. $z^{(0)}$) and then starts the prediction and the two transformers are provided with the first three time steps and then start the prediction. The prediction is made for the time interval $[0, 100]$, i.e. 500 time steps in total.}
 \label{fig:Validation3d}
 \end{figure}
 ```
 
-We see that the regular transformer very clearly fails on this task (discussed below) and that the volume-preserving feedforward network and the volume-preserving transformer manage to stay close to the numerical solution much better. We further compare those two networks and plot the time evolution of the relative error (compared to the solution with implicit midpoint). These results are shown in m[fig:VPFFvsVPT]m(@latex).
+We see that the standard transformer very clearly fails on this task and that the volume-preserving feedforward network slowly drifts of. The volume-preserving transformer manage to stay close to the numerical solution much better. We further compare the two volume-preserving networks and plot the time evolution of the relative error (compared to the solution with implicit midpoint). These results are shown in m[fig:VPFFvsVPT]m(@latex).
 
 ```@raw latex
 \begin{figure}
