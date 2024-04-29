@@ -83,7 +83,7 @@ The time evolution of the different training losses is shown in m[fig:TrainingLo
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/feedforward_validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/standard_transformer_validation3d_3.png}
-\caption{Validation plot in 3d. We plot the solution obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}. The volume-preserving feedforward neural network is provided with the initial condition (i.e. $z^{(0)}$) and then starts the prediction and the two transformers are provided with the first three time steps and then start the prediction. The prediction is made for the time interval $[0, 100]$, i.e. 500 time steps in total.}
+\caption{Validation plot in 3d. We plot the solution obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer together with the numerical solution for "trajectory 1" and "trajectory 4" in \cref{fig:RigidBodyCurves}. The volume-preserving feedforward neural network is provided with the initial condition (i.e. $z^{(0)}$) and then starts the prediction and the two transformers are provided with the first three time steps ($z^{(1)}$ and $z^{(2)}$ are obtained via implicit midpoint) and then start the prediction. The prediction is made for the time interval $[0, 100]$, i.e. 500 time steps in total.}
 \label{fig:Validation3d}
 \end{figure}
 ```
@@ -101,7 +101,7 @@ We see that the standard transformer very clearly fails on this task and that th
 
 ## Why does regular attention fail? 
 
-We can see in m[fig:Validation3d]m(@latex) that the regular transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction.  
+We can see in m[fig:Validation3d]m(@latex) that the regular transformer fails very clearly to predict the time evolution of the system correctly. This reason behind this could be that it is not sufficiently restrictive, i.e. the three columns making the output of the transformer (see m[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We further see that there "trajectory 1" and "trajectory 4" seem to merge at some point. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
 
 
 ## A note on parameter-dependent equations
