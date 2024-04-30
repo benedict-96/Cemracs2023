@@ -43,7 +43,7 @@ introduction_gets_no_label:
 
 use_acknowledgements_environment:
 	sed -i'' -e 's/\\section{Acknowledgements}/\\begin{acknowledgement}/g' build/V*.tex;
-	sed -i'' -e 's/\\section{References}/\\end{acknowledgement}\\section{References}/g' build/V*.tex
+	sed -i'' -e 's/\\appendix/\\end{acknowledgement}\\appendix/g' build/V*.tex
 
 give_equations_labels:
 	sed -i'' -e 's/equation\*/equation/g' build/V*.tex;
