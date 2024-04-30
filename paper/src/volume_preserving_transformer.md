@@ -7,13 +7,23 @@ In this section we introduce a new attention mechanism that we call *volume-pres
 
 Consider an isomorphism ``\hat{}: \times_T \mathbb{R}^{d} \stackrel{\approx}{\longrightarrow} \mathbb{R}^{dT}`` of the form:
 ```math
-Z =  \left[\begin{array}{cccc}
+Z = \begin{pmatrix}
             z_1^{(1)} &  z_1^{(2)} & \quad\cdots\quad & z_1^{(T)} \\
             z_2^{(1)} &  z_2^{(2)} & \cdots & z_2^{(T)} \\
             \cdots &  \cdots & \cdots & \cdots \\
             z_d^{(1)} & z_d^{(2)} & \cdots & z_d^{(T)}
-            \end{array}\right] \mapsto 
-            \left[\begin{array}{c}  z_1^{(1)} \\ z_1^{(2)} \\ \cdots \\ z_1^{(T)} \\ z_2^{(1)} \\ \cdots \\ z_d^{(T)} \end{array}\right] =: Z_\mathrm{vec}.
+    \end{pmatrix}
+\mapsto 
+\begin{bmatrix}
+    z_1^{(1)} \\
+    z_1^{(2)} \\
+    \cdots \\
+    z_1^{(T)} \\
+    z_2^{(1)} \\
+    \cdots \\
+    z_d^{(T)}
+\end{bmatrix} 
+=: Z_\mathrm{vec}.
 \label{eq:isomorphism}
 ```
 
