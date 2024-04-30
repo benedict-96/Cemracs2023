@@ -4,7 +4,7 @@
 
 # The rigid body
 
-In the following, we will consider the rigid body as an example to study the performance of our new volume-preserving transformer.
+In this appendix, we sketch the derivation of the rigid body equations used in [Experimental results](@ref).
 The differential equation for the rigid body [hairer2006geometric, arnold1978mathematical](@cite) describes the dynamics of a solid object fixed at a point. M[fig:RigidBody]m(@latex) shows an example for a rigid body. 
 Its dynamics can always be described in terms of an ellipsoid. To see this, let us consider the derivation of the rigid body equations. The motion of a point ``(x_1, x_2, x_3)^T`` in the rigid body ``\mathcal{B}`` can be described as follows: 
 ```math
@@ -88,57 +88,3 @@ or equivalently:
 ```
 
 In the above equation, we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3`` throughout the remainder of this paper, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In M[fig:RigidBodyCurves]m(@latex), we show some trajectories. We immediately see that the vector field M[eq:FinalRigidBodyEquations]m(@latex) is trivially divergence-free.
-
-
-```@eval 
-using GeometricProblems.RigidBody: odeensemble, tspan, tstep, default_parameters
-using GeometricIntegrators: integrate, ImplicitMidpoint
-using GeometricEquations: EnsembleProblem
-using GeometricSolutions: GeometricSolution
-using LaTeXStrings
-using Plots; pyplot()
-
-ics = [
-        [sin(1.1), 0., cos(1.1)],
-        [sin(2.1), 0., cos(2.1)],
-        [sin(2.2), 0., cos(2.2)],
-        [0., sin(1.1), cos(1.1)],
-        [0., sin(1.5), cos(1.5)], 
-        [0., sin(1.6), cos(1.6)]
-]
-
-ensemble_problem = odeensemble(ics; tspan = tspan, tstep = tstep, parameters = default_parameters)
-ensemble_solution = integrate(ensemble_problem, ImplicitMidpoint())
-
-function plot_geometric_solution!(p::Plots.Plot, solution::GeometricSolution; kwargs...)
-    plot!(p, solution.q[:, 1], solution.q[:, 2], solution.q[:, 3]; kwargs...)
-end
-
-function sphere(r, C)   # r: radius; C: center [cx,cy,cz]
-           n = 100
-           u = range(-π, π; length = n)
-           v = range(0, π; length = n)
-           x = C[1] .+ r*cos.(u) * sin.(v)'
-           y = C[2] .+ r*sin.(u) * sin.(v)'
-           z = C[3] .+ r*ones(n) * cos.(v)'
-           return x, y, z
-       end
-
-p = surface(sphere(1., [0., 0., 0.]), alpha = .2, colorbar = false, dpi = 400, xlabel = L"z_1", ylabel = L"z_2", zlabel = L"z_3", xlims = (-1, 1), ylims = (-1, 1), zlims = (-1, 1), aspect_ratio = :equal)
-
-for (i, solution) in zip(1:length(ensemble_solution), ensemble_solution)
-    plot_geometric_solution!(p, solution; color = i, label = "trajectory "*string(i))
-end
-
-savefig(p, "rigid_body.png")
-
-nothing
-```
-
-```@raw latex
-\begin{figure}
-\includegraphics[width=.5\textwidth]{rigid_body.png}
-\caption{Trajectories for $I_1 = 1$, $I_2 = 2$ and $I_3 = 2/3$ and various initial conditions.}
-\label{fig:RigidBodyCurves}
-\end{figure}
-```
