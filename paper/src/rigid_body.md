@@ -1,3 +1,7 @@
+```@raw latex 
+\appendix
+```
+
 # The rigid body
 
 In the following, we will consider the rigid body as an example to study the performance of our new volume-preserving transformer.
