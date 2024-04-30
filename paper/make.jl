@@ -28,8 +28,8 @@ makedocs(;
         "VPT" => "volume_preserving_transformer.md",
         "Results" => "results.md",
         "Conclusion" => "conclusion.md",
-        "Acknowledgements" => "acknowledgements.md",
         "Rigid Body" => "rigid_body.md",
+        "Acknowledgements" => "acknowledgements.md",
         "References" => "references.md",
     ],
 )
