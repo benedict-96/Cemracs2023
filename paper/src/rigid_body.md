@@ -87,4 +87,4 @@ or equivalently:
 \label{eq:FinalRigidBodyEquations}
 ```
 
-In the above equation, we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. We further set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3`` throughout the remainder of this paper, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``. In M[fig:RigidBodyCurves]m(@latex), we show some trajectories. We immediately see that the vector field M[eq:FinalRigidBodyEquations]m(@latex) is trivially divergence-free.
+In the above equation, we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. In all of the examples, we set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``.
