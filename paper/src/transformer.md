@@ -5,6 +5,7 @@ The transformer architecture [vaswani2017attention](@cite) was originally motiva
 [^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is re-weighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" [vaswani2017attention](@cite).
 
 In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet[^2] [he2016deep](@cite)). Despite its simplicity, the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
+Furthermore, the simplicity of the transformer architecture makes it possible to interpret all its constituent operations, which is not so much the case with LSTMs, for example. As the individual operations have a straight-forward mathematical interpretation, it is easier to imbue them with additional structure such as volume-preservation.
 
 [^2]: The simplest form of a ResNet is a regular feed-forward neural network with an add connection: ``x \rightarrow x + \sigma (Wx + b)``. In this work we use a slightly more complicated version where the ResNet step is repeated `n_blocks` times (also confer M[fig:VolumePreservingFeedForward]m(@latex)).
 
