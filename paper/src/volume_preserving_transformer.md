@@ -36,7 +36,7 @@ A mapping ``\varphi: \times_T \mathbb{R}^{d} \to \times_T \mathbb{R}^{d}`` is sa
 The main difficulty in adapting a transformer-like architecture to be volume-preserving is to adapt the activation function. Indeed, the softmax acts vector-wise and cannot preserve volume. We thus replace the softmax by a different activation function, which is based on the Cayley transform:
 
 ```math
-\sigma(Y) = \mathrm{Cayley}(Y) = \frac{1}{2}(\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
+\sigma(Y) = \mathrm{Cayley}(Y) = (\mathbb{I}_{T} - Y)(\mathbb{I}_{T} + Y)^{-1}.
 ```
 
 The Cayley transform maps skew-symmetric matrices to orthogonal matrices[^1]. This results in a new activation function for the attention mechanism which we denote by ``\Lambda(Z) = \sigma (Z^T A Z)``. Further note that the input into the Cayley transform has to be a skew-symmetric matrix. For this reason we need to constrain ``A`` to be also skew-symmetric. With this, ``\Lambda(Z)`` is an orthogonal matrix and the entire mapping is equivalent to a multiplication by an orthogonal matrix in the *vector representation* shown in M[eq:isomorphism]m(@latex). To see this, note that the attention layer performs the following operation:
