@@ -11,7 +11,7 @@ Furthermore, the simplicity of the transformer architecture makes it possible to
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width = .25\textwidth]{tikz/transformer.png}
+\includegraphics[width = .26\textwidth]{tikz/transformer.png}
 \caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out.}
 \label{fig:TransformerArchitecture}
 \end{figure}

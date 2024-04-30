@@ -64,7 +64,7 @@ It is easy to see that ``\tilde{\Lambda}(Z)`` in M[eq:LambdaApplication]m(@latex
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width = .3\textwidth]{tikz/vp_transformer.png}
+\includegraphics[width = .29\textwidth]{tikz/vp_transformer.png}
 \caption{Architecture of the volume-preserving transformer. In comparison with the standard transformer in~\Cref{fig:TransformerArchitecture}, the Add layer has been removed, the attention layer has been replaced with a volume-preserving attention layer, and the feed forward layer has been replaced with the volume-preserving feedforward neural network from~\Cref{fig:VolumePreservingFeedForward}.}
 \label{fig:VolumePreservingTransformerArchitecture}
 \end{figure}

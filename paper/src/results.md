@@ -1,7 +1,7 @@
 # Experimental results
 
 In the following, we will consider the rigid body as an example to study the performance of our new volume-preserving transformer.
-We will solve the following equations:
+We will solve the following equations (see [The rigid body](@ref) for the derivation):
 ```math
 \frac{d}{dt}\begin{bmatrix} z_1 \\  z_2 \\ z_3  \end{bmatrix} 
 = \begin{bmatrix} Az_2z_3 \\ Bz_1z_3 \\ Cz_1z_2 \end{bmatrix} ,
@@ -9,7 +9,6 @@ We will solve the following equations:
 ```
 with ``A = 1``, ``B = -1/2`` and ``C = -1/2``.
 We immediately see that the vector field M[eq:RigidBodyEquations]m(@latex) is trivially divergence-free.
-The derivation of these equations can be found in [The rigid body](@ref).
 In M[fig:RigidBodyCurves]m(@latex), we show some trajectories.
 
 
@@ -60,8 +59,8 @@ nothing
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width=.5\textwidth]{rigid_body.png}
-\caption{Trajectories for $I_1 = 1$, $I_2 = 2$ and $I_3 = 2/3$ and various initial conditions.}
+\includegraphics[width=.6\textwidth]{rigid_body.png}
+\caption{Rigid body trajectories for $A = 1$, $B = -1/2$ and $C = -1/2$ and different initial conditions.}
 \label{fig:RigidBodyCurves}
 \end{figure}
 ```
