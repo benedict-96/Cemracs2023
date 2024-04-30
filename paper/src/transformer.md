@@ -32,7 +32,7 @@ input \mapsto \left([y_i^{(j)}]_{i=1,\ldots,T,j=1,\ldots,T}\right)
 ```
 is nonlinear. These coefficients are computed based on a correlation of the input data and involve learnable parameters that are adapted to the data during training.
 
-The correlation in the input data is computed through a *correlation matrix* : ``Z \rightarrow Z^T A Z =: C``. The correlations in the input data are therefore determined by computing weighted scalar products of all possible combinations of two input vectors where the weighting is done with ``A``; any entry of the matrix ``c_{ij}=(z^{(i)}_\mu)^TAz^{(j)}_\mu`` is the result of computing the scalar product of two input vectors. So any relationship, short-term or long-term, is encoded in this matrix.
+The correlations in the input data are computed through a *correlation matrix* : ``Z \rightarrow Z^T A Z =: C``; they are therefore determined by computing weighted scalar products of all possible combinations of two input vectors where the weighting is done with ``A``; any entry of the matrix ``c_{ij}=(z^{(i)}_\mu)^TAz^{(j)}_\mu`` is the result of computing the scalar product of two input vectors. So any relationship, short-term or long-term, is encoded in this matrix.
 
 In the next step, a softmax function is applied column-wise to ``C`` and returns the following output: 
 ```math
