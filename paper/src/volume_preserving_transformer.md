@@ -20,7 +20,7 @@ Z =  \left[\begin{array}{cccc}
 We refer to the inverse of ``Z \mapsto \hat{Z} `` as ``Y \mapsto \tilde{Y}``. In the following we also write ``\hat{\varphi}`` for the mapping ``\,\hat{}\circ\varphi\circ\tilde{}\,``.
 
 DEFINITION::
-We say that a mapping ``\varphi: \times_T \mathbb{R}^{d} \to \times_T \mathbb{R}^{d}`` is *volume-preserving* if the associated ``\hat{\varphi}`` is volume-preserving.
+A mapping ``\varphi: \times_T \mathbb{R}^{d} \to \times_T \mathbb{R}^{d}`` is said to be *volume-preserving* if the associated ``\hat{\varphi}`` is volume-preserving.
 ::
 
 The main difficulty in adapting a transformer-like architecture to be volume-preserving is to adapt the activation function. Indeed, the softmax acts vector-wise and cannot preserve volume. We thus replace the softmax by a different activation function, which is based on the Cayley transform:
