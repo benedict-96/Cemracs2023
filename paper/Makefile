@@ -9,7 +9,9 @@ arxiv_version_without_training: arxiv_version_without_training_and_compilation
 	$(MAKE) compile_with_pdflatex;
 	rm -r build/*.log;
 	rm -r build/*.out;
-	rm -r build/*.pdf
+	rm -r build/*.pdf;
+	rm -r _minted*;
+	zip -r arxiv_submission.zip build
 
 arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images
 	cp src/assets/preamble_arxiv.tex build/preamble.tex;
@@ -95,3 +97,4 @@ do_correct_remarks:
 clear: 
 	$(MAKE) empty -C src/tikz;
 	rm -r -f build;
+	rm arxiv_submission.zip;
