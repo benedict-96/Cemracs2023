@@ -7,10 +7,14 @@ all_mac: train_networks;
 arxiv_version_without_training: arxiv_version_without_training_and_compilation
 	$(MAKE) compile_with_pdflatex;
 	$(MAKE) compile_with_pdflatex;
-	rm -r build/*.log;
-	rm -r build/*.out;
-	rm -r build/*.pdf;
-	rm -r _minted*;
+	rm build/*.log;
+	rm build/*.out;
+	rm build/*.aux;
+	rm build/*.pdf;
+	rm -r build/_minted-*;
+	rm build/.DS*;
+	rm *.jl;
+	sed -i'' -e 's/\\usepackage{minted}/\\usepackage[frozencache=true,cachedir=minted-cache]{minted}/g' documenter_custom.sty;
 	zip -r arxiv_submission.zip build
 
 arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images
@@ -25,7 +29,9 @@ arxiv_version_without_training_and_compilation: tikz_images tex_without_training
 	rm -r build/simulations;
 	rm build/edpsmath.cls;
 	rm build/edpsproc.clo;
-	rm -r build/assets
+	rm -r build/assets;
+	rm -r build/*.tex-e;
+	rm -r build/*.bib
 
 pdf_without_training: tikz_images pdf_without_training_and_images;
 
