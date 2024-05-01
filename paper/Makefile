@@ -13,7 +13,7 @@ arxiv_version_without_training: arxiv_version_without_training_and_compilation
 	rm build/*.pdf;
 	rm -r build/_minted-*;
 	rm build/.DS*;
-	rm *.jl;
+	rm build/*.jl;
 	sed -i'' -e 's/\\usepackage{minted}/\\usepackage[frozencache=true,cachedir=minted-cache]{minted}/g' documenter_custom.sty;
 	zip -r arxiv_submission.zip build
 
