@@ -1,0 +1,135 @@
+\documentclass[12pt,a4paper,reqno]{article}
+\usepackage{geometry}
+\geometry{left=2.7cm,right=2.7cm,top=2.7cm,bottom=2.7cm}
+
+%%%%%%%%%%%%%--PREAMBLE--%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{theorem}
+\usepackage{./documenter_custom}
+\usepackage{./custom}
+
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+
+\usepackage{natbib}
+
+\usepackage{tikz}
+\usepackage{ulem}
+% need this package for tikz pictures
+\usepackage{standalone}
+\usetikzlibrary{cd}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+\tikzset{set/.style={draw,circle,inner sep=0pt,align=center}}
+
+\usepackage{xcolor}
+\definecolor{morange}{RGB}{255,127,14}
+\definecolor{mblue}{RGB}{31,119,180}
+\definecolor{mred}{RGB}{214,39,40}
+\definecolor{mpurple}{RGB}{148,103,189}
+\definecolor{mgreen}{RGB}{44,160,44}
+
+% \usepackage[level]{datetime}
+\newtheorem{dfntn}{Definition}
+\newtheorem{thrm}{Theorem}
+\newtheorem{lmm}{Lemma}
+\newtheorem{xmpl}{Example}
+\theoremstyle{remark}
+\newtheorem{rmrk}{Remark}
+
+\usepackage[affil-it]{authblk}
+
+\providecommand{\keywords}[1]{\footnotesize\textbf{\textit{Keywords:}} #1}
+\providecommand{\MSCcodes}[1]{\footnotesize\textbf{\textit{MSC 2020:}} #1}
+
+% resume environment
+\makeatletter
+\newbox\resumebox
+\newenvironment{resume}{
+    \global\setbox\resumebox=\vtop\bgroup\fontsize{9}{11}
+    \selectfont\advance\hsize-6pc\trivlist\labelsep.5em
+    \item[\hskip\labelsep{\fontsize{10}{12}\selectfont\bf R\'esum\'e.}]
+    }{
+        \endtrivlist\egroup\ifx\@setresume\relax \@setresumea \fi
+        }
+\def\@setresume{\@setresumea\global\let\@setresume\relax}
+\def\@setresumea{\skip@20\p@\advance\skip@-\lastskip\advance\skip@-\baselineskip \vskip\skip@
+  \ifvoid\resumebox\else\moveright 3pc \box\resumebox\fi}
+\makeatother
+
+\makeatletter
+\newbox\abstractbox
+\renewenvironment{abstract}{
+  \global\setbox\abstractbox=\vtop\bgroup\iflanguage{french}{\selectlanguage{english}}{}
+  \fontsize{9}{11}\selectfont 
+  \advance \hsize -6pc
+  \trivlist 
+    \labelsep.5em\item[\hskip\labelsep{\fontsize{10}{12}\selectfont\bf Abstract.}]}
+{\endtrivlist\egroup\ifx\@setabstract\relax \@setabstracta \fi}
+\def\@setabstract{\@setabstracta\global\let\@setabstract\relax}
+\def\@setabstracta{\skip@20\p@ \advance\skip@-\lastskip \advance\skip@-\baselineskip \vskip\skip@
+    \moveright 3pc \box\abstractbox}
+\makeatother
+
+\makeatletter
+\renewcommand\@maketitle{
+    {\raggedright % Note the extra {
+    \begin{center}
+    {\Large \bfseries \sffamily \@title }\\[4ex] 
+    {\footnotesize \@author}\\[4ex] 
+    \@date\\
+    \@setabstract
+    \@setresume
+    \end{center}} % Note the extra }
+}
+\makeatother
+
+
+
+% acknowledgements environment 
+\theoremstyle{plain}
+\newenvironment{acknowledgement}{\par\addvspace{17pt}\small\rmfamily\noindent {\it \ackname}.~}{\par\addvspace{6pt}}
+\providecommand{\ackname}{Acknowledgements}
+
+\begin{document}
+\normalem
+%%-----------------------------
+%%      the top matter
+%%-----------------------------
+\title{Volume-Preserving Transformers for Learning Time Series Data with Structure}
+%
+\author[1]{Benedikt Brantner}\affil[1]{Max-Planck-Institut f\"ur Plasmaphysik, Boltzmannstra\ss{}e 2, 85748 Garching}
+\author[2,3]{Guillaume de Romemont}\affil[2]{DAAA, ONERA, Université Paris Saclay, F-92322, Châtillon, France}\affil[3]{Arts et Métiers Institute of Technology, Paris, France}
+\author[1]{Michael Kraus}
+\author[4]{Zeyuan Li}\affil[4]{Zentrum Mathematik, Technische Universität München, Boltzmannstra\ss{}e 3, 85748 Garching, Germany}
+%
+\date{\today}
+
+\maketitle
+
+\begin{abstract} 
+    Two of the many trends in neural network research of the past few years have been (i) the learning of dynamical systems, especially with recurrent neural networks such as long short-term memory networks (LSTMs) and (ii) the introduction of transformer neural networks for natural language processing (NLP) tasks. Both of these trends have created enormous amounts of traction, particularly the second one: transformer networks now dominate the field of NLP. 
+
+    Even though some work has been performed on the intersection of these two trends, those efforts was largely limited to using the vanilla transformer directly without adjusting its architecture for the setting of a physical system.
+
+    In this work we use a transformer-inspired neural network to learn a dynamical system and furthermore (for the first time) imbue it with structure-preserving properties to improve long-term stability. This is shown to be of great advantage when applying the neural network to real world applications.
+\end{abstract}
+%
+\begin{resume} 
+    Deux des nombreuses tendances de la recherche sur les réseaux neuronaux de ces dernières années ont été (i) l'apprentissage des systèmes dynamiques, en particulier avec les réseaux neuronaux récurrents tels que les Long Short Term Memory (LSTM) et (ii) l'introduction de réseaux neuronaux transformer pour le traitement du langage naturel (NLP). Ces deux tendances ont suscité un énorme engouement, en particulier la seconde : les réseaux transformer dominent désormais le NLP. 
+
+    Bien que certains travaux aient été réalisés à l'intersection de ces deux tendances, ils se sont largement limités à l'utilisation directe du transformer vanilla sans adapter son architecture à la configuration d'un système physique.
+    
+    Dans ce cadre, nous utilisons un réseau neuronal inspiré d'un transformer pour apprendre un système dynamique et, en outre (pour la première fois), lui conférer des propriétés de préservation de la structure afin d'améliorer la stabilité à long terme. Ces propriétés s'avèrent extrêmement importantes lors de l'application du réseau neuronal à des applications réelles.
+    
+\end{resume}
+
+
+%53Z50, 53C30, 68T07, 68W10, 90C26
+%
+\keywords{Reduced-Order Modeling, Hyper Reduction, Machine Learning, Transformers, Neural Networks, Divergence-Free, Volume-Preserving, Structure-Preserving, Multi-Step Methods}
+%
+%
+
+\pagebreak

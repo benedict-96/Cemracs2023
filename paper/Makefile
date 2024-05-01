@@ -4,12 +4,35 @@ all: train_networks;
 all_mac: train_networks;
 	$(MAKE) pdf_without_training_mac
 
+arxiv_version_without_training: arxiv_version_without_training_and_compilation
+	$(MAKE) compile_with_pdflatex;
+	$(MAKE) compile_with_pdflatex;
+	rm -r build/*.log;
+	rm -r build/*.out;
+	rm -r build/*.pdf
+
+arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images
+	cp src/assets/preamble_arxiv.tex build/preamble.tex;
+	sed -i'' -e 's/\\begin{figure}/\\begin{figure}\\centering/g' build/V*.tex;
+	sed -i'' -e 's/\\begin{tabulary}/\\footnotesize\\begin{tabulary}/g' build/V*.tex;
+	mv -v build/tikz/*.png build/;
+	mv -v build/simulations/vpt_Float32/*.png build/;
+	sed -i'' -e 's/tikz\///g' build/V*.tex;
+	sed -i'' -e 's/simulations\/vpt_Float32\///g' build/V*.tex;
+	rm -r build/tikz;
+	rm -r build/simulations;
+	rm build/edpsmath.cls;
+	rm build/edpsproc.clo;
+	rm -r build/assets
+
 pdf_without_training: tikz_images pdf_without_training_and_images;
 
-pdf_without_training_and_images: generate_tex;
-	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks;
+pdf_without_training_and_images: tex_without_training_and_images;
 	$(MAKE) compile_tex;
 	$(MAKE) compile_tex
+
+tex_without_training_and_images: generate_tex;
+	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks
 
 tikz_images:
 	$(MAKE) linux -C src/tikz
@@ -25,6 +48,10 @@ generate_tex:
 compile_tex: 
 	cd build; \
 	xelatex -shell-escape V*.tex 
+
+compile_with_pdflatex:
+	cd build; \
+	pdflatex -shell-escape V*.tex
 
 train_networks:
 	julia --project --threads=8 src/volume_preserving_transformer.jl
