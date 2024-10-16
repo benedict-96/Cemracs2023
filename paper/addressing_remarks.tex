@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{amsmath, amsfonts}
+
+\begin{document}
+
+We thanks both reviewers for their comments. Here we quickly point out how we adressed them:
+
+\section{Comments from Reviewer I}
+
+\subsection*{Major Comments}
+\begin{enumerate}
+\item Regarding Section 1:
+\begin{enumerate}
+\item The variable t should not be called a ``time step'' since it represents continuous time.
+\item It would be clearer to use another notation than $\nabla$ for the Jacobian matrix (as it is, it can be confused with the gradient operator).
+\item The remark below equation (4) should appear earlier.
+\item Before equation (3), A is not defined (I guess it's any matrix-valued function).
+\item Equation (4) proves that the determinant is constant, not that it is equal to 1.
+\end{enumerate}
+\item Regarding Section 4:
+\begin{enumerate}
+\item I suggest using $\check{}$ instead of $\tilde{}$ for the inverse of $\hat{}$.
+\item I suggest adding $\check{Z} =$ after the $\mapsto$ sign in equation (14).
+\item Since the Cayley transform in such an integral part of your method, and since it is not completely classical, I suggest spending more time explaining it, and its properties, around equation (15).
+\item After equation (15), who is the matrix $A$? It is not defined, unless I missed it.
+\item Why does equation (16) hold? More details are required.
+\item It would be interesting to add a justification of equation (17), e.g. in the case where $T = 2$ and $d = 2$. It would help convince the reader without having to redo the computations on paper.
+\item Please highlight the results of this section by grouping them in a theorem, and give a self-contained proof of the volume-preservation property of the new volume-preserving attention.
+\end{enumerate}
+\end{enumerate}
+\subsection*{Minor Comments}
+
+\begin{enumerate}
+\item Figure 1 should appear below remark 2.1.
+\item After reading remark 2.1, it is unclear whether you are considering single- or multi-head attention in your volume-preserving transformer.
+\item A paragraph quickly presenting ResNets is required, rather than just a footnote.
+\item In equation 9, σ is not defined: is it any nonlinear activation function?
+\item It is unclear whether section 3 contains new results or not. Whatever the case, it needs to be clarified.
+\item In equation (18), A, B and C should be named otherwise, since they are scalar numbers and since capital letters refer to matrices in the previous sections.
+\item Please justify the choice of the Adam optimizer. Could you have switched to another optimizer to help drive the loss further down?
+\item Please comment on the difference in training time between VPT and ST, despite ST having more trainable weights than VPT.
+\item A way of introducing parameter dependence in feedforward NNs would be to take equation (25) as $\mathcal{NN}_{ff}: \mathbb{R}^d\times\mathbb{P}\to\mathbb{R}^d$, with $\mathbb{P}$ a parameter space. This makes it possible to study parameter-dependent problems with feedforward NNs. Please comment on that as it could change the conclusions of section 5.5.
+\end{enumerate}
+
+\subsection*{Typos}
+\begin{enumerate}
+    \item page 3: ``determinant ob the Jacobian'' should read ``determinant of the Jacobian matrix'' everywhere: ``Jacobian'' should read ``Jacobian matrix''
+\end{enumerate}
+
+\section{Comments from Reviewer II}
+
+\subsection*{Major Doubts}
+\begin{enumerate}
+    \item In my opinion, the main issue is that the result is not clear enough. The introduction says that this approach ``aims at imbuing'' structure. Does it succeed? If it does (as is the case), how so? In the same vein, the abstract mentions ``real-world'' applications, which I find excessive considering that the only test case is a rigid body without noise. This makes the paper seem untrustworthy before getting to the heart of the topic.
+    
+    \item Because of this ambiguity, Section 4 is difficult to read. Why should I care about the product structure? Or about the flattened formulation? I believe that 
+    \begin{enumerate} 
+    \item[(i)] Section 2 about the standard transformer structure should make the feed-forward component explicit: have a first subsection about the attention layer and a second about the feed-forward. ``The ResNet'' from Section 3 would then refer to more than just a footnote.
+    \item[(ii)] Section 4 should contain three subsections: one about the new VP attention layer, another about the VP feed-forward, and a final one describing the product structure and proofs of the properties of the new architecture. Therefore it would merge with Section 3.
+    \end{enumerate}
+    Regarding the choice $T = 3$ in the experiment, it should be made more clear in the description of (hyper)parameters. As of now, it is only mentioned in the caption of Figure 6 and in the comment of Section 5.4. Similarly, the meaning of the hyperparameter $L$ is not specified, although it appears in the table before Section 5.1. The activation functions of the feed-forward layers should also be specified.
+\end{enumerate}
+
+\subsection*{Minor Doubts}
+
+\begin{enumerate}
+    \item The abstract mentions ``some work'' applying transformers to dynamical systems, but does not cite any in the introduction, except perhaps Solera-Rico et al.
+    \item For the VPFF of Figure 2, in the block repeated $\mathtt{n\_linear}$ times, are the same weight matrices repeated (as with LA-SympNets) or are they new ones?
+    \item For the rigid body test case, how does the norm evolve over time? We see in the graph that it seems to remain close to 1, but does it drift over time? This could replace Figure 7, for which the specific trajectory is not mentioned.
+    \item In Section 5.4, it is mentioned that the columns in the output of the VPT are linearly independent. This seems like a stretch, considering a zero vector-field could be considered. Perhaps this is rather a matter of invertibility? Is there a bound $T\leq{}d$? If so, this should be mentioned.
+\end{enumerate}
+
+
+\subsection*{Remarks}
+
+\begin{enumerate}
+    \item In terms of philosophy, why would long-range interactions/dependencies be interesting for first-order differential equations?
+    \item Too much importance is given to reduced-order modelling in the introduction, considering no ROM is performed in the paper. Instead, more this space could be used to accurately introduce and describe the volume-preserving properties of the authors' architecture.
+    \item As someone unfamiliar with volume-preserving multistep methods, I would have appreciated a comparison of the theoretical results: what is the impact of replacing the volume on the original space by the volume on the product space? Is that standard? Is one better than the other?
+    \item Assuming the ODE is unknown, how can one compute the first three time-steps? Would using the less-accurate VPFF for this prediction be accurate enough? If not, is the transformer faster and/or more accurate than the midpoint scheme?
+    \item Some typos: ``those efforts was'' in the abstract, ``ob the Jacobian'' p. 3.
+\end{enumerate}
+
+\end{document}
