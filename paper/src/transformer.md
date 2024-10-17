@@ -4,22 +4,24 @@ The transformer architecture [vaswani2017attention](@cite) was originally motiva
 
 [^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is re-weighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" [vaswani2017attention](@cite).
 
-In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet[^2] [he2016deep](@cite)). Despite its simplicity, the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
-Furthermore, the simplicity of the transformer architecture makes it possible to interpret all its constituent operations, which is not so much the case with LSTMs, for example. As the individual operations have a straight-forward mathematical interpretation, it is easier to imbue them with additional structure such as volume-preservation.
-
-[^2]: The simplest form of a ResNet is a regular feed-forward neural network with an add connection: ``x \rightarrow x + \sigma (Wx + b)``. In this work we use a slightly more complicated version where the ResNet step is repeated `n_blocks` times (also confer M[fig:VolumePreservingFeedForward]m(@latex)).
-
-```@raw latex
-\begin{figure}
-\includegraphics[width = .25\textwidth]{tikz/transformer.png}
-\caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out.}
-\label{fig:TransformerArchitecture}
-\end{figure}
+In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet[^2]) [he2016deep](@cite). In its simplest form a ResNet is a standard feed-forward neural network with an add connection:
+```math
+\mathrm{ResNet}: z \rightarrow z + \mathcal{NN}(z),
 ```
+where ``\mathcal{NN}`` is any feed-forward neural network. In this work we use a version where the ResNet step is repeated `n_blocks` times (also confer M[fig:VolumePreservingFeedForward]m(@latex)), i.e. we have
+```math
+    \mathrm{ResNet} = \mathrm{ResNet}_{\ell_\mathtt{n\_blocks}}\circ\cdots\circ\mathrm{ResNet}_{\ell_2}\circ\mathrm{ResNet}_{\ell_1}.
+```
+Further, one ResNet layer is simply ``\mathrm{ResNet}_{\ell_i}(z) = z + \mathcal{NN}_{\ell_i}(z) = z + \sigma(W_iz + b_i)`` where we pick tanh as activation function ``\sigma.`` 
+
+[^2]: ResNets are often used because they improve stability in training [he2016deep](@cite) or make it possible to interpret a neural network as an ODE solver [chen2018neural](@cite).
+
+Despite its simplicity, the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
+Furthermore, the simplicity of the transformer architecture makes it possible to interpret all its constituent operations, which is not so much the case with LSTMs, for example. As the individual operations have a straight-forward mathematical interpretation, it is easier to imbue them with additional structure such as volume-preservation.
 
 The attention layer, the first part of a transformer layer, takes a series of vectors ``z^{(1)}_\mu, \ldots, z^{(T)}_\mu`` as input (the ``\mu`` indicates a specific time sequence) and outputs a *learned convex combination of these vectors*. So for a specific input: 
 ```math
-input = [z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}],
+input = Z = [z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}],
 ```
 the output of an attention layer becomes:
 ```math
@@ -38,11 +40,24 @@ In the next step, a softmax function is applied column-wise to ``C`` and returns
 ```math
 y_i^{(j)} = [\mathrm{softmax}(C)]_{ij} := e^{c_{ij}}/\left(\sum_{i'=1}^Te^{c_{i'j}}\right).
 ```
-This softmax function maps the correlation matrix to a sequence of *probability vectors*, i.e., vectors in the space ``\mathcal{P}:=\{\mathbf{y}\in[0,1]^d: \sum_{i=1}^dy_i = 1\}``. Every one of these ``d`` probability vectors is then used to compute a convex combination of the input vectors ``[z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}]``, i.e., we get ``\sum_{i=1}^Ty_i^{(j)}z_\mu^{(i)}`` for ``j=1,\ldots,T``.
+This softmax function maps the correlation matrix to a sequence of *probability vectors*, i.e., vectors in the space ``\mathcal{P}:=\{\mathbf{y}\in[0,1]^d: \sum_{i=1}^dy_i = 1\}``. Every one of these ``d`` probability vectors is then used to compute a convex combination of the input vectors ``[z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}]``, i.e., we get ``\sum_{i=1}^Ty_i^{(j)}z_\mu^{(i)}`` for ``j=1,\ldots,T``. Note that we can also write the convex combination of input vectors as:
 
+```math
+output = input\Lambda = Z\Lambda,
+\label{eq:RightMultiplication}
+```
+where ``\Lambda = \mathrm{softmax}(C).`` So a linear recombination of input vectors can be seen as a multiplication by a matrix from the right.
 
 REMARK::
-M[fig:TransformerArchitecture]m(@latex) indicates the use of a *multi-head attention layer* as opposed to a *single-head attention layer*. What we described in this section is single-head attention. A multi-head attention layer is slightly more complex: it is a concatenation of multiple single-head attention layers. This is useful for NLP tasks[^3], but introduces additional complexity that makes it harder to imbue the multi-head attention layer with structure-preserving properties.::
+M[fig:TransformerArchitecture]m(@latex) indicates the use of a *multi-head attention layer* as opposed to a *single-head attention layer*. What we described in this section is single-head attention. A multi-head attention layer is slightly more complex: it is a concatenation of multiple single-head attention layers. This is useful for NLP tasks[^3], but introduces additional complexity that makes it harder to imbue the multi-head attention layer with structure-preserving properties. For this reason we stick to single-head attention in this work.::
 
 
 [^3]: Intuitively, multi-head attention layers allow for attending to different parts of the sequence in different ways (i.e. different heads in the multi-head attention layer *attend to* different parts of the input sequence) and can therefore extract richer contextual information.
+
+```@raw latex
+\begin{figure}[h]
+\includegraphics[width = .25\textwidth]{tikz/transformer.png}
+\caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out.}
+\label{fig:TransformerArchitecture}
+\end{figure}
+```

@@ -83,8 +83,8 @@ and obtain via the Euler-Poincaré equations[^3] for M[eq:KineticEnergyForLieGro
 or equivalently:
 ```math
 \frac{d}{dt}\begin{bmatrix} z_1 \\  z_2 \\ z_3  \end{bmatrix} 
-= \begin{bmatrix} Az_2z_3 \\ Bz_1z_3 \\ Cz_1z_2 \end{bmatrix}.
+= \begin{bmatrix} \mathfrak{a}z_2z_3 \\ \mathfrak{b}z_1z_3 \\ \mathfrak{c}z_1z_2 \end{bmatrix}.
 \label{eq:FinalRigidBodyEquations}
 ```
 
-In the above equation, we defined ``A := I_3^{-1} - I_2^{-1}``, ``B := I_1^{-1} - I_3^{-1}`` and ``C := I_2^{-1} - I_1^{-1}``. In all of the examples, we set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, thus yielding ``A = 1``, ``B = -1/2`` and ``C = -1/2``.
+In the above equation, we defined ``\mathfrak{a} := I_3^{-1} - I_2^{-1}``, ``\mathfrak{b} := I_1^{-1} - I_3^{-1}`` and ``\mathfrak{c} := I_2^{-1} - I_1^{-1}``. In all of the examples, we set ``I_1 = 1``, ``I_2 = 2`` and ``I_3 = 2/3``, thus yielding ``\mathfrak{a} = 1``, ``\mathfrak{b} = -1/2`` and ``\mathfrak{c} = -1/2``.

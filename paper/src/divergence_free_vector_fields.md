@@ -5,20 +5,21 @@ The *flow* of such a vector field ``f`` is the (unique) map ``\varphi_f^t:\mathb
 ```math
 \left. \frac{d}{dt} \right|_{t=t_0}\varphi^t(z) = f(\varphi^{t_0}(z)),
 ```
-for ``z\in\mathbb{R}^d`` and ``t`` is a time step. For a divergence-free vector field ``f`` the flow ``\varphi_f^t`` is volume-preserving, i.e. the determinant ob the Jacobian of ``\varphi_f^t`` is one: ``\mathrm{det}(\nabla\varphi_f^t) = 1``. This can easily be proved:
+for ``z\in\mathbb{R}^d`` and ``t`` indicates the time. For a divergence-free vector field ``f`` the flow ``\varphi_f^t``, in addition to being invertible, is also volume-preserving, i.e. the determinant ob the Jacobian of ``\varphi_f^t`` is one: ``\mathrm{det}(D\varphi_f^t) = 1``. This can easily be proved (we drop the subscript ``f`` here):
 ```math
-\frac{d}{dt}\nabla\varphi^t(z) = \nabla{}f(\varphi^t(z))\nabla\varphi^t(z) \implies \mathrm{tr}\left( \left(\nabla\varphi^t(z) \right)^{-1} \frac{d}{dt}\nabla\varphi^t(z) \right) = \mathrm{tr}\left(\nabla{}f(\varphi^t(z))\right) = 0.
+\frac{d}{dt}D\varphi^t(z) = D{}f(\varphi^t(z))D\varphi^t(z) \implies \mathrm{tr}\left( \left(D\varphi^t(z) \right)^{-1} \frac{d}{dt}D\varphi^t(z) \right) = \mathrm{tr}\left(D{}f(\varphi^t(z))\right) = 0.
 \label{eq:VolumePreservingFlows}
 ```
-We further have 
+For any matrix-valued function ``A`` we further have
 ```math
 \mathrm{tr}(A^{-1}\dot{A}) = \frac{\frac{d}{dt}\mathrm{det}(A)}{\mathrm{det}(A)} 
 ```
-and therefore
+and therefore (by using that ``\varphi^t`` is invertible):
 ```math
-\frac{d}{dt}\mathrm{det}\left( \nabla\varphi^t(z) \right) = 0.
+\frac{d}{dt}\mathrm{det}\left( D\varphi^t(z) \right) = 0.
 ```
-In M[eq:VolumePreservingFlows]m(@latex) we have also used that the flow of the ODE is invertible.
+
+The determinant of ``D\varphi^t`` is therefore constant and w further have ``D\varphi^0 = 1`` because ``\varphi^0`` is the identity. This proofs our assertion.
 
 Numerical integrators for ODEs constitute an approximation ``\psi^h`` of the flow ``\varphi_f^t`` where ``h`` denotes the time step, which most of the time is fixed. If the flow ``\varphi_f^t`` exhibits certain properties (like volume preservation) it appears natural to also imbue ``\psi^h`` with these properties. The discipline of doing so is generally known as *geometric numerical integration* [leimkuhler2004simulating, hairer2006geometric](@cite).
 

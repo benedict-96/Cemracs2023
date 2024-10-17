@@ -4,10 +4,10 @@ In the following, we will consider the rigid body as an example to study the per
 We will solve the following equations (see [The rigid body](@ref) for the derivation):
 ```math
 \frac{d}{dt}\begin{bmatrix} z_1 \\  z_2 \\ z_3  \end{bmatrix} 
-= \begin{bmatrix} Az_2z_3 \\ Bz_1z_3 \\ Cz_1z_2 \end{bmatrix} ,
+= \begin{bmatrix} \mathfrak{a}z_2z_3 \\ \mathfrak{b}z_1z_3 \\ \mathfrak{c}z_1z_2 \end{bmatrix} ,
 \label{eq:RigidBodyEquations}
 ```
-with ``A = 1``, ``B = -1/2`` and ``C = -1/2``.
+with ``\mathfrak{a} = 1``, ``\mathfrak{b} = -1/2`` and ``\mathfrak{c} = -1/2``.
 We immediately see that the vector field M[eq:RigidBodyEquations]m(@latex) is trivially divergence-free.
 In M[fig:RigidBodyCurves]m(@latex), we show some trajectories.
 
@@ -60,7 +60,7 @@ nothing
 ```@raw latex
 \begin{figure}
 \includegraphics[width=.75\textwidth]{rigid_body.png}
-\caption{Rigid body trajectories for $A = 1$, $B = -1/2$ and $C = -1/2$ and different initial conditions.}
+\caption{Rigid body trajectories for $\mathfrak{a} = 1$, $\mathfrak{b} = -1/2$ and $\mathfrak{c} = -1/2$ and different initial conditions.}
 \label{fig:RigidBodyCurves}
 \end{figure}
 ```
@@ -129,7 +129,9 @@ With these settings we get the following training times (given as HOURS:MINUTES:
 | ------------- | :------ | :------ | :------   |
 | Training time | 4:02:09 | 5:58:57 | 3:58:06   |
 
-The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). The training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``5 \times 10^{-4}``), whereas the standard transformer is stuck at a rather high level (``5 \times 10^{-2}``). The consequences are shown in M[fig:Validation3d]m(@latex), where we plot the predicted trajectories for two initial conditions, ``( \sin(1.1), \, 0, \, \cos(1.1) )^T`` and ``( 0, \, \sin(1.1) , \, \cos(1.1) )^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in M[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
+The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). The training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``5 \times 10^{-4}``), whereas the standard transformer is stuck at a rather high level (``5 \times 10^{-2}``). In addition to the Adam optimizer we also tried stochastic gradient descent (with and without momentum) and the BFGS optimizer [nocedal1999numerical](@cite), but obtained the best results with the Adam optimizer. We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though `GeometricMachineLearning.jl` has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).
+
+The corresponding predicted trajectories are shown in M[fig:Validation3d]m(@latex), where we plot the predicted trajectories for two initial conditions, ``( \sin(1.1), \, 0, \, \cos(1.1) )^T`` and ``( 0, \, \sin(1.1) , \, \cos(1.1) )^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in M[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
 
 ```@raw latex
 \begin{figure}
@@ -178,7 +180,7 @@ In applications such as *reduced order modeling* [lee2020model, lassila2014model
 ```math
 \dot{z} = f(z; \mu) \text{ for $\mu\in\mathbb{P}$},
 ```
-where ``\mathbb{P}`` is a set of parameters on which the differential equation depends. In the example of the rigid body, these parameters could be the moments of inertia ``(I_1, I_2, I_3)`` and thus the parameters ``(A,B,C)`` in M[eq:RigidBodyEquations]m(@latex). A normal feedforward neural network is unable to learn such a parameter-dependent system as it *only sees one point at a time*: 
+where ``\mathbb{P}`` is a set of parameters on which the differential equation depends. In the example of the rigid body, these parameters could be the moments of inertia ``(I_1, I_2, I_3)`` and thus the parameters ``(\mathfrak{a},\mathfrak{b},\mathfrak{c})`` in M[eq:RigidBodyEquations]m(@latex). A normal feedforward neural network is unable to learn such a parameter-dependent system as it *only sees one point at a time*: 
 ```math
 \mathcal{NN}_\mathrm{ff}: \mathbb{R}^d\to\mathbb{R}^d.
 ```

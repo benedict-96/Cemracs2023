@@ -1,10 +1,18 @@
 \documentclass{article}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
-\usepackage{amsmath, amsfonts}
+\usepackage{amsmath, amsfonts, yhmath}
+\usepackage{amsthm}
+\newtheorem*{dfntn*}{Definition}
+\usepackage{xcolor}
+\definecolor{morange}{RGB}{255,127,14}
+\definecolor{mblue}{RGB}{31,119,180}
+\definecolor{mred}{RGB}{214,39,40}
+\definecolor{mpurple}{RGB}{148,103,189}
+\definecolor{mgreen}{RGB}{44,160,44}
 
 \begin{document}
 
-We thanks both reviewers for their comments. Here we quickly point out how we adressed them:
+We thanks both reviewers for their detailed comments and suggestions. Here we point out how we addressed them (the remarks of the reviewers are in black and our comments in {\color{mred} red}):
 
 \section{Comments from Reviewer I}
 
@@ -13,33 +21,121 @@ We thanks both reviewers for their comments. Here we quickly point out how we ad
 \item Regarding Section 1:
 \begin{enumerate}
 \item The variable t should not be called a ``time step'' since it represents continuous time.
+
+    {\color{mred}We now call this ``time''}.
+
 \item It would be clearer to use another notation than $\nabla$ for the Jacobian matrix (as it is, it can be confused with the gradient operator).
+
+    {\color{mred}We changed $\nabla\varphi$ to $D\varphi$ etc.}
+
 \item The remark below equation (4) should appear earlier.
+
+    {\color{mred}We now write ``the flow $\varphi_f^t$, in addition to being invertible, is also volume-preserving'' and ``and therefore (by using that $\varphi^t$ is invertible)''}
+
 \item Before equation (3), A is not defined (I guess it's any matrix-valued function).
+
+    {\color{mred} We now write: ``For any matrix-valued function $A$ we further have''}
+
 \item Equation (4) proves that the determinant is constant, not that it is equal to 1.
+
+    {\color{mred} We added ``The determinant of $D\varphi^t$ is therefore constant and w further have $D\varphi^0 = 1$ because $\varphi^0$ is the identity. This proofs our assertion.''}
+
 \end{enumerate}
+
 \item Regarding Section 4:
 \begin{enumerate}
 \item I suggest using $\check{}$ instead of $\tilde{}$ for the inverse of $\hat{}$.
+
+    {\color{mred} Done!}
 \item I suggest adding $\check{Z} =$ after the $\mapsto$ sign in equation (14).
+
+    {\color{mred} Done!}
 \item Since the Cayley transform in such an integral part of your method, and since it is not completely classical, I suggest spending more time explaining it, and its properties, around equation (15).
+
+    {\color{mred} We added the following: ``The Cayley transform maps skew-symmetric matrices to orthogonal matrices, so if $Y$ has the property that $Y^T = -Y,$ then we have $\sigma(Y)^T\sigma(Y) = \mathbb{I}.$ This can be easily shown:
+
+    \begin{equation*}
+    \begin{aligned}
+    \frac{d}{dt}\Big|_{t=0}\sigma(tY)^T\sigma(tY) & = \frac{d}{dt}(\mathbb{I}_{T} - tY)^{-1}(\mathbb{I}_{T} + tY)(\mathbb{I}_{T} - tY)(\mathbb{I}_{T} + tY)^{-1} \\
+                                                  & = Y + Y - Y - Y = \mathbb{O},
+    \end{aligned}
+    \end{equation*}
+    
+    where we used that $(\Lambda^{-1})^T = (\Lambda^T)^{-1}$ for an arbitrary invertible matrix $\Lambda$.''}
 \item After equation (15), who is the matrix $A$? It is not defined, unless I missed it.
+
+    {\color{mred} In the corresponding section we changed/added: ``We now define a new activation function for the attention mechanism which we denote by 
+
+    \begin{equation*}
+    \Lambda(Z) = \sigma (Z^T A Z),
+    \end{equation*}    
+    where $A$ is a \textit{learnable skew-symmetric matrix}. Note that the input into the Cayley transform has to be a skew-symmetric matrix in order for the output to be orthogonal; hence we have the restriction on $A$ to be skew-symmetric.''}
+
 \item Why does equation (16) hold? More details are required.
+
+    {\color{mred} We added another remark at the end of Section 2 and reference it.}
 \item It would be interesting to add a justification of equation (17), e.g. in the case where $T = 2$ and $d = 2$. It would help convince the reader without having to redo the computations on paper.
+
+    {\color{mred} We added the following: ``We show that this expression is true:
+
+    \begin{multline*}
+        \widehat{Z\Lambda(Z)} = \widehat{\sum_{k=1}^Tz_i^{(k)}\lambda_{kj}} = \begin{bmatrix} \sum_{k=1}^T z_1^{(k)}\lambda_{k1} \\ \sum_{k=1}^T z_1^{(k)}\lambda_{k2} \\ \ldots \\ \sum_{k=1}^T z_1^{(k)}\lambda_{kT} \\ \sum_{k=1}^T z_2^{(k)}\lambda_{k1} \\ \ldots \\ \sum_{k=1}^T z_d^{(k)}\lambda_{kT} \end{bmatrix} = \begin{bmatrix} \sum_{k=1}^T \lambda_{k1}z_1^{(k)} \\ \sum_{k=1}^T \lambda_{k2}z_1^{(k)} \\ \ldots \\ \sum_{k=1}^T \lambda_{kT}z_1^{(k)} \\ \sum_{k=1}^T \lambda_{k1}z_2^{(k)} \\ \ldots \\ \sum_{k=1}^T \lambda_{kT}z_d^{(k)} \end{bmatrix} = \begin{bmatrix} [\Lambda(Z)^T z_1^{(\bullet)}]_1 \\ [\Lambda(Z)^T z_1^{(\bullet)}]_2 \\ \ldots \\ [\Lambda(Z)^T z_1^{(\bullet)}]_T \\ [\Lambda(Z)^T z_2^{(\bullet)}]_1 \\ \ldots \\ [\Lambda(Z)^T z_d^{(\bullet)}]_T \end{bmatrix} \\ = \begin{bmatrix} \Lambda(Z)^Tz_1^{(\bullet)} \\ \Lambda(Z)^Tz_2^{(\bullet)} \\ \ldots \\ \Lambda(Z)^Tz_d^{(\bullet)} \end{bmatrix},    \end{multline*}
+    
+    where we defined:
+    
+    \begin{equation*}
+        z_i^{(\bullet)} := \begin{bmatrix} z_i^{(1)} \\ z_i^{(2)} \\ \ldots \\ z_i^{(T)} \end{bmatrix}."
+    \end{equation*}}
+
+
 \item Please highlight the results of this section by grouping them in a theorem, and give a self-contained proof of the volume-preservation property of the new volume-preserving attention.
+
+    {\color{mred} We added the following at the end of the section: ``We conclude this section by formalizing what the volume-preserving attention mechanism:
+
+    \begin{dfntn*} The \textbf{volume-preserving attention mechanism} is a map based on the Cayley transform that reweights a collection of input vectors \(Z\) via \(Z \mapsto Z\Lambda(Z),\) where \(\Lambda(Z) = \mathrm{Cayley}(Z^TAZ)\) and \(A\) is a learnable skew-symmetric matrix.  \end{dfntn*}
+
+    The main result of this section was to show that this attention mechanism is \emph{volume-preserving} in a product space that is spanned by the input vectors.''}
 \end{enumerate}
 \end{enumerate}
 \subsection*{Minor Comments}
 
 \begin{enumerate}
 \item Figure 1 should appear below remark 2.1.
+    {\color{mred} Done!}
+    %{\color{mred} We were unfortunately not able to find an ideal solution to this. We now placed the figure after the remark as suggested, but as a result it is now contained in the next section.}
 \item After reading remark 2.1, it is unclear whether you are considering single- or multi-head attention in your volume-preserving transformer.
+
+    {\color{mred} We added another sentence: ``For this reason we stick to single-head attention in this work.''}
 \item A paragraph quickly presenting ResNets is required, rather than just a footnote.
-\item In equation 9, σ is not defined: is it any nonlinear activation function?
+
+    {\color{mred} We turned the footnote into a paragraph:
+    In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet). In its simplest form a ResNet is a standard feed-forward neural network with an add connection:
+
+    \begin{equation}
+    \begin{split}\mathrm{ResNet}: z \rightarrow z + \mathcal{NN}(z),\end{split}\end{equation}
+
+    where \(\mathcal{NN}\) is any feed-forward neural network. In this work we use a version where the ResNet step is repeated \texttt{n\_blocks} times, i.e. we have
+
+    \begin{equation}
+    \begin{split}    \mathrm{ResNet} = \mathrm{ResNet}_{\ell_\mathtt{n\_blocks}}\circ\cdots\circ\mathrm{ResNet}_{\ell_2}\circ\mathrm{ResNet}_{\ell_1}.\end{split}\end{equation}
+    Further, one ResNet layer is simply \(\mathrm{ResNet}_{\ell_i}(z) = z + \mathcal{NN}_{\ell_i}(z) = z + \sigma(W_iz + b_i)\) where we pick tanh as activation function \(\sigma.\) }
+
+\item In equation 9, $\sigma$ is not defined: is it any nonlinear activation function?
+
+        {\color{mred} We added a footnote as an explanation.}
 \item It is unclear whether section 3 contains new results or not. Whatever the case, it needs to be clarified.
+
+        {\color{mred} We added the following as a clarification: ``Similar volume-preserving feedforward neural networks were introduced before (Bajars, 2023). The difference between the volume-preserving feedforward neural networks in (Bajars, 2023) and the ones presented here is that the ones in (Bajars, 2023) are based on ``G``-SympNets, whereas ours are based on ``LA``-SympNets (Jin et al., 2020).''}
 \item In equation (18), A, B and C should be named otherwise, since they are scalar numbers and since capital letters refer to matrices in the previous sections.
+
+        {\color{mred} We switched these to $\mathfrak{a}$, $\mathfrak{b}$ and $\mathfrak{c}$.}
 \item Please justify the choice of the Adam optimizer. Could you have switched to another optimizer to help drive the loss further down?
+
+        {\color{mred} We added ``In addition to the Adam optimizer we also tried stochastic gradient descent (with and without momentum) and the BFGS optimizer, but obtained the best results with the Adam optimizer.'' and for the conclusion ``As was already observed by other authors, efforts should also be directed towards making the learning process more efficient by reducing the number of epochs for small networks by using e.g. a Newton optimizer instead of Adam.''}
 \item Please comment on the difference in training time between VPT and ST, despite ST having more trainable weights than VPT.
+
+        {\color{mred} We added the following: ``We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though \texttt{GeometricMachineLearning.jl} has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).''}
+        
 \item A way of introducing parameter dependence in feedforward NNs would be to take equation (25) as $\mathcal{NN}_{ff}: \mathbb{R}^d\times\mathbb{P}\to\mathbb{R}^d$, with $\mathbb{P}$ a parameter space. This makes it possible to study parameter-dependent problems with feedforward NNs. Please comment on that as it could change the conclusions of section 5.5.
 \end{enumerate}
 
