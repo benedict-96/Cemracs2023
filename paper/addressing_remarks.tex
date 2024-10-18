@@ -3,6 +3,9 @@
 \usepackage{amsmath, amsfonts, yhmath}
 \usepackage{amsthm}
 \newtheorem*{dfntn*}{Definition}
+
+\usepackage{enumitem}
+
 \usepackage{xcolor}
 \definecolor{morange}{RGB}{255,127,14}
 \definecolor{mblue}{RGB}{31,119,180}
@@ -19,7 +22,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \subsection*{Major Comments}
 \begin{enumerate}
 \item Regarding Section 1:
-\begin{enumerate}
+\begin{enumerate}[label=\arabic*.]
 \item The variable t should not be called a ``time step'' since it represents continuous time.
 
     {\color{mred}We now call this ``time''}.
@@ -38,12 +41,12 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
 \item Equation (4) proves that the determinant is constant, not that it is equal to 1.
 
-    {\color{mred} We added ``The determinant of $D\varphi^t$ is therefore constant and w further have $D\varphi^0 = 1$ because $\varphi^0$ is the identity. This proofs our assertion.''}
+    {\color{mred} We added ``The determinant of $D\varphi^t$ is therefore constant and we further have $D\varphi^0 = 1$ because $\varphi^0$ is the identity. This proofs our assertion.''}
 
 \end{enumerate}
 
 \item Regarding Section 4:
-\begin{enumerate}
+\begin{enumerate}[label=\arabic*.]
 \item I suggest using $\check{}$ instead of $\tilde{}$ for the inverse of $\hat{}$.
 
     {\color{mred} Done!}
@@ -90,7 +93,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
 \item Please highlight the results of this section by grouping them in a theorem, and give a self-contained proof of the volume-preservation property of the new volume-preserving attention.
 
-    {\color{mred} We added the following at the end of the section: ``We conclude this section by formalizing what the volume-preserving attention mechanism:
+    {\color{mred} We added the following at the end of the section: ``We conclude by formalizing what the volume-preserving attention mechanism:
 
     \begin{dfntn*} The \textbf{volume-preserving attention mechanism} is a map based on the Cayley transform that reweights a collection of input vectors \(Z\) via \(Z \mapsto Z\Lambda(Z),\) where \(\Lambda(Z) = \mathrm{Cayley}(Z^TAZ)\) and \(A\) is a learnable skew-symmetric matrix.  \end{dfntn*}
 
@@ -135,13 +138,15 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \item Please comment on the difference in training time between VPT and ST, despite ST having more trainable weights than VPT.
 
         {\color{mred} We added the following: ``We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though \texttt{GeometricMachineLearning.jl} has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).''}
-        
+
 \item A way of introducing parameter dependence in feedforward NNs would be to take equation (25) as $\mathcal{NN}_{ff}: \mathbb{R}^d\times\mathbb{P}\to\mathbb{R}^d$, with $\mathbb{P}$ a parameter space. This makes it possible to study parameter-dependent problems with feedforward NNs. Please comment on that as it could change the conclusions of section 5.5.
 \end{enumerate}
 
 \subsection*{Typos}
 \begin{enumerate}
     \item page 3: ``determinant ob the Jacobian'' should read ``determinant of the Jacobian matrix'' everywhere: ``Jacobian'' should read ``Jacobian matrix''
+    
+    {\color{mred} Done!}
 \end{enumerate}
 
 \section{Comments from Reviewer II}
@@ -150,10 +155,16 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \begin{enumerate}
     \item In my opinion, the main issue is that the result is not clear enough. The introduction says that this approach ``aims at imbuing'' structure. Does it succeed? If it does (as is the case), how so? In the same vein, the abstract mentions ``real-world'' applications, which I find excessive considering that the only test case is a rigid body without noise. This makes the paper seem untrustworthy before getting to the heart of the topic.
     
+    {\color{mred} We changed the corresponding part in the abstract to ``In this work we use a transformer-inspired neural network to learn a dynamical system and furthermore (for the first time) change the activation function of the attention layer to imbue the network with structure-preserving properties to improve long-term stability. This is shown to be of great advantage when applying the neural network to learning the trajectory of a rigid body.''}
+
     \item Because of this ambiguity, Section 4 is difficult to read. Why should I care about the product structure? Or about the flattened formulation? I believe that 
     \begin{enumerate} 
     \item[(i)] Section 2 about the standard transformer structure should make the feed-forward component explicit: have a first subsection about the attention layer and a second about the feed-forward. ``The ResNet'' from Section 3 would then refer to more than just a footnote.
+    
+    {\color{mred} We added the two subsections! We however made the first of these subsections pertain to the ResNet and the second to the attention layer. Please also confer our response to the third ``minor comment'' of Reviewer I.}
     \item[(ii)] Section 4 should contain three subsections: one about the new VP attention layer, another about the VP feed-forward, and a final one describing the product structure and proofs of the properties of the new architecture. Therefore it would merge with Section 3.
+    
+    {\color{mred} Done! As with section 2 we however first discuss the ResNet (feedforward neural network) and then the attention layer. The last subsection shows the proof.}
     \end{enumerate}
     Regarding the choice $T = 3$ in the experiment, it should be made more clear in the description of (hyper)parameters. As of now, it is only mentioned in the caption of Figure 6 and in the comment of Section 5.4. Similarly, the meaning of the hyperparameter $L$ is not specified, although it appears in the table before Section 5.1. The activation functions of the feed-forward layers should also be specified.
 \end{enumerate}
