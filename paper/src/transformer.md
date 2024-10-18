@@ -2,9 +2,13 @@
 
 The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series data. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in M[fig:TransformerArchitecture]m(@latex)[^1].
 
-[^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is re-weighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" [vaswani2017attention](@cite).
+[^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is re-weighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" [vaswani2017attention](@cite). In essence, the transformer consists of a residual network (ResNet[^2]) [he2016deep](@cite) and an attention layer. 
 
-In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet[^2]) [he2016deep](@cite). In its simplest form a ResNet is a standard feed-forward neural network with an add connection:
+[^2]: ResNets are often used because they improve stability in training [he2016deep](@cite) or make it possible to interpret a neural network as an ODE solver [chen2018neural](@cite).
+
+## Residual Neural Networks
+
+In its simplest form a ResNet is a standard feed-forward neural network with an add connection:
 ```math
 \mathrm{ResNet}: z \rightarrow z + \mathcal{NN}(z),
 ```
@@ -14,12 +18,9 @@ where ``\mathcal{NN}`` is any feed-forward neural network. In this work we use a
 ```
 Further, one ResNet layer is simply ``\mathrm{ResNet}_{\ell_i}(z) = z + \mathcal{NN}_{\ell_i}(z) = z + \sigma(W_iz + b_i)`` where we pick tanh as activation function ``\sigma.`` 
 
-[^2]: ResNets are often used because they improve stability in training [he2016deep](@cite) or make it possible to interpret a neural network as an ODE solver [chen2018neural](@cite).
+## The Attention Layer
 
-Despite its simplicity, the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
-Furthermore, the simplicity of the transformer architecture makes it possible to interpret all its constituent operations, which is not so much the case with LSTMs, for example. As the individual operations have a straight-forward mathematical interpretation, it is easier to imbue them with additional structure such as volume-preservation.
-
-The attention layer, the first part of a transformer layer, takes a series of vectors ``z^{(1)}_\mu, \ldots, z^{(T)}_\mu`` as input (the ``\mu`` indicates a specific time sequence) and outputs a *learned convex combination of these vectors*. So for a specific input: 
+The attention layer, which can be seen as a preprocessing step to the ResNet, takes a series of vectors ``z^{(1)}_\mu, \ldots, z^{(T)}_\mu`` as input (the ``\mu`` indicates a specific time sequence) and outputs a *learned convex combination of these vectors*. So for a specific input: 
 ```math
 input = Z = [z_\mu^{(1)}, z_\mu^{(2)}, \ldots, z_\mu^{(T)}],
 ```
@@ -47,6 +48,9 @@ output = input\Lambda = Z\Lambda,
 \label{eq:RightMultiplication}
 ```
 where ``\Lambda = \mathrm{softmax}(C).`` So a linear recombination of input vectors can be seen as a multiplication by a matrix from the right.
+
+Despite its simplicity, the transformer exhibits vast improvements compared to RNNs and LSTMs, including the ability to better capture long-range dependencies and contextual information and its near-perfect parallelizability for computation on GPUs and modern hardware.
+Furthermore, the simplicity of the transformer architecture makes it possible to interpret all its constituent operations, which is not so much the case with LSTMs, for example. As the individual operations have a straight-forward mathematical interpretation, it is easier to imbue them with additional structure such as volume-preservation.
 
 REMARK::
 M[fig:TransformerArchitecture]m(@latex) indicates the use of a *multi-head attention layer* as opposed to a *single-head attention layer*. What we described in this section is single-head attention. A multi-head attention layer is slightly more complex: it is a concatenation of multiple single-head attention layers. This is useful for NLP tasks[^3], but introduces additional complexity that makes it harder to imbue the multi-head attention layer with structure-preserving properties. For this reason we stick to single-head attention in this work.::
