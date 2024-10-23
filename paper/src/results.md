@@ -58,7 +58,7 @@ nothing
 ```
 
 ```@raw latex
-\begin{figure}
+\begin{figure}[h]
 \includegraphics[width=.75\textwidth]{rigid_body.png}
 \caption{Rigid body trajectories for $\mathfrak{a} = 1$, $\mathfrak{b} = -1/2$ and $\mathfrak{c} = -1/2$ and different initial conditions.}
 \label{fig:RigidBodyCurves}
@@ -69,14 +69,14 @@ nothing
 We will compare three different neural network architectures that are trained on simulation data of the rigid body. 
 These architectures are:
 
-| Architecture    | Description                     | `n_linear` | `n_blocks` | L | Total number of parameters |
-| :-------------  |:------------------------------  |:---------: |:---------: |:-:|:-------------------------: |
-| VPFF            | Volume-preserving feed-forward  | 1          | 6          | - | 135                        |
-| VPT             | Volume-preserving transformer   | 1          | 2          | 3 | 162                        |
-| ST              | Standard transformer            | -          | 2          | 3 | 213                        |
+| Architecture                    | `n_linear` | `n_blocks` | L | Total number of parameters |
+|:------------------------------  |:---------: |:---------: |:-:|:-------------------------: |
+| Volume-preserving feed-forward  | 1          | 6          | - | 135                        |
+| Volume-preserving transformer   | 1          | 2          | 3 | 162                        |
+| Standard transformer            | -          | 2          | 3 | 213                        |
 
 
-For the standard transformer, we further remove the optional add connection (i.e. the green line in M[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer, `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation).
+For the standard transformer, we further remove the optional add connection (i.e. the green line in M[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer, `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation). The activation functions in the *feedforward layer* (see M[fig:TransformerArchitecture]m(@latex)) and volume-preserving feedfoward layers (the *non-linear layers* in M[fig:VolumePreservingFeedForward]m(@latex) and the *volume-preserving feedforward layers* in M[fig:VolumePreservingTransformerArchitecture]m(@latex)) are all tanh. For the standard transformer and the volume-preserving transformer we further pick ``T = 3``, i.e. we always feed three time steps into the network during training and validation. We also note that strictly speaking ``T`` is not a hyperparameter of the network as its choice does not change the architecture: the dimensions of the matrix ``A`` in the volume-preserving activation in M[eq:VolumePreservingActivation]m(@latex) (or the equivalent for the standard attention mechanism) are independent of the number of time steps ``T`` that we feed into the network.
 
 ## Training data
 
@@ -151,21 +151,35 @@ The corresponding predicted trajectories are shown in M[fig:Validation3d]m(@late
 \end{figure}
 ```
 
-The standard transformer clearly fails on this task while the volume-preserving feedforward network slowly drifts of. The volume-preserving transformer shows much smaller errors and manages to stay close to the numerical solution. 
-M[fig:VPFFvsVPT]m(@latex) shows the time evolution of the relative error (compared to the solution with implicit midpoint) of the two volume-preserving networks.
+The standard transformer clearly fails on this task while the volume-preserving feedforward network slowly drifts off. The volume-preserving transformer shows much smaller errors and manages to stay close to the numerical solution.  M[fig:VPFFvsVPT]m(@latex) shows the time evolution of the invariant ``I(z) = ||z||_2`` for implicit midpoint and the three neural network integrators.
 
 ```@raw latex
 \begin{figure}
-\includegraphics[width = .7\textwidth]{simulations/vpt_Float32/error_evolution_3.png}
-\caption{Comparison between the time evolution of the relative error of the volume-preserving feedforward neural network and the volume-preserving transformer.}
+\centering
+\includegraphics[width = .7\textwidth]{violate_invariant_long.png}
+\caption{Time evolution of invariant $I(z) = \sqrt{z_1^2 + z_2^2 + z_3^2} = ||z||_2$ for ``trajectory 1" up for the time interval $[0, 100]$. We see that for implicit midpoint this invariant is conserved and for the volume-preserving transformer it oscillates around the correct value.}
 \label{fig:VPFFvsVPT}
 \end{figure}
 ```
 
+In order to get an estimate for the different computational times we perform integration up to time 50000 for all four methods. On CPU we get:
+
+| Method        | IM            |    VPFF      |   VPT          |   ST                  |
+| ------------- | :-------      | :-------     | :------        | :------               |
+| Training time | 2.51 seconds  | 6.44 seconds | 0.71 seconds   | 0.20 seconds          |
+
+We see that the standard transformer is the fastest, followed by the volume-preserving transformer. The slowest is the volume-preserving feedforward neural network. We attempt to explain those findings:
+- we assume that the standard transformer is faster than the volume-preserving transformer because the softmax can be quicker evaluated than our new activation function M[eq:VolumePreservingActivation]m(@latex),
+- we assume that implicit midpoint is slower than the two transformers because it involves a Newton solver and the neural networks all perform explicit operations,
+- the very poor performance of the volume-preserving feedforward neural network is harder to explain. We suspect that our implementation performs all computations in serial and is therefore slower than the volume-preserving transformer by a factor of three, because we have ``\mathrm{L} = 3`` transformer units. It can furthermore be assumed to be slower by another factor of three because the feedforward neural network only predicts one time step at a time as opposed to three time steps at a time for the two transformer neural networks.
+
+Another advantage of all neural network-based integrators over implicit midpoint is that it is easily suitable for parallel computation on GPU because all operations are explicit[^2]. The biggest motivation for using neural networks to learn dynamics comes however from non-intrusive reduced order modeling as discussed in the introduction; a traditional integrator like implicit midpoint is simply not suitable for this task as we need to recover dynamics from data.
+
+[^2]: The implementation of these architectures in `GeometricMachineLearning.jl` supports parallel computation on GPU.
 
 ## Why does regular attention fail? 
 
-M[fig:Validation3d]m(@latex) shows, that the standard transformer fails to predict the time evolution of the system correctly. The reason behind this could be that it is not sufficiently restrictive, i.e., the three columns making the output of the transformer (see M[eq:StandardTransformerOutput]m(@latex)) are not necessarily linearly independent; a property that the volume-preserving transformer has by construction. We observe that the "trajectory 1" and "trajectory 4" seem to merge at some point, as if there were some kind of attractor in the system. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
+M[fig:Validation3d]m(@latex) shows, that the standard transformer fails to predict the time evolution of the system correctly. The reason behind this could be that it is not sufficiently restrictive, i.e., the matrix which is made up of the three columns in the output of the transformer (see M[eq:StandardTransformerOutput]m(@latex)) does not have full rank (i.e. is not invertible); a property that the volume-preserving transformer has by construction. We observe that the "trajectory 1" and "trajectory 4" seem to merge at some point, as if there were some kind of attractor in the system. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
 
 
 ## A note on parameter-dependent equations
@@ -185,6 +199,6 @@ where ``\mathbb{P}`` is a set of parameters on which the differential equation d
 \mathcal{NN}_\mathrm{ff}: \mathbb{R}^d\to\mathbb{R}^d.
 ```
 
-Thus a feedforward neural network can only approximate the flow of a differential equation with fixed parameters as the prediction becomes ambiguous in the case of data coming from solutions for different parameters. A transformer neural network[^2] on the other hand, is able to describe solutions with different parameters of the system, as it is able to *consider the history of the trajectory up to that point*. 
+Thus a feedforward neural network can only approximate the flow of a differential equation with fixed parameters as the prediction becomes ambiguous in the case of data coming from solutions for different parameters. A transformer neural network[^3] on the other hand, is able to describe solutions with different parameters of the system, as it is able to *consider the history of the trajectory up to that point*. 
 
-[^2]: It should be noted that recurrent neural networks such as LSTMs [hochreiter1997long](@cite) are also able to do this. 
+[^3]: It should be noted that recurrent neural networks such as LSTMs [hochreiter1997long](@cite) are also able to do this. 
