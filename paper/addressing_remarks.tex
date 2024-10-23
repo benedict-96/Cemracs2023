@@ -3,8 +3,16 @@
 \usepackage{amsmath, amsfonts, yhmath}
 \usepackage{amsthm}
 \newtheorem*{dfntn*}{Definition}
+\newtheorem*{rmrk*}{Remark}
+
 
 \usepackage{enumitem}
+
+\usepackage{graphicx}
+\usepackage{./src/assets/custom}
+
+% for table
+\usepackage{tabulary,booktabs}
 
 \usepackage{xcolor}
 \definecolor{morange}{RGB}{255,127,14}
@@ -15,7 +23,7 @@
 
 \begin{document}
 
-We thanks both reviewers for their detailed comments and suggestions. Here we point out how we addressed them (the remarks of the reviewers are in black and our comments in {\color{mred} red}):
+We thanks both reviewers for their detailed comments and suggestions. Here we point out how we addressed them (the comments of the reviewers are in black and our responses to them in {\color{mred} red}):
 
 \section{Comments from Reviewer I}
 
@@ -97,7 +105,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
     \begin{dfntn*} The \textbf{volume-preserving attention mechanism} is a map based on the Cayley transform that reweights a collection of input vectors \(Z\) via \(Z \mapsto Z\Lambda(Z),\) where \(\Lambda(Z) = \mathrm{Cayley}(Z^TAZ)\) and \(A\) is a learnable skew-symmetric matrix.  \end{dfntn*}
 
-    The main result of this section was to show that this attention mechanism is \emph{volume-preserving} in a product space that is spanned by the input vectors.''}
+    The main result of this section was to show that this attention mechanism is \textit{volume-preserving} in a product space that is spanned by the input vectors.''}
 \end{enumerate}
 \end{enumerate}
 \subsection*{Minor Comments}
@@ -167,15 +175,52 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
     {\color{mred} Done! As with section 2 we however first discuss the ResNet (feedforward neural network) and then the attention layer. The last subsection shows the proof.}
     \end{enumerate}
     Regarding the choice $T = 3$ in the experiment, it should be made more clear in the description of (hyper)parameters. As of now, it is only mentioned in the caption of Figure 6 and in the comment of Section 5.4. Similarly, the meaning of the hyperparameter $L$ is not specified, although it appears in the table before Section 5.1. The activation functions of the feed-forward layers should also be specified.
+
+    {
+        \color{mred}
+
+    \begin{enumerate}
+        \item Regarding ``L'' we added the following: 
+            \begin{enumerate}
+                \item ``As the output of the transformer is of the same dimension as the input to the transformer, we can stack \textit{transformer units} on top of each other; the number of \textit{stacked units} is indicated with the integer `L'.''
+                \item ``The Integer `L' indicates how often a \textit{transformer unit} (i.e. what is enclosed in the big black shape) is repeated.'' in the caption of Figure 1.
+                \item  ``Similar to Figure 1 the integer `L' indicates how often a \textit{transformer unit} is repeated.'' in the caption of Figure 2.
+            \end{enumerate}
+        \item Regarding $T$ we added the following:
+            \begin{enumerate}
+                \item For the standard transformer and the volume-preserving transformer we further pick $T = 3$, i.e. we always feed three time steps into the network during training and validation. We also note that strictly speaking $T$ is not a hyperparameter of the network as its choice does not change the architecture: the dimensions of the matrix $A$ in the volume-preserving activation are independent of the number of time steps $T$ that we feed into the network.
+            \end{enumerate}
+        \item Regarding the activation function we added the following:
+            \begin{enumerate}
+                \item The activation functions in the \textit{feedforward layer} and volume-preserving feedfoward layers (the \textit{non-linear layers} and the \textit{volume-preserving feedforward layers}) are all tanh.
+            \end{enumerate}
+    \end{enumerate}
+
+    }
 \end{enumerate}
 
 \subsection*{Minor Doubts}
 
 \begin{enumerate}
     \item The abstract mentions ``some work'' applying transformers to dynamical systems, but does not cite any in the introduction, except perhaps Solera-Rico et al.
+        {\color{mred} We added/modified the following for clarification in the introduction: ``Specifically, transformer neural networks have been used for the online stage of reduced order modeling (i.e. have been applied to dynamical systems) in (Hemasian and Farimani, 2023) and (Solera et. al, 2023).''}
     \item For the VPFF of Figure 2, in the block repeated $\mathtt{n\_linear}$ times, are the same weight matrices repeated (as with LA-SympNets) or are they new ones?
+        {\color{mred} We added the following to the respective figure as a clarification: ``Every unit (enclosure within black thick borders) has new parameters for every repetition, so the neural network weights are not repeated.''}
     \item For the rigid body test case, how does the norm evolve over time? We see in the graph that it seems to remain close to 1, but does it drift over time? This could replace Figure 7, for which the specific trajectory is not mentioned.
+    
+        {\color{mred} We changed the figures as suggested to highlight this point better. We now write:
+        
+        ``\Cref{fig:VPFFvsVPT} shows the time evolution of the invariant $I(z) = ||z||_2$ for implicit midpoint and the three neural network integrators.''
+
+        \begin{figure}[h]
+        \centering
+        \includegraphics[width = .7\textwidth]{src/violate_invariant_long.png}
+        \caption{\color{mred}Time evolution of invariant $I(z) = \sqrt{z_1^2 + z_2^2 + z_3^2} = ||z||_2$ for ``trajectory 1" up for the time interval $[0, 100]$. We see that for implicit midpoint this invariant is conserved and for the volume-preserving transformer it oscillates around the correct value.}
+        \label{fig:VPFFvsVPT}
+        \end{figure}
+        }
     \item In Section 5.4, it is mentioned that the columns in the output of the VPT are linearly independent. This seems like a stretch, considering a zero vector-field could be considered. Perhaps this is rather a matter of invertibility? Is there a bound $T\leq{}d$? If so, this should be mentioned.
+        {\color{mred} We rephrased the corresponding sentence to: ``The reason behind this could be that it is not sufficiently restrictive, i.e., the matrix which is made up of the three columns in the output of the transformer does not have full rank (i.e. is not invertible); a property that the volume-preserving transformer has by construction.''}
 \end{enumerate}
 
 
@@ -184,8 +229,67 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \begin{enumerate}
     \item In terms of philosophy, why would long-range interactions/dependencies be interesting for first-order differential equations?
     \item Too much importance is given to reduced-order modelling in the introduction, considering no ROM is performed in the paper. Instead, more this space could be used to accurately introduce and describe the volume-preserving properties of the authors' architecture.
+        
+    
+    {\color{mred} We reduced the discussion of reduced order modeling to the following: ``An application, where all of these developments intersect, is \textit{reduced-order modeling} , which can be split into an \textit{offline phase} and an \textit{online phase} (see \Cref{fig:OfflineOnlineSplit}).
+
+        \begin{figure}[h]
+        \centering
+        \includestandalone[width=.5\textwidth]{src/tikz/offline_online}
+        \caption{\color{mred}Visualization of offline-online split in reduced order modeling. The volume-preserving transformer presented in this work is \textit{used for the online phase}.}
+        \label{fig:OfflineOnlineSplit}
+        \end{figure}
+        
+        For the online phase we face the following challenges:
+        
+        \begin{itemize}
+        \item[1. ] in many cases we need to recover the dynamics of our system from data alone (this is known as ``non-intrusive reduced order modeling"), 
+        \item[2. ] if the big system exhibits specific structure (such as volume-preservation) it is often crucial to also respect this structure in the reduced model''.  
+        \end{itemize}}
+
     \item As someone unfamiliar with volume-preserving multistep methods, I would have appreciated a comparison of the theoretical results: what is the impact of replacing the volume on the original space by the volume on the product space? Is that standard? Is one better than the other?
+        {\color{mred} We added the following remark to highlight the similarities of our product structure with different work:
+        
+        \begin{rmrk*} 
+            To our knowledge there is no literature on volume-preserving multi-step methods, there is however significant work on \textit{symplectic multi-step methods}. Of the two definitions of symplecticity for multi-step methods given in (Hairer et. al, 2006), that of \textit{\(G\)-symplecticity} is similar to the definition of volume preservation given here as it is also defined on a product space. The product structure through which we defined volume preservation also bears strong similarities to ``discrete multi-symplectic structures" defined in (Bridges and Reich, 2001) and (Y{\i}ld{\i}z et. al, 2024). 
+        \end{rmrk*}
+
+        }
     \item Assuming the ODE is unknown, how can one compute the first three time-steps? Would using the less-accurate VPFF for this prediction be accurate enough? If not, is the transformer faster and/or more accurate than the midpoint scheme?
+        {\color{mred}
+        We answer this in two parts:
+        \begin{enumerate}
+            \item 
+
+            \item Regarding the comparison with implicit midpoint we added:
+
+            ``In order to get an estimate for the different computational times we perform integration up to time 50000 for all four methods. On CPU we get:
+            
+            \begin{table}[h]
+            \centering
+            \begin{tabulary}{\linewidth}{R L L L L}
+            \toprule
+            \color{mred} Method & \color{mred} IM & \color{mred} VPFF & \color{mred} VPT & \color{mred} ST \\
+            \toprule
+            \color{mred} Training time & \color{mred} 2.51 seconds & \color{mred} 6.44 seconds & \color{mred} 0.71 seconds & \color{mred} 0.20 seconds \\
+            \bottomrule
+            \end{tabulary}
+            
+            \end{table}
+            
+            We see that the standard transformer is the fastest, followed by the volume-preserving transformer. The slowest is the volume-preserving feedforward neural network. We attempt to explain those findings:
+            
+            \begin{itemize}
+            \item we assume that the standard transformer is faster than the volume-preserving transformer because the softmax can be quicker evaluated than our new activation function,
+            \item we assume that implicit midpoint is slower than the two transformers because it involves a Newton solver and the neural networks all perform explicit operations,
+            \item the very poor performance of the volume-preserving feedforward neural network is harder to explain. We suspect that our implementation performs all computations in serial and is therefore slower than the volume-preserving transformer by a factor of three, because we have \(\mathrm{L} = 3\) transformer units. It can furthermore be assumed to be slower by another factor of three because the feedforward neural network only predicts one time step at a time as opposed to three time steps at a time for the two transformer neural networks.
+            \end{itemize}
+            
+            Another advantage of all neural network-based integrators over implicit midpoint is that it is easily suitable for parallel computation on GPU because all operations are explicit\footnotemark. The biggest motivation for using neural networks to learn dynamics comes however from non-intrusive reduced order modeling as discussed in the introduction; a traditional integrator like implicit midpoint is simply not suitable for this task as we need to recover dynamics from data.''
+        \end{enumerate}
+
+        
+        }
     \item Some typos: ``those efforts was'' in the abstract, ``ob the Jacobian'' p. 3.
 \end{enumerate}
 

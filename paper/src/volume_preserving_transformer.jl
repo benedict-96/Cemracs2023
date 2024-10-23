@@ -6,7 +6,10 @@ using GeometricIntegrators: integrate, ImplicitMidpoint
 using GeometricProblems.RigidBody: odeproblem, odeensemble, default_parameters
 using LaTeXStrings
 using LinearAlgebra: norm
+using JLD2
 import Random 
+
+Random.seed!(123)
 
 # hyperparameters for the problem 
 const tstep = .2
@@ -27,7 +30,7 @@ const L = 3 # transformer blocks
 const activation = tanh
 const n_linear = 1
 const n_blocks = 2
-const skew_sym = true
+const skew_sym = false
 
 # backend 
 const backend = CUDABackend()
@@ -39,7 +42,7 @@ const T = Float32
 const dl = backend == CPU() ? DataLoader(dl₁.input) : DataLoader(dl₁.input |> CuArray{T})
 
 # hyperparameters concerning training 
-const n_epochs = 500000
+const n_epochs = 100000
 const batch_size = 16384
 const seq_length = 3
 const opt_method = AdamOptimizerWithDecay(n_epochs, T; η₁ = 1e-2, η₂ = 1e-6)
@@ -88,11 +91,14 @@ model₂ = VolumePreservingFeedForward(sys_dim, n_blocks * L, n_linear, resnet_a
 
 model₃ = VolumePreservingTransformer(sys_dim, seq_length; n_blocks = n_blocks, n_linear = n_linear, L = L, activation = resnet_activation, skew_sym = skew_sym)
 
-model₄ = RegularTransformerIntegrator(sys_dim, sys_dim, n_heads; n_blocks = n_blocks, L = L, resnet_activation = resnet_activation, add_connection = false)
+model₄ = StandardTransformerIntegrator(sys_dim; n_heads = n_heads, n_blocks = n_blocks, L = L, resnet_activation = resnet_activation, add_connection = false)
 
 # nn₁, loss_array₁ = setup_and_train(model₁, transformer_batch)
-nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
+println("VPT")
 nn₃, loss_array₃ = setup_and_train(model₃, transformer_batch)
+println("VPFF")
+nn₂, loss_array₂ = setup_and_train(model₂, feedforward_batch)
+println("ST")
 nn₄, loss_array₄ = setup_and_train(model₄, transformer_batch)
 
 function numerical_solution(sys_dim::Int, t_integration::Int, tstep::Real, ics_val::Vector)
@@ -229,10 +235,19 @@ p_error_evolution_long = plot_error_evolution(t_validation_long)
 
 ##############################
 
-png(p_validation, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation_"*string(seq_length)))
-png(p_training_loss, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/training_loss_"*string(seq_length)))
-png(p_validation3d, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation3d_"*string(seq_length)))
-# png(p_validation3d_standard_transformer, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/standard_transformer_validation3d_"*string(seq_length)))
-png(p_validation3d_feedforward, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/feedforward_validation3d_"*string(seq_length)))
-png(p_error_evolution, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_"*string(seq_length)))
-png(p_error_evolution_long, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_long_"*string(seq_length)))
+png(p_validation, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation_"*string(seq_length)*"_short_training"))
+png(p_training_loss, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/training_loss_"*string(seq_length)*"_short_training"))
+png(p_validation3d, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/validation3d_"*string(seq_length)*"_short_training"))
+png(p_validation3d_standard_transformer, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/standard_transformer_validation3d_"*string(seq_length)*"_short_training"))
+png(p_validation3d_feedforward, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/feedforward_validation3d_"*string(seq_length)*"_short_training"))
+png(p_error_evolution, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_"*string(seq_length)*"_short_training"))
+png(p_error_evolution_long, joinpath(@__DIR__, "simulations/vpt_"*string(T)*"/error_evolution_long_"*string(seq_length)*"_short_training"))
+
+save("transformer_rigid_body_short_training.jld2",
+        "nn2_params", nn₂.params,
+        # "nn2_loss_array", loss_array₂,
+        "nn3_params", nn₃.params,
+        # "nn3_loss_array", loss_array₃,
+        "nn4_params", nn₄.params,
+        # "nn4_loss_array", loss_array₄
+        )

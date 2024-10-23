@@ -45,7 +45,7 @@ x \mapsto x + \sigma(Ux + b) .
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .31\textwidth]{tikz/vp_feedforward.png}
-\caption{Architecture of the volume-preserving feedforward neural network. "LinearLowerLayer" refers to $x \mapsto x + Lx$ (and similarly for "LinearUpperLayer"). "NonLinearLowerLayer" is shown in \Cref{eq:VPFF}. "Bias" is the addition with a bias vector.}
+\caption{Architecture of the volume-preserving feedforward neural network. "LinearLowerLayer" refers to $x \mapsto x + Lx$ (and similarly for "LinearUpperLayer"). "NonLinearLowerLayer" is shown in \Cref{eq:VPFF}. "Bias" is the addition with a bias vector. Every unit (enclosure within black thick borders) has new parameters for every repetition, so the neural network weights are not repeated.}
 \label{fig:VolumePreservingFeedForward}
 \end{figure}
 ```

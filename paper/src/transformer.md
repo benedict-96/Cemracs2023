@@ -1,6 +1,6 @@
 # The transformer
 
-The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series data. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in M[fig:TransformerArchitecture]m(@latex)[^1].
+The transformer architecture [vaswani2017attention](@cite) was originally motivated by natural language processing (NLP) tasks and has quickly come to dominate that field. The "T" in ChatGPT (see e.g. [achiam2023gpt](@cite)) stands for "Transformer" and transformer models are the key element for generative AI. These models are a type of neural network architecture designed to process sequential input data, such as sentences or time-series data. The transformer has replaced, or is in the process of replacing, earlier architectures such as long short term memory (LSTM) networks [graves2012long](@cite) and other recurrent neural networks (RNNs, see [rumelhart1985learning](@cite)). The transformer architecture is visualized in M[fig:TransformerArchitecture]m(@latex)[^1]. As the output of the transformer is of the same dimension as the input to the transformer, we can stack *transformer units* on top of each other; the number of *stacked units* is indicated with the integer "L".
 
 [^1]: The three arrows going into the multihead attention module symbolize that the input is used three times: twice when computing the correlation matrix ``C`` and then again when the input is re-weighted based on ``C``. In the NLP literature those inputs are referred to as "queries", "keys" and "values" [vaswani2017attention](@cite). In essence, the transformer consists of a residual network (ResNet[^2]) [he2016deep](@cite) and an attention layer. 
 
@@ -61,7 +61,7 @@ M[fig:TransformerArchitecture]m(@latex) indicates the use of a *multi-head atten
 ```@raw latex
 \begin{figure}[h]
 \includegraphics[width = .25\textwidth]{tikz/transformer.png}
-\caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out.}
+\caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in light green to emphasize that this can be left out. The Integer ``L'' indicates how often a \textit{transformer unit} (i.e. what is enclosed within the big black borders) is repeated.}
 \label{fig:TransformerArchitecture}
 \end{figure}
 ```

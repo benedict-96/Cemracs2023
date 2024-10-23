@@ -23,6 +23,7 @@ where we used that ``(\Lambda^{-1})^T = (\Lambda^T)^{-1}`` for an arbitrary inve
 
 ```math
 \Lambda(Z) = \sigma (Z^T A Z),
+\label{eq:VolumePreservingActivation}
 ``` 
 
 where ``A`` is a *learnable skew-symmetric matrix*. Note that the input into the Cayley transform has to be a skew-symmetric matrix in order for the output to be orthogonal; hence we have the restriction on ``A`` to be skew-symmetric. With this, ``\Lambda(Z)`` is an orthogonal matrix and the entire mapping is equivalent to a multiplication by an orthogonal matrix in the *vector representation* shown in M[eq:isomorphism]m(@latex). To see this, note that the attention layer performs the following operation (see M[eq:RightMultiplication]m(@latex) and the comment below that equation):
@@ -86,7 +87,7 @@ In the transformed coordinate system, that is in terms of the vector ``Z_\mathrm
     \label{eq:LambdaApplication}
 ```
 
-We show that this expression is true:
+and it is easy to see that ``\widehat{\Lambda(Z)}`` in M[eq:LambdaApplication]m(@latex) is an orthogonal matrix. We show that M[eq:LamdaApplication]m(@latex) is true:
 
 ```math
     \widehat{Z\Lambda(Z)} = \widehat{\sum_{k=1}^Tz_i^{(k)}\lambda_{kj}} = \begin{bmatrix} \sum_{k=1}^T z_1^{(k)}\lambda_{k1} \\ \sum_{k=1}^T z_1^{(k)}\lambda_{k2} \\ \ldots \\ \sum_{k=1}^T z_1^{(k)}\lambda_{kT} \\ \sum_{k=1}^T z_2^{(k)}\lambda_{k1} \\ \ldots \\ \sum_{k=1}^T z_d^{(k)}\lambda_{kT} \end{bmatrix} = \begin{bmatrix} \sum_{k=1}^T \lambda_{k1}z_1^{(k)} \\ \sum_{k=1}^T \lambda_{k2}z_1^{(k)} \\ \ldots \\ \sum_{k=1}^T \lambda_{kT}z_1^{(k)} \\ \sum_{k=1}^T \lambda_{k1}z_2^{(k)} \\ \ldots \\ \sum_{k=1}^T \lambda_{kT}z_d^{(k)} \end{bmatrix} = \begin{bmatrix} [\Lambda(Z)^T z_1^{(\bullet)}]_1 \\ [\Lambda(Z)^T z_1^{(\bullet)}]_2 \\ \ldots \\ [\Lambda(Z)^T z_1^{(\bullet)}]_T \\ [\Lambda(Z)^T z_2^{(\bullet)}]_1 \\ \ldots \\ [\Lambda(Z)^T z_d^{(\bullet)}]_T \end{bmatrix} = \begin{bmatrix} \Lambda(Z)^Tz_1^{(\bullet)} \\ \Lambda(Z)^Tz_2^{(\bullet)} \\ \ldots \\ \Lambda(Z)^Tz_d^{(\bullet)} \end{bmatrix},
@@ -98,15 +99,17 @@ where we defined:
     z_i^{(\bullet)} := \begin{bmatrix} z_i^{(1)} \\ z_i^{(2)} \\ \ldots \\ z_i^{(T)} \end{bmatrix}.
 ```
 
-It is easy to see that ``\widehat{\Lambda(Z)}`` in M[eq:LambdaApplication]m(@latex) is an orthogonal matrix. 
-
 ```@raw latex
 \begin{figure}
 \includegraphics[width = .29\textwidth]{tikz/vp_transformer.png}
-\caption{Architecture of the volume-preserving transformer. In comparison with the standard transformer in~\Cref{fig:TransformerArchitecture}, the Add layer has been removed, the attention layer has been replaced with a volume-preserving attention layer, and the feed forward layer has been replaced with the volume-preserving feedforward neural network from~\Cref{fig:VolumePreservingFeedForward}.}
+\caption{Architecture of the volume-preserving transformer. In comparison with the standard transformer in~\Cref{fig:TransformerArchitecture}, the Add layer has been removed, the attention layer has been replaced with a volume-preserving attention layer, and the feed forward layer has been replaced with the volume-preserving feedforward neural network from~\Cref{fig:VolumePreservingFeedForward}. Similar to~\Cref{fig:TransformerArchitecture} the integer ``L'' indicates how often a \textit{transformer unit} is repeated.}
 \label{fig:VolumePreservingTransformerArchitecture}
 \end{figure}
 ```
+
+REMARK::
+To our knowledge there is no literature on volume-preserving multi-step methods, there is however significant work on *symplectic multi-step methods* [feng1998step, hairer2006geometric, hairer2008conjugate](@cite). Of the two definitions of symplecticity for multi-step methods given in [hairer2006geometric](@cite), that of *``G``-symplecticity* is similar to the definition of volume preservation given here as it is also defined on a product space. The product structure through which we defined volume preservation also bears strong similarities to ``discrete multi-symplectic structures" defined in [bridges2001multi, yildiz2024structure](@cite).
+::
 
 The main result of this section was to show that this attention mechanism is *volume-preserving* in a product space that is spanned by the input vectors. To conclude we make the transformer volume-preserving  by (i) replacing the feedforward neural network (ResNet) by a volume-preserving feedforward network (volume-preserving ResNet), replacing standard attention by volume-preserving attention and removing the first add connection[^2]. The resulting architecture is shown in M[fig:VolumePreservingTransformerArchitecture]m(@latex).
 
