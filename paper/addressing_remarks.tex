@@ -148,6 +148,27 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
         {\color{mred} We added the following: ``We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though \texttt{GeometricMachineLearning.jl} has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).''}
 
 \item A way of introducing parameter dependence in feedforward NNs would be to take equation (25) as $\mathcal{NN}_{ff}: \mathbb{R}^d\times\mathbb{P}\to\mathbb{R}^d$, with $\mathbb{P}$ a parameter space. This makes it possible to study parameter-dependent problems with feedforward NNs. Please comment on that as it could change the conclusions of section 5.5.
+        {\color{mred} We comment on this: 
+        
+        ``We also note that one could build parameter-dependent feedforward neural networks as
+
+        \begin{equation*}
+        \mathcal{NN}_{ff}:\mathbb{R}^d\times\mathbb{P} \to \mathbb{R}^d.
+        \end{equation*}
+        
+        A simple single-layer feedforward neural network
+        
+        \begin{equation*}
+            \overline{\mathcal{NN}}_{ff}: x \mapsto \sigma(Ax + b),
+        \end{equation*}
+        
+        could be made parameter-dependent by modifying it to
+        
+        \begin{equation*}
+            \mathcal{NN}_{ff}: (x, \mu) \mapsto \sigma\Big(A\begin{bmatrix}x \\ \mu \end{bmatrix} + b\Big),
+        \end{equation*}
+        
+        for example. This makes it however harder to imbue the neural network with structure-preserving properties and we do not pursue this approach further in this work.''}
 \end{enumerate}
 
 \subsection*{Typos}
@@ -228,10 +249,16 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
 \begin{enumerate}
     \item In terms of philosophy, why would long-range interactions/dependencies be interesting for first-order differential equations?
+    
+    {\color{mred} We added the following remark to explain the \textit{philosophy}:
+    
+    \begin{rmrk*} Using transformer neural networks instead of standard feedforward neural networks for \emph{integrating} ordinary differential equations can be motivated similarly to using multi-step methods as opposed to single-step methods in traditional numerical integration (another motivation comes from the possibility to consider parameter-dependent equations as discussed below). In (Cellier and Kofman, 2006) it is stated that multi-step methods constitute ``[an entire class] of integration algorithms of arbitrary order of approximation accuracy that require only a single function evaluation in every new step". We conjecture that this also holds true for transformer-based integrators: we can hope to build higher-order methods without increased cost. \end{rmrk*}
+    
+    }
     \item Too much importance is given to reduced-order modelling in the introduction, considering no ROM is performed in the paper. Instead, more this space could be used to accurately introduce and describe the volume-preserving properties of the authors' architecture.
         
     
-    {\color{mred} We reduced the discussion of reduced order modeling to the following: ``An application, where all of these developments intersect, is \textit{reduced-order modeling} , which can be split into an \textit{offline phase} and an \textit{online phase} (see \Cref{fig:OfflineOnlineSplit}).
+    {\color{mred} We reduced the discussion of reduced order modeling to the following: ``An application, where all of these developments intersect, is \textit{reduced-order modeling}. Reduced-order modeling is typically split into an \textit{offline phase} and an \textit{online phase} (see \Cref{fig:OfflineOnlineSplit}).
 
         \begin{figure}[h]
         \centering
@@ -259,9 +286,10 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
         {\color{mred}
         We answer this in two parts:
         \begin{enumerate}
-            \item 
+            \item We clarified the first point, regarding the initialization of the transformer solution, by adding a remark:
+                ``\begin{rmrk*} Note that for the two transformers we need to supply three vectors as input as opposed to one for the feedforward neural network. We therefore compute the first two steps with implicit midpoint and then proceed by using the transformer. We could however also use the volume-preserving feedforward neural network to predict those first two steps instead of using implicit midpoint. This is necessary if the differential equation is not known.''\end{rmrk*}
 
-            \item Regarding the comparison with implicit midpoint we added:
+            \item Regarding the comparison with implicit midpoint, if the ODE is known, we added:
 
             ``In order to get an estimate for the different computational times we perform integration up to time 50000 for all four methods. On CPU we get:
             
@@ -291,6 +319,8 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
         
         }
     \item Some typos: ``those efforts was'' in the abstract, ``ob the Jacobian'' p. 3.
+    
+        {\color{mred} We fixed those and thoroughly proofread the manuscript again.}
 \end{enumerate}
 
 \end{document}

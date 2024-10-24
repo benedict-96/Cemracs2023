@@ -65,7 +65,6 @@ nothing
 \end{figure}
 ```
 
-
 We will compare three different neural network architectures that are trained on simulation data of the rigid body. 
 These architectures are:
 
@@ -74,6 +73,11 @@ These architectures are:
 | Volume-preserving feed-forward  | 1          | 6          | - | 135                        |
 | Volume-preserving transformer   | 1          | 2          | 3 | 162                        |
 | Standard transformer            | -          | 2          | 3 | 213                        |
+
+
+REMARK::
+Using transformer neural networks instead of standard feedforward neural networks for *integrating* ordinary differential equations can be motivated similarly to using multi-step methods as opposed to single-step methods in traditional numerical integration (another motivation comes from the possibility to consider parameter-dependent equations as discussed below). In [cellier2006continuous](@cite) it is stated that multi-step methods constitute "[an entire class] of integration algorithms of arbitrary order of approximation accuracy that require only a single function evaluation in every new step". We conjecture that this also holds true for transformer-based integrators: we can hope to build higher-order methods without increased cost.
+::
 
 
 For the standard transformer, we further remove the optional add connection (i.e. the green line in M[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer, `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation). The activation functions in the *feedforward layer* (see M[fig:TransformerArchitecture]m(@latex)) and volume-preserving feedfoward layers (the *non-linear layers* in M[fig:VolumePreservingFeedForward]m(@latex) and the *volume-preserving feedforward layers* in M[fig:VolumePreservingTransformerArchitecture]m(@latex)) are all tanh. For the standard transformer and the volume-preserving transformer we further pick ``T = 3``, i.e. we always feed three time steps into the network during training and validation. We also note that strictly speaking ``T`` is not a hyperparameter of the network as its choice does not change the architecture: the dimensions of the matrix ``A`` in the volume-preserving activation in M[eq:VolumePreservingActivation]m(@latex) (or the equivalent for the standard attention mechanism) are independent of the number of time steps ``T`` that we feed into the network.
@@ -109,7 +113,7 @@ L_{\mathcal{NN}}(input, output) = \frac{ ||output - \mathcal{NN}(input)||_2 }{ |
 ```
 where ``||\cdot||_2`` is the ``L_2``-norm. The only difference between the two losses for the feedforward neural network and the transformer is that ``input`` and ``output`` are vectors ``\in\mathbb{R}^d`` in the first case and matrices ``\in\mathbb{R}^{d\times{}T}`` in the second. 
 
-## Details on training and choice of hyperparameters
+## Details on Training and Choice of Hyperparameters
 
 The code is implemented in Julia [bezanson2017julia](@cite) as part of the library `GeometricMachineLearning.jl` [brantner2020GML](@cite). All the computations performed here are done in single precision on an NVIDIA Geforce RTX 4090 GPU [rtx4090](@cite). We use `CUDA.jl` [besard2018juliagpu](@cite) to perform computations on the GPU.
 
@@ -131,7 +135,12 @@ With these settings we get the following training times (given as HOURS:MINUTES:
 
 The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). The training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``5 \times 10^{-4}``), whereas the standard transformer is stuck at a rather high level (``5 \times 10^{-2}``). In addition to the Adam optimizer we also tried stochastic gradient descent (with and without momentum) and the BFGS optimizer [nocedal1999numerical](@cite), but obtained the best results with the Adam optimizer. We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though `GeometricMachineLearning.jl` has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).
 
-The corresponding predicted trajectories are shown in M[fig:Validation3d]m(@latex), where we plot the predicted trajectories for two initial conditions, ``( \sin(1.1), \, 0, \, \cos(1.1) )^T`` and ``( 0, \, \sin(1.1) , \, \cos(1.1) )^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in M[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4".
+## Using the Networks for Prediction
+
+The corresponding predicted trajectories are shown in M[fig:Validation3d]m(@latex), where we plot the predicted trajectories for two initial conditions, ``( \sin(1.1), \, 0, \, \cos(1.1) )^T`` and ``( 0, \, \sin(1.1) , \, \cos(1.1) )^T``, for the time interval ``[0, 100]``. These initial conditions are also shown in M[fig:RigidBodyCurves]m(@latex) as "trajectory 1" and "trajectory 4". 
+
+REMARK::
+Note that for the two transformers we need to supply three vectors as input as opposed to one for the feedforward neural network. We therefore compute the first two steps with implicit midpoint and then proceed by using the transformer. We could however also use the volume-preserving feedforward neural network to predict those first two steps instead of using implicit midpoint. This is necessary if the differential equation is not known.::
 
 ```@raw latex
 \begin{figure}
@@ -177,12 +186,12 @@ Another advantage of all neural network-based integrators over implicit midpoint
 
 [^2]: The implementation of these architectures in `GeometricMachineLearning.jl` supports parallel computation on GPU.
 
-## Why does regular attention fail? 
+## Why Does Regular Attention Fail? 
 
 M[fig:Validation3d]m(@latex) shows, that the standard transformer fails to predict the time evolution of the system correctly. The reason behind this could be that it is not sufficiently restrictive, i.e., the matrix which is made up of the three columns in the output of the transformer (see M[eq:StandardTransformerOutput]m(@latex)) does not have full rank (i.e. is not invertible); a property that the volume-preserving transformer has by construction. We observe that the "trajectory 1" and "trajectory 4" seem to merge at some point, as if there were some kind of attractor in the system. This is not a property of the physical system and seems to be mitigated if we use volume-preserving architectures. 
 
 
-## A note on parameter-dependent equations
+## A Note on Parameter-Dependent Equations
 
 In the example presented here, training data was generated by varying the initial condition of the system, specifically
 ```math
@@ -202,3 +211,23 @@ where ``\mathbb{P}`` is a set of parameters on which the differential equation d
 Thus a feedforward neural network can only approximate the flow of a differential equation with fixed parameters as the prediction becomes ambiguous in the case of data coming from solutions for different parameters. A transformer neural network[^3] on the other hand, is able to describe solutions with different parameters of the system, as it is able to *consider the history of the trajectory up to that point*. 
 
 [^3]: It should be noted that recurrent neural networks such as LSTMs [hochreiter1997long](@cite) are also able to do this. 
+
+We also note that one could build parameter-dependent feedforward neural networks as
+
+```math
+\mathcal{NN}_{ff}:\mathbb{R}^d\times\mathbb{P} \to \mathbb{R}^d.
+```
+
+A simple single-layer feedforward neural network
+
+```math
+    \overline{\mathcal{NN}}_{ff}: x \mapsto \sigma(Ax + b),
+```
+
+could be made parameter-dependent by modifying it to
+
+```math
+    \mathcal{NN}_{ff}: (x, \mu) \mapsto \sigma\Big(A\begin{bmatrix}x \\ \mu \end{bmatrix} + b\Big),
+```
+
+for example. This makes it however harder to imbue the neural network with structure-preserving properties and we do not pursue this approach further in this work.
