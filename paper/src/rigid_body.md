@@ -38,6 +38,7 @@ This shows that it is sufficient to know the eigenvalues of the matrix ``\Theta`
 
 ```@raw latex
 \begin{figure}
+\centering
 \includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
 \caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$.}
 \label{fig:RigidBody}

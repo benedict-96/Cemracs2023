@@ -59,6 +59,7 @@ nothing
 
 ```@raw latex
 \begin{figure}[h]
+\centering
 \includegraphics[width=.75\textwidth]{rigid_body.png}
 \caption{Rigid body trajectories for $\mathfrak{a} = 1$, $\mathfrak{b} = -1/2$ and $\mathfrak{c} = -1/2$ and different initial conditions.}
 \label{fig:RigidBodyCurves}
@@ -144,6 +145,7 @@ Note that for the two transformers we need to supply three vectors as input as o
 
 ```@raw latex
 \begin{figure}
+\centering
 \includegraphics[width = .6\textwidth]{simulations/vpt_Float32/training_loss_3.png}
 \caption{Training loss for the different networks.}
 \label{fig:TrainingLoss}

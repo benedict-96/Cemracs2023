@@ -102,6 +102,7 @@ where we defined:
 
 ```@raw latex
 \begin{figure}
+\centering
 \includegraphics[width = .29\textwidth]{tikz/vp_transformer.png}
 \caption{Architecture of the volume-preserving transformer. In comparison with the standard transformer in~\Cref{fig:TransformerArchitecture}, (i) the feedforward layer has been replaced with the volume-preserving feedforward neural network from~\Cref{fig:VolumePreservingFeedForward}, (ii) the attention layer has been replaced with a volume-preserving attention layer and (iii) the Add layer has been removed. Similar to~\Cref{fig:TransformerArchitecture} the integer ``L'' indicates how often a \textit{transformer unit} is repeated.}   
 \label{fig:VolumePreservingTransformerArchitecture}

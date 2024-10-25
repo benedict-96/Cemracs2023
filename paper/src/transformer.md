@@ -60,6 +60,7 @@ M[fig:TransformerArchitecture]m(@latex) indicates the use of a *multi-head atten
 
 ```@raw latex
 \begin{figure}[h]
+\centering
 \includegraphics[width = .25\textwidth]{tikz/transformer.png}
 \caption{Sketch of the transformer architecture. It is a composition of an attention layer and a feedforward neural network. The first \textit{add connection} is drawn in green to emphasize that this can be left out. The Integer ``L'' indicates how often a \textit{transformer unit} (i.e. what is enclosed within the big black borders) is repeated.}
 \label{fig:TransformerArchitecture}
