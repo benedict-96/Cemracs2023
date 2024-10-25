@@ -25,14 +25,16 @@ where
     -  \int_\mathcal{B}x_ix_jdm & \text{else} ,
 \end{cases}
 ```
-``dm`` indicates an integral over the mass density of the rigid body, and ``i\neq{}k\neq\ell\neq{}i`` for the first case.
+where ``dm`` indicates an integral over the mass density of the rigid body, and we further have ``i\neq{}k\neq\ell\neq{}i`` for the first case.
 
-The mathematical description of a rigid body (modulo rotations) does not require knowledge of the precise shape of the body. As ``\Theta`` is a symmetric matrix, we can write the kinetic energy as:
+The mathematical description of the motion of a rigid body hence does not require knowledge of the precise shape of the body, but only the coefficients ``\Theta_{ij}``. As ``\Theta`` is a symmetric matrix, we can write the kinetic energy as:
 ```math
 T = \frac{1}{2}\omega^T\Theta\omega = \frac{1}{2}\omega^TU^TIU\omega,
+\label{eq:RigidBodyKineticEnergy}
 ```
-with $I = \mathrm{diag} (I_1, I_2, I_3)$.
-This shows that it is sufficient to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3``. From this point of view every rigid body is equivalent to an ellipsoid. 
+where ``U`` is an orthonormal matrix that diagonalizes ``\Theta.`` In M[eq:RigidBodyKineticEnergy]m(@latex) we called the eigenvalues of ``\Theta`` ``I = \mathrm{diag} (I_1, I_2, I_3)``.
+
+This shows that it is sufficient to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3`` to describe the motion of the rigid body (modulo a rotation). From this point of view every rigid body is equivalent to an ellipsoid as indicated in M[fig:RigidBody]m(@latex). 
 
 ```@raw latex
 \begin{figure}
@@ -66,19 +68,22 @@ With this description, the kinetic energy can be written as:
 T = \frac{1}{2}\mathrm{tr}(WDW^T),
 \label{eq:KineticEnergyForLieGroup}
 ```
-where ``D`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 = d_3 + d_1`` and ``I_3 = d_1 + d_2``. We now write ``z := I^{-1}\omega`` and introduce the following notation: 
+where ``D = \mathrm{diag}(d_1, d_2, d_3)`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 = d_3 + d_1`` and ``I_3 = d_1 + d_2``. We now write ``z := I^{-1}\omega`` and introduce the following notation[^3]:
+
+[^3]: Note that the ``\hat{}`` operation used here is different from the hat operation used in [How is Structure Preserved?](@ref).
+
 ```math
-\hat{z} = \begin{bmatrix} z_1 \\ z_2 \\ z_3 \end{bmatrix}^{\widehat{\,}} = \begin{bmatrix} \frac{\omega_1}{I_1} \\ \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} \end{bmatrix}^{\widehat{\,}} = \begin{pmatrix} 0 & -\frac{\omega_3}{I_3} & \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} & 0 & -\frac{\omega_1}{I_1} \\ -\frac{\omega_2}{I_2} & \frac{\omega_1}{I_1} & 0 \end{pmatrix} .
+\hat{z} = \widehat{\begin{bmatrix} z_1 \\ z_2 \\ z_3 \end{bmatrix}} = \widehat{\begin{bmatrix} \frac{\omega_1}{I_1} \\ \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} \end{bmatrix}} = \begin{pmatrix} 0 & -\frac{\omega_3}{I_3} & \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} & 0 & -\frac{\omega_1}{I_1} \\ -\frac{\omega_2}{I_2} & \frac{\omega_1}{I_1} & 0 \end{pmatrix}.
 ```
 
 [^2]: This matrix is equivalent to the diagonal entries of the *coefficient of inertia matrix* in [holm2009geometric](@cite).
 
-and obtain via the Euler-Poincaré equations[^3] for M[eq:KineticEnergyForLieGroup]m(@latex): 
+and obtain via the Euler-Poincaré equations[^4] for M[eq:KineticEnergyForLieGroup]m(@latex): 
 ```math
 \widehat{I\dot{\omega}} = [\widehat{I\omega}, W],
 ```
 
-[^3]: For the Euler-Poincaré equations we have to compute variations of M[eq:KineticEnergyForLieGroup]m(@latex) with respect to ``\delta{}W = \delta(\dot{Q}Q^{-1} = \dot{\Sigma} - [W,\Sigma]`` where ``\Sigma := \delta{}QQ^{-1}``. For more details on this see [holm2009geometric](@cite).
+[^4]: For the Euler-Poincaré equations we have to compute variations of M[eq:KineticEnergyForLieGroup]m(@latex) with respect to ``\delta{}W = \delta(\dot{Q}Q^{-1}) = \dot{\Sigma} - [W,\Sigma]`` where ``\Sigma := \delta{}QQ^{-1}``. For more details on this see [holm2009geometric](@cite).
 
 or equivalently:
 ```math

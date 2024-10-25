@@ -41,7 +41,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
 \item The remark below equation (4) should appear earlier.
 
-    {\color{mred}We now write ``the flow $\varphi_f^t$, in addition to being invertible, is also volume-preserving'' and ``and therefore (by using that $\varphi^t$ is invertible)''}
+    {\color{mred} Instead of the ``remark below equation (4)'', i.e. ``In Equation (2) we have also used that the flow of the ODE is invertible.'',  we now write ``the flow $\varphi_f^t$, in addition to being invertible, is also volume-preserving'' and ``and therefore (by using that $\varphi^t$ is invertible)'' before this equation.}
 
 \item Before equation (3), A is not defined (I guess it's any matrix-valued function).
 
@@ -120,7 +120,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \item A paragraph quickly presenting ResNets is required, rather than just a footnote.
 
     {\color{mred} We turned the footnote into a paragraph:
-    In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet). In its simplest form a ResNet is a standard feedforward neural network with an add connection:
+    ``In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet). In its simplest form a ResNet is a standard feedforward neural network with an add connection:
 
     \begin{equation}
     \begin{split}\mathrm{ResNet}: z \rightarrow z + \mathcal{NN}(z),\end{split}\end{equation}
@@ -129,7 +129,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
     \begin{equation}
     \begin{split}    \mathrm{ResNet} = \mathrm{ResNet}_{\ell_\mathtt{n\_blocks}}\circ\cdots\circ\mathrm{ResNet}_{\ell_2}\circ\mathrm{ResNet}_{\ell_1}.\end{split}\end{equation}
-    Further, one ResNet layer is simply \(\mathrm{ResNet}_{\ell_i}(z) = z + \mathcal{NN}_{\ell_i}(z) = z + \sigma(W_iz + b_i)\) where we pick tanh as activation function \(\sigma.\) }
+    Further, one ResNet layer is simply \(\mathrm{ResNet}_{\ell_i}(z) = z + \mathcal{NN}_{\ell_i}(z) = z + \sigma(W_iz + b_i)\) where we pick tanh as activation function \(\sigma.\)'' }
 
 \item In equation 9, $\sigma$ is not defined: is it any nonlinear activation function?
 
@@ -272,7 +272,11 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
         \begin{itemize}
         \item[1. ] in many cases we need to recover the dynamics of our system from data alone (this is known as ``non-intrusive reduced order modeling"), 
         \item[2. ] if the big system exhibits specific structure (such as volume-preservation) it is often crucial to also respect this structure in the reduced model''.  
-        \end{itemize}}
+        \end{itemize}
+
+
+        Regarding the second point of this remark, i.e. ``accurately introducing and describing the volume-preserving properties of the author's architecture'', we refer to our answer to the third remark below.
+    }
 
     \item As someone unfamiliar with volume-preserving multistep methods, I would have appreciated a comparison of the theoretical results: what is the impact of replacing the volume on the original space by the volume on the product space? Is that standard? Is one better than the other?
         {\color{mred} We added the following remark to highlight the similarities of our product structure with different work:
