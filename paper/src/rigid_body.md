@@ -2,7 +2,7 @@
 \appendix
 ```
 
-# The rigid body
+# The Rigid Body
 
 In this appendix, we sketch the derivation of the rigid body equations used in [Experimental results](@ref).
 The differential equation for the rigid body [hairer2006geometric, arnold1978mathematical](@cite) describes the dynamics of a solid object fixed at a point. M[fig:RigidBody]m(@latex) shows an example for a rigid body. 
@@ -42,7 +42,7 @@ This shows that it is sufficient to know the eigenvalues of the matrix ``\Theta`
 \end{figure}
 ```
 
-## Formulation of the equations of motion in the Euler-Poincaré framework
+## Formulation of the Equations of Motion in the Euler-Poincaré Framework
 
 The dynamics of the rigid body can be described through a rotational matrix ``Q(t)``, i.e. each point of the rigid body ``x(0)\in\mathcal{B}`` can be described through ``x(t) = Q(t)x(0)`` where ``Q(t)^TQ(t) = \mathbb{I}``. We can therefore describe the evolution of the rigid body through a differential equation on the Lie group ``G := \{Q\in\mathbb{R}^{d\times{}d}:Q^TQ = \mathbb{I}\}``. The associated tangent vector ``\dot{Q}\in{}T_QG`` can be mapped to the Lie algebra[^1] ``\mathfrak{g}=T_\mathbb{I}G`` by:
 ```math

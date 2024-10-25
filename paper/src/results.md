@@ -1,15 +1,15 @@
 # Experimental results
 
 In the following, we will consider the rigid body as an example to study the performance of our new volume-preserving transformer.
-We will solve the following equations (see [The rigid body](@ref) for the derivation):
+We will solve the following equations (see [The Rigid Body](@ref) for the derivation):
 ```math
 \frac{d}{dt}\begin{bmatrix} z_1 \\  z_2 \\ z_3  \end{bmatrix} 
 = \begin{bmatrix} \mathfrak{a}z_2z_3 \\ \mathfrak{b}z_1z_3 \\ \mathfrak{c}z_1z_2 \end{bmatrix} ,
 \label{eq:RigidBodyEquations}
 ```
 with ``\mathfrak{a} = 1``, ``\mathfrak{b} = -1/2`` and ``\mathfrak{c} = -1/2``.
-We immediately see that the vector field M[eq:RigidBodyEquations]m(@latex) is trivially divergence-free.
-In M[fig:RigidBodyCurves]m(@latex), we show some trajectories.
+We immediately see that the vector field in M[eq:RigidBodyEquations]m(@latex) is trivially divergence-free.
+In M[fig:RigidBodyCurves]m(@latex) we show some trajectories.
 
 
 ```@eval 
@@ -70,7 +70,7 @@ These architectures are:
 
 | Architecture                    | `n_linear` | `n_blocks` | L | Total number of parameters |
 |:------------------------------  |:---------: |:---------: |:-:|:-------------------------: |
-| Volume-preserving feed-forward  | 1          | 6          | - | 135                        |
+| Volume-preserving feedforward  | 1          | 6          | - | 135                        |
 | Volume-preserving transformer   | 1          | 2          | 3 | 162                        |
 | Standard transformer            | -          | 2          | 3 | 213                        |
 
@@ -103,7 +103,7 @@ where ``v\in0.1:0.01:2\pi`` means that we incrementally increase ``v`` from 0.1 
 \right\}.
 ```
 
-All solutions lie on a sphere of radius one.
+All solutions lie on a sphere of radius one. That they do is a special property of the rigid body (see [The Rigid Body](@ref)) equation and is proofed in [hairer2006geometric; Theorem IV.1.6](@cite) for example.
 
 ## Loss functions 
 
@@ -133,7 +133,7 @@ With these settings we get the following training times (given as HOURS:MINUTES:
 | ------------- | :------ | :------ | :------   |
 | Training time | 4:02:09 | 5:58:57 | 3:58:06   |
 
-The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). The training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``5 \times 10^{-4}``), whereas the standard transformer is stuck at a rather high level (``5 \times 10^{-2}``). In addition to the Adam optimizer we also tried stochastic gradient descent (with and without momentum) and the BFGS optimizer [nocedal1999numerical](@cite), but obtained the best results with the Adam optimizer. We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform (even though `GeometricMachineLearning.jl` has an efficient explicit matrix inverse implemented this is still slower than simply computing the exponential in the softmax).
+The time evolution of the different training losses is shown in M[fig:TrainingLoss]m(@latex). The training losses for the volume-preserving transformer and the volume-preserving feedforward neural network reach very low levels (about ``5 \times 10^{-4}``), whereas the standard transformer is stuck at a rather high level (``5 \times 10^{-2}``). In addition to the Adam optimizer we also tried stochastic gradient descent (with and without momentum) and the BFGS optimizer [nocedal1999numerical](@cite), but obtained the best results with the Adam optimizer. We also see that training the VPT takes longer than the ST even though it has fewer parameters. This is probably because the softmax activation function requires fewer floating-point operations than the inverse in the Cayley transform. We hence observe that even though `GeometricMachineLearning.jl` has an efficient explicit matrix inverse implemented, this is still slower than computing the exponential in the softmax.
 
 ## Using the Networks for Prediction
 
@@ -155,7 +155,7 @@ Note that for the two transformers we need to supply three vectors as input as o
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/feedforward_validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/validation3d_3.png}%
 \includegraphics[width = .33\textwidth]{simulations/vpt_Float32/standard_transformer_validation3d_3.png}
-\caption{Sample trajectories of the rigid body obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer, together with the numerical solution for "trajectory 1" and "trajectory 4" in \Cref{fig:RigidBodyCurves}. The volume-preserving feedforward neural network is provided with the initial condition (i.e. $z^{(0)}$) and then starts the prediction and the two transformers are provided with the first three time steps ($z^{(1)}$ and $z^{(2)}$ are obtained via implicit midpoint) and then start the prediction. The prediction is made for the time interval $[0, 100]$, i.e. 500 time steps in total.}
+\caption{Sample trajectories of the rigid body obtained with the three neural networks: volume-preserving feedforward, volume-preserving transformer and the standard transformer, together with the numerical solution (implicit midpoint) for "trajectory 1" and "trajectory 4" in \Cref{fig:RigidBodyCurves}. The volume-preserving feedforward neural network is provided with the initial condition (i.e. $z^{(0)}$) and then starts the prediction and the two transformers are provided with the first three time steps ($z^{(1)}$ and $z^{(2)}$ are obtained via implicit midpoint) and then start the prediction. The prediction is made for the time interval $[0, 100]$, i.e. 500 time steps in total.}
 \label{fig:Validation3d}
 \end{figure}
 ```
@@ -175,9 +175,9 @@ In order to get an estimate for the different computational times we perform int
 
 | Method        | IM            |    VPFF      |   VPT          |   ST                  |
 | ------------- | :-------      | :-------     | :------        | :------               |
-| Training time | 2.51 seconds  | 6.44 seconds | 0.71 seconds   | 0.20 seconds          |
+| Evaluation time | 2.51 seconds  | 6.44 seconds | 0.71 seconds   | 0.20 seconds          |
 
-We see that the standard transformer is the fastest, followed by the volume-preserving transformer. The slowest is the volume-preserving feedforward neural network. We attempt to explain those findings:
+We see that the standard transformer is the fastest, followed by the volume-preserving transformer. The slowest is the volume-preserving feedforward neural network. We attempt to explain these findings:
 - we assume that the standard transformer is faster than the volume-preserving transformer because the softmax can be quicker evaluated than our new activation function M[eq:VolumePreservingActivation]m(@latex),
 - we assume that implicit midpoint is slower than the two transformers because it involves a Newton solver and the neural networks all perform explicit operations,
 - the very poor performance of the volume-preserving feedforward neural network is harder to explain. We suspect that our implementation performs all computations in serial and is therefore slower than the volume-preserving transformer by a factor of three, because we have ``\mathrm{L} = 3`` transformer units. It can furthermore be assumed to be slower by another factor of three because the feedforward neural network only predicts one time step at a time as opposed to three time steps at a time for the two transformer neural networks.
@@ -203,7 +203,7 @@ In applications such as *reduced order modeling* [lee2020model, lassila2014model
 ```math
 \dot{z} = f(z; \mu) \text{ for $\mu\in\mathbb{P}$},
 ```
-where ``\mathbb{P}`` is a set of parameters on which the differential equation depends. In the example of the rigid body, these parameters could be the moments of inertia ``(I_1, I_2, I_3)`` and thus the parameters ``(\mathfrak{a},\mathfrak{b},\mathfrak{c})`` in M[eq:RigidBodyEquations]m(@latex). A normal feedforward neural network is unable to learn such a parameter-dependent system as it *only sees one point at a time*: 
+where ``\mathbb{P}`` is a set of parameters on which the differential equation depends. In the example of the rigid body, these parameters could be the moments of inertia ``(I_1, I_2, I_3)`` and thus equivalent to the parameters ``(\mathfrak{a},\mathfrak{b},\mathfrak{c})`` in M[eq:RigidBodyEquations]m(@latex). A normal feedforward neural network is unable to learn such a parameter-dependent system as it *only sees one point at a time*: 
 ```math
 \mathcal{NN}_\mathrm{ff}: \mathbb{R}^d\to\mathbb{R}^d.
 ```

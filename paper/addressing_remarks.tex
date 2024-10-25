@@ -49,7 +49,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
 \item Equation (4) proves that the determinant is constant, not that it is equal to 1.
 
-    {\color{mred} We added ``The determinant of $D\varphi^t$ is therefore constant and we further have $D\varphi^0 = 1$ because $\varphi^0$ is the identity. This proofs our assertion.''}
+    {\color{mred} We added ``The determinant of $D\varphi^t$ is therefore constant and we further have $\det(D\varphi^0) = 1$ because $\varphi^0$ is the identity. This proofs our assertion.''}
 
 \end{enumerate}
 
@@ -63,11 +63,11 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
     {\color{mred} Done!}
 \item Since the Cayley transform in such an integral part of your method, and since it is not completely classical, I suggest spending more time explaining it, and its properties, around equation (15).
 
-    {\color{mred} We added the following: ``The Cayley transform maps skew-symmetric matrices to orthogonal matrices, so if $Y$ has the property that $Y^T = -Y,$ then we have $\sigma(Y)^T\sigma(Y) = \mathbb{I}.$ This can be easily shown:
+    {\color{mred} We added the following: ``The Cayley transform maps skew-symmetric matrices to orthogonal matrices, so if $Y$ has the property that $Y^T = -Y,$ then we have $\alpha(Y)^T\alpha(Y) = \mathbb{I}.$ This can be easily shown:
 
     \begin{equation*}
     \begin{aligned}
-    \frac{d}{dt}\Big|_{t=0}\sigma(tY)^T\sigma(tY) & = \frac{d}{dt}(\mathbb{I}_{T} - tY)^{-1}(\mathbb{I}_{T} + tY)(\mathbb{I}_{T} - tY)(\mathbb{I}_{T} + tY)^{-1} \\
+    \frac{d}{dt}\Big|_{t=0}\alpha(tY)^T\alpha(tY) & = \frac{d}{dt}(\mathbb{I}_{T} - tY)^{-1}(\mathbb{I}_{T} + tY)(\mathbb{I}_{T} - tY)(\mathbb{I}_{T} + tY)^{-1} \\
                                                   & = Y + Y - Y - Y = \mathbb{O},
     \end{aligned}
     \end{equation*}
@@ -78,7 +78,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
     {\color{mred} In the corresponding section we changed/added: ``We now define a new activation function for the attention mechanism which we denote by 
 
     \begin{equation*}
-    \Lambda(Z) = \sigma (Z^T A Z),
+    \Lambda(Z) = \alpha (Z^T A Z),
     \end{equation*}    
     where $A$ is a \textit{learnable skew-symmetric matrix}. Note that the input into the Cayley transform has to be a skew-symmetric matrix in order for the output to be orthogonal; hence we have the restriction on $A$ to be skew-symmetric.''}
 
@@ -120,12 +120,12 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 \item A paragraph quickly presenting ResNets is required, rather than just a footnote.
 
     {\color{mred} We turned the footnote into a paragraph:
-    In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet). In its simplest form a ResNet is a standard feed-forward neural network with an add connection:
+    In essence, the transformer consists of an attention layer (explained below) and a residual network (ResNet). In its simplest form a ResNet is a standard feedforward neural network with an add connection:
 
     \begin{equation}
     \begin{split}\mathrm{ResNet}: z \rightarrow z + \mathcal{NN}(z),\end{split}\end{equation}
 
-    where \(\mathcal{NN}\) is any feed-forward neural network. In this work we use a version where the ResNet step is repeated \texttt{n\_blocks} times, i.e. we have
+    where \(\mathcal{NN}\) is any feedforward neural network. In this work we use a version where the ResNet step is repeated \texttt{n\_blocks} times, i.e. we have
 
     \begin{equation}
     \begin{split}    \mathrm{ResNet} = \mathrm{ResNet}_{\ell_\mathtt{n\_blocks}}\circ\cdots\circ\mathrm{ResNet}_{\ell_2}\circ\mathrm{ResNet}_{\ell_1}.\end{split}\end{equation}
@@ -188,14 +188,14 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
 
     \item Because of this ambiguity, Section 4 is difficult to read. Why should I care about the product structure? Or about the flattened formulation? I believe that 
     \begin{enumerate} 
-    \item[(i)] Section 2 about the standard transformer structure should make the feed-forward component explicit: have a first subsection about the attention layer and a second about the feed-forward. ``The ResNet'' from Section 3 would then refer to more than just a footnote.
+    \item[(i)] Section 2 about the standard transformer structure should make the feedforward component explicit: have a first subsection about the attention layer and a second about the feedforward. ``The ResNet'' from Section 3 would then refer to more than just a footnote.
     
     {\color{mred} We added the two subsections! We however made the first of these subsections pertain to the ResNet and the second to the attention layer. Please also confer our response to the third ``minor comment'' of Reviewer I.}
-    \item[(ii)] Section 4 should contain three subsections: one about the new VP attention layer, another about the VP feed-forward, and a final one describing the product structure and proofs of the properties of the new architecture. Therefore it would merge with Section 3.
+    \item[(ii)] Section 4 should contain three subsections: one about the new VP attention layer, another about the VP feedforward, and a final one describing the product structure and proofs of the properties of the new architecture. Therefore it would merge with Section 3.
     
     {\color{mred} Done! As with section 2 we however first discuss the ResNet (feedforward neural network) and then the attention layer. The last subsection shows the proof.}
     \end{enumerate}
-    Regarding the choice $T = 3$ in the experiment, it should be made more clear in the description of (hyper)parameters. As of now, it is only mentioned in the caption of Figure 6 and in the comment of Section 5.4. Similarly, the meaning of the hyperparameter $L$ is not specified, although it appears in the table before Section 5.1. The activation functions of the feed-forward layers should also be specified.
+    Regarding the choice $T = 3$ in the experiment, it should be made more clear in the description of (hyper)parameters. As of now, it is only mentioned in the caption of Figure 6 and in the comment of Section 5.4. Similarly, the meaning of the hyperparameter $L$ is not specified, although it appears in the table before Section 5.1. The activation functions of the feedforward layers should also be specified.
 
     {
         \color{mred}
@@ -203,7 +203,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
     \begin{enumerate}
         \item Regarding ``L'' we added the following: 
             \begin{enumerate}
-                \item ``As the output of the transformer is of the same dimension as the input to the transformer, we can stack \textit{transformer units} on top of each other; the number of \textit{stacked units} is indicated with the integer `L'.''
+                \item ``As the output of the transformer is of the same dimension as the input to the transformer, we can stack \textit{transformer units} on top of each other; the number of \textit{stacked units} is described by the integer `L'.''
                 \item ``The Integer `L' indicates how often a \textit{transformer unit} (i.e. what is enclosed in the big black shape) is repeated.'' in the caption of Figure 1.
                 \item  ``Similar to Figure 1 the integer `L' indicates how often a \textit{transformer unit} is repeated.'' in the caption of Figure 2.
             \end{enumerate}
@@ -316,6 +316,7 @@ We thanks both reviewers for their detailed comments and suggestions. Here we po
             Another advantage of all neural network-based integrators over implicit midpoint is that it is easily suitable for parallel computation on GPU because all operations are explicit\footnotemark. The biggest motivation for using neural networks to learn dynamics comes however from non-intrusive reduced order modeling as discussed in the introduction; a traditional integrator like implicit midpoint is simply not suitable for this task as we need to recover dynamics from data.''
         \end{enumerate}
 
+        Regarding this we also added another sentence to the conclusion: ``Lastly the poor performance of the volume-preserving feedforward neural network, when used has an integrator, has to be investigated further.''
         
         }
     \item Some typos: ``those efforts was'' in the abstract, ``ob the Jacobian'' p. 3.
