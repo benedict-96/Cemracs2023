@@ -22,7 +22,6 @@ arxiv_version_without_training_and_compilation: tikz_images tex_without_training
 	cp src/assets/abstract.tex build/abstract.tex;
 	cp src/assets/resume.tex build/resume.tex;
 	cp src/tikz/offline_online.tex build/offline_online.tex;
-	sed -i'' -e 's/\\begin{figure}/\\begin{figure}\\centering/g' build/V*.tex;
 	sed -i'' -e 's/\\begin{tabulary}/\\footnotesize\\begin{tabulary}/g' build/V*.tex;
 	mv -v build/tikz/*.png build/;
 	mv -v build/simulations/vpt_Float32/*.png build/;
