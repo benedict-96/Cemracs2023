@@ -5,32 +5,37 @@ all_mac: train_networks;
 	$(MAKE) pdf_without_training_mac
 
 arxiv_version_without_training: arxiv_version_without_training_and_compilation
-	$(MAKE) compile_with_pdflatex;
-	$(MAKE) compile_with_pdflatex;
+	$(MAKE) compile_tex;
+	$(MAKE) compile_tex;
 	rm build/*.log;
 	rm build/*.out;
 	rm build/*.aux;
 	rm build/*.pdf;
 	rm -r build/_minted-*;
-	rm build/.DS*;
-	rm build/*.jl;
-	sed -i'' -e 's/\\usepackage{minted}/\\usepackage[frozencache=true,cachedir=minted-cache]{minted}/g' documenter_custom.sty;
+	rm -f build/.DS*;
+	rm -f build/*.jl;
+	sed -i'' -e 's/\\usepackage{minted}/\\usepackage[frozencache=true,cachedir=minted-cache]{minted}/g' build/documenter_custom.sty;
 	zip -r arxiv_submission.zip build
 
 arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images
 	cp src/assets/preamble_arxiv.tex build/preamble.tex;
+	cp src/assets/abstract.tex build/abstract.tex;
+	cp src/assets/resume.tex build/resume.tex;
+	cp src/tikz/offline_online.tex build/offline_online.tex;
 	sed -i'' -e 's/\\begin{figure}/\\begin{figure}\\centering/g' build/V*.tex;
 	sed -i'' -e 's/\\begin{tabulary}/\\footnotesize\\begin{tabulary}/g' build/V*.tex;
 	mv -v build/tikz/*.png build/;
 	mv -v build/simulations/vpt_Float32/*.png build/;
 	sed -i'' -e 's/tikz\///g' build/V*.tex;
 	sed -i'' -e 's/simulations\/vpt_Float32\///g' build/V*.tex;
+	sed -i'' -e 's/assets\/abstract/abstract/g' build/preamble.tex;
+	sed -i'' -e 's/assets\/resume/resume/g' build/preamble.tex;
 	rm -r build/tikz;
 	rm -r build/simulations;
 	rm build/edpsmath.cls;
 	rm build/edpsproc.clo;
 	rm -r build/assets;
-	rm -r build/*.tex-e;
+	rm -r -f build/*.tex-e;
 	rm -r build/*.bib
 
 pdf_without_training: tikz_images pdf_without_training_and_images;
@@ -106,4 +111,4 @@ do_correct_remarks:
 clear: 
 	$(MAKE) empty -C src/tikz;
 	rm -r -f build;
-	rm arxiv_submission.zip;
+	rm -f arxiv_submission.zip;
