@@ -17,12 +17,13 @@ arxiv_version_without_training: arxiv_version_without_training_and_compilation
 	sed -i'' -e 's/\\usepackage{minted}/\\usepackage[frozencache=true,cachedir=minted-cache]{minted}/g' build/documenter_custom.sty;
 	zip -r arxiv_submission.zip build
 
-arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images
+arxiv_version_without_training_and_compilation: tikz_images tex_without_training_and_images_arxiv
 	cp src/assets/preamble_arxiv.tex build/preamble.tex;
 	cp src/assets/abstract.tex build/abstract.tex;
 	cp src/assets/resume.tex build/resume.tex;
 	cp src/tikz/offline_online.tex build/offline_online.tex;
 	sed -i'' -e 's/\\begin{tabulary}/\\footnotesize\\begin{tabulary}/g' build/V*.tex;
+	sed -i'' -e 's/\\section{The Rigid Body}/\\newpage\\section{The Rigid Body}/g' build/V*.tex;
 	mv -v build/tikz/*.png build/;
 	mv -v build/simulations/vpt_Float32/*.png build/;
 	sed -i'' -e 's/tikz\///g' build/V*.tex;
@@ -39,11 +40,14 @@ arxiv_version_without_training_and_compilation: tikz_images tex_without_training
 
 pdf_without_training: tikz_images pdf_without_training_and_images;
 
-pdf_without_training_and_images: tex_without_training_and_images;
+pdf_without_training_and_images: tex_without_training_and_images_cemracs;
 	$(MAKE) compile_tex;
 	$(MAKE) compile_tex
 
-tex_without_training_and_images: generate_tex;
+tex_without_training_and_images_cemracs: generate_tex_cemracs;
+	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks reference_section
+
+tex_without_training_and_images_arxiv: generate_tex_arxiv;
 	$(MAKE) copy_edps_files chapter_to_section introduction_gets_no_label use_acknowledgements_environment make_tex_references give_equations_labels do_correct_quotation_marks do_correct_footnotes do_correct_references_to_section do_correct_remarks reference_section
 
 tikz_images:
@@ -54,8 +58,11 @@ copy_edps_files:
 	cp src/assets/edpsproc.clo build/edpsproc.clo;
 	cp src/assets/documenter.sty build/documenter_custom.sty
 
-generate_tex:
-	julia --project --threads=8 make.jl no_pdf
+generate_tex_cemracs:
+	julia --project --threads=8 make.jl no_pdf cemracs
+
+generate_tex_arxiv:
+	julia --project --threads=8 make.jl no_pdf arxiv
 
 compile_tex: 
 	cd build; \
