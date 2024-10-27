@@ -23,7 +23,7 @@ arxiv_version_without_training_and_compilation: tikz_images tex_without_training
 	cp src/assets/resume.tex build/resume.tex;
 	cp src/tikz/offline_online.tex build/offline_online.tex;
 	sed -i'' -e 's/\\begin{tabulary}/\\footnotesize\\begin{tabulary}/g' build/V*.tex;
-	sed -i'' -e 's/\\section{The Rigid Body}/\\newpage\\section{The Rigid Body}/g' build/V*.tex;
+	sed -i'' -e 's/\\appendix/\\newpage\\appendix/g' build/V*.tex;
 	mv -v build/tikz/*.png build/;
 	mv -v build/simulations/vpt_Float32/*.png build/;
 	sed -i'' -e 's/tikz\///g' build/V*.tex;

@@ -37,7 +37,7 @@ where ``U`` is an orthonormal matrix that diagonalizes ``\Theta.`` In M[eq:Rigid
 This shows that it is sufficient to know the eigenvalues of the matrix ``\Theta`` which are called *moments of inertia* and denoted by ``I_k`` for ``k = 1, 2, 3`` to describe the motion of the rigid body (modulo a rotation). From this point of view every rigid body is equivalent to an ellipsoid as indicated in M[fig:RigidBody]m(@latex). 
 
 ```@raw latex
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[width=.5\textwidth]{tikz/ellipsoid.png}
 \caption{Any rigid body fixed at a point (left) can be described through an ellipsoid (right) through $I_1$, $I_2$ and $I_3$.}
