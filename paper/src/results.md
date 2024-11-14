@@ -60,7 +60,7 @@ nothing
 ```@raw latex
 \begin{figure}[h]
 \centering
-\includegraphics[width=.75\textwidth]{rigid_body.png}
+\includegraphics[width=.65\textwidth]{rigid_body.png}
 \caption{Rigid body trajectories for $\mathfrak{a} = 1$, $\mathfrak{b} = -1/2$ and $\mathfrak{c} = -1/2$ and different initial conditions.}
 \label{fig:RigidBodyCurves}
 \end{figure}
@@ -83,11 +83,26 @@ Using transformer neural networks instead of standard feedforward neural network
 
 For the standard transformer, we further remove the optional add connection (i.e. the green line in M[fig:TransformerArchitecture]m(@latex)) to have a better comparison with the volume-preserving transformer which does not have an add connection. For the standard transformer, `n_blocks` refers to the number of ResNet layers we use (the last ResNet layer always has a linear activation). The activation functions in the *feedforward layer* (see M[fig:TransformerArchitecture]m(@latex)) and volume-preserving feedfoward layers (the *non-linear layers* in M[fig:VolumePreservingFeedForward]m(@latex) and the *volume-preserving feedforward layers* in M[fig:VolumePreservingTransformerArchitecture]m(@latex)) are all tanh. For the standard transformer and the volume-preserving transformer we further pick ``T = 3``, i.e. we always feed three time steps into the network during training and validation. We also note that strictly speaking ``T`` is not a hyperparameter of the network as its choice does not change the architecture: the dimensions of the matrix ``A`` in the volume-preserving activation in M[eq:VolumePreservingActivation]m(@latex) (or the equivalent for the standard attention mechanism) are independent of the number of time steps ``T`` that we feed into the network.
 
+For nondegenerate matrices that are of size ``(1\times1)`` to ``(5\times5)``, or in our notation for ``T = 1, \ldots, 5``, we use explicit matrix inverses. We here state that such an explicit inverse always exists by using matrix adjugates. A proof can be found in e.g. [lang2002algebra; Proposition VIII.4.16](@cite). For a (``1\times1``) matrix this inverse is simply:
+
+```math
+a \mapsto a^{-1},
+```
+
+and for a (``2\times2``) matrix it is:
+
+```math
+\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}.
+\label{eq:inverse2}
+```
+
+For matrices of increasing size this explicit expression gets increasingly expensive, which is why in `GeometricMachineLearning.jl` we perform it explicitly only for matrices up to size ``5\times5`` (we generate these explicit expressions with `Symbolics.jl` [10.1145/3511528.3511535](@cite)). For inverting bigger matrices `GeometricMachineLearning.jl` uses LU decompositions [schwarzenberg1995matrix](@cite). We also note that such an explicit inverse is easily parallelizable on GPU as M[eq:inverse2]m(@latex) (and other inverses) already constitutes the computations performed in a GPU kernel.
+
 ## Training data
 
 As training data we take solutions of M[eq:RigidBodyEquations]m(@latex) for various initial conditions: 
 ```math
-\mathtt{ics} = \left\{ \begin{pmatrix} \sin(v) \\ 0 \\ \cos(v) \end{pmatrix}, \begin{pmatrix} 0 \\ \sin(v) \\ \cos(v) \end{pmatrix}: v\in0.1:0.01:2\pi \right\},
+\mathtt{ics} = \left\{ \begin{bmatrix} \sin(v) \\ 0 \\ \cos(v) \end{bmatrix}, \begin{bmatrix} 0 \\ \sin(v) \\ \cos(v) \end{bmatrix}: v\in0.1:0.01:2\pi \right\},
 \label{eq:Ics}
 ```
 
@@ -95,12 +110,12 @@ where ``v\in0.1:0.01:2\pi`` means that we incrementally increase ``v`` from 0.1 
 
 ```math
 \left\{
-\begin{pmatrix} \sin(1.1) \\  0.       \\  \cos(1.1)\end{pmatrix},
-\begin{pmatrix} \sin(2.1) \\  0.       \\  \cos(2.1)\end{pmatrix},
-\begin{pmatrix} \sin(2.2) \\  0.       \\  \cos(2.2)\end{pmatrix},
-\begin{pmatrix}  0.       \\ \sin(1.1) \\  \cos(1.1)\end{pmatrix},
-\begin{pmatrix}  0.       \\ \sin(1.5) \\  \cos(1.5)\end{pmatrix}, 
-\begin{pmatrix}  0.       \\ \sin(1.6) \\  \cos(1.6)\end{pmatrix}
+\begin{bmatrix} \sin(1.1) \\  0.       \\  \cos(1.1)\end{bmatrix},
+\begin{bmatrix} \sin(2.1) \\  0.       \\  \cos(2.1)\end{bmatrix},
+\begin{bmatrix} \sin(2.2) \\  0.       \\  \cos(2.2)\end{bmatrix},
+\begin{bmatrix}  0.       \\ \sin(1.1) \\  \cos(1.1)\end{bmatrix},
+\begin{bmatrix}  0.       \\ \sin(1.5) \\  \cos(1.5)\end{bmatrix}, 
+\begin{bmatrix}  0.       \\ \sin(1.6) \\  \cos(1.6)\end{bmatrix}
 \right\}.
 ```
 

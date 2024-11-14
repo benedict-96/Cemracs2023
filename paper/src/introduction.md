@@ -32,7 +32,7 @@ Our aim in this work is to construct structure-preserving neural network models,
 [^2]: Apart from neural networks, there are also other approaches to alleviate the cost during the online stage, notably the "discrete empirical interpolation method" (DEIM [chaturantabut2010nonlinear](@cite)).
 
 While previously, other authors applied transformers for model reduction, and volume-preserving neural networks have been developed as well, both aspects have not yet been considered together.
-Thus to our knowledge, this work is the first that aims at imbuing a transformer with structure-preserving properties[^3] (namely volume-preservation) and applying it to a system described by a divergence-free vector field. 
+Thus to our knowledge, this work is the first that imbues a transformer with structure-preserving properties[^3] (namely volume-preservation) and applying it to a system described by a divergence-free vector field. 
 In the previous work of other authors, transformer neural networks have been used for the online stage of reduced order modeling (i.e. have been applied to dynamical systems) in [hemmasian2023reduced, solera2023beta](@cite). The authors applied the vanilla transformer architecture without taking any physical properties of the system into account.
 Volume-preserving feedforward neural networks have been developed in [bajars2023locally](@cite). The authors based the network design on a theorem introduced in [kang1995volume](@cite) for the design of traditional integrators for divergence-free vector fields [hairer2006geometric](@cite). 
 

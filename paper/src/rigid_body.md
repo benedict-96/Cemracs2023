@@ -69,15 +69,16 @@ With this description, the kinetic energy can be written as:
 T = \frac{1}{2}\mathrm{tr}(WDW^T),
 \label{eq:KineticEnergyForLieGroup}
 ```
-where ``D = \mathrm{diag}(d_1, d_2, d_3)`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 = d_3 + d_1`` and ``I_3 = d_1 + d_2``. We now write ``z := I^{-1}\omega`` and introduce the following notation[^3]:
+where ``D = \mathrm{diag}(d_1, d_2, d_3)`` is a diagonal matrix[^2] that satisfies ``I_1 = d_2 + d_3``, ``I_2 = d_3 + d_1`` and ``I_3 = d_1 + d_2``. 
+
+[^2]: This matrix is equivalent to the diagonal entries of the *coefficient of inertia matrix* in [holm2009geometric](@cite).
+We now write ``z := I^{-1}\omega`` and introduce the following notation[^3]:
 
 [^3]: Note that the ``\hat{}`` operation used here is different from the hat operation used in [How is Structure Preserved?](@ref).
 
 ```math
 \hat{z} = \widehat{\begin{bmatrix} z_1 \\ z_2 \\ z_3 \end{bmatrix}} = \widehat{\begin{bmatrix} \frac{\omega_1}{I_1} \\ \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} \end{bmatrix}} = \begin{pmatrix} 0 & -\frac{\omega_3}{I_3} & \frac{\omega_2}{I_2} \\ \frac{\omega_3}{I_3} & 0 & -\frac{\omega_1}{I_1} \\ -\frac{\omega_2}{I_2} & \frac{\omega_1}{I_1} & 0 \end{pmatrix}.
 ```
-
-[^2]: This matrix is equivalent to the diagonal entries of the *coefficient of inertia matrix* in [holm2009geometric](@cite).
 
 and obtain via the Euler-Poincaré equations[^4] for M[eq:KineticEnergyForLieGroup]m(@latex): 
 ```math

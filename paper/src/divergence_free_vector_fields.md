@@ -19,7 +19,7 @@ and therefore (by using that ``\varphi^t`` is invertible):
 \frac{d}{dt}\mathrm{det}\left( D\varphi^t(z) \right) = 0.
 ```
 
-The determinant of ``D\varphi^t`` is therefore constant and we further have ``\det(D\varphi^0) = 1`` because ``\varphi^0`` is the identity. This proofs our assertion.
+The determinant of ``D\varphi^t`` is therefore constant and we further have ``\det(D\varphi^0) = 1`` because ``\varphi^0`` is the identity. This proves our assertion.
 
 Numerical integrators for ODEs constitute an approximation ``\psi^h`` of the flow ``\varphi_f^t`` where ``h`` denotes the time step, which is fixed in most cases. If the flow ``\varphi_f^t`` exhibits certain properties (like volume preservation) it appears natural to also imbue ``\psi^h`` with these properties. The discipline of doing so is generally known as *geometric numerical integration* [leimkuhler2004simulating, hairer2006geometric](@cite).
 
