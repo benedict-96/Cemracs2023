@@ -1,0 +1,56 @@
+\documentclass{article}
+
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{amsmath, amsfonts, yhmath}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{cleveref}
+
+\definecolor{mred}{RGB}{214,39,40}
+
+
+\begin{document}
+
+We again write the reviewers comments in black and ours in {\color{mred} red}.
+
+\section*{Comments from Reviewer I}
+
+\begin{enumerate}
+    \item  page 4: "this proofs our assertion" should read "this proves our assertion"
+
+    {\color{mred}Done!}
+\end{enumerate}
+
+\section*{Comments from Reviewer II}
+
+\begin{enumerate}
+    \item I disagree with the authors saying "the neural networks all perform explicit operations". The VPT computes a matrix inverse in the Cayley transform (3 layers, therefore 3 inverses for 3 predictions). From the performance difference, I'm guessing there are 3 to 4 Newton iterations on average for the IM method, meaning 3 to 4 inverses for 1 prediction, compared to 1 for 1 with the VPT.
+
+    {\color{mred}
+
+    We have not clarified this in the previous version. The computations we perform here are indeed explicit (for small matrices). We added the following:
+    ``For nondegenerate matrices that are of size \((1\times1)\) to \((5\times5)\), or in our notation for \(T = 1, \ldots, 5\), we use explicit matrix inverses. We here state that such an explicit inverse always exists by using matrix adjugates. A proof can be found in e.g. (Lang, 2002). For a \(1\times1\) matrix this matrix is simply:
+    \begin{equation*}
+    \begin{split}a \mapsto a^{-1},\end{split}
+    \end{equation*}
+    
+    and for a \(2\times2\) matrix it is:
+    
+    \begin{equation}
+    \begin{split}\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}.
+    \end{split}\label{eq:inverse2}
+    \end{equation}
+
+    For matrices of increasing size this explicit expression gets increasingly expensive, which is why in \texttt{GeometricMachineLearning.jl} we perform it explicitly only for matrices up to size \(5\times5\) (we generate these explicit expressions with \texttt{Symbolics.jl}. For inverting bigger matrices \texttt{GeometricMachineLearning.jl} uses LU decompositions. We also note that such an explicit inverse is easily parallelizable on GPU as \Cref{eq:inverse2} (and other inverses) already constitutes the computations performed in a GPU kernel.''
+
+    }
+
+    \item "aims at imbuing" in the intro could (still) be more direct
+
+    {\color{mred}We now write ``Thus to our knowledge, this work is the first that imbues a transformer with structure-preserving properties.''}
+    \item the document might need to be compiled again, there are two footnotes "6" page 4 (and maybe other issues I did not notice)
+
+    {\color{mred}We fixed the issue with footnote 6 and read the document again meticulously. We discovered that footnote 16 also appeared twice.}
+\end{enumerate}
+
+\end{document}
